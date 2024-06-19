@@ -3,10 +3,10 @@
  */
 
 export default {
-  dev: {
-    '/api/': {
-      target: process.env.API_URL,
-      changeOrigin: true,
-    },
-  },
+  // dev: {
+  //   '/api/': {
+  //     target: process.env.API_URL,
+  //     changeOrigin: true,
+  //   },
+  // },
 };

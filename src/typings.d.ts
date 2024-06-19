@@ -21,3 +21,4 @@ declare const REACT_APP_ENV: 'test' | 'dev' | 'pre' | false;
 
 declare const SITE_ROOT: string;
 declare const DOMAIN: string;
+declare const API_URL: string;

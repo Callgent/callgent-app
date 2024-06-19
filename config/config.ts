@@ -4,12 +4,13 @@ import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
-const { REACT_APP_ENV, SITE_ROOT, DOMAIN } = process.env;
+const { REACT_APP_ENV, SITE_ROOT, API_URL, DOMAIN } = process.env;
 
 export default defineConfig({
   define: {
     SITE_ROOT: SITE_ROOT,
     DOMAIN: DOMAIN,
+    API_URL: API_URL,
   },
   hash: true,
   routes,
