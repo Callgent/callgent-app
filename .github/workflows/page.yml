@@ -1,0 +1,62 @@
+name: Deploy static content to Pages
+
+on:
+  push:
+    # Trigger the workflow on push events to the 'main' branch
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          # Specify Node.js version
+          node-version: '18'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        env:
+          SITE_ROOT: ${{ secrets.SITE_ROOT }}
+          DOMAIN: ${{ secrets.DOMAIN }}
+          COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
+          DOCUMENTATION_URL: ${{ secrets.DOCUMENTATION_URL }}
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          GETTING_STARTED_PATH: ${{ secrets.GETTING_STARTED_PATH }}
+          DEVELOPERS_PATH: ${{ secrets.DEVELOPERS_PATH }}
+          API_URL: ${{ secrets.API_URL }}
+        run: pnpm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
