@@ -1,45 +1,70 @@
-import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
+import React, { useState, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
-import { Alert, Card, Typography } from 'antd';
-import React from 'react';
+import { Row, Col, Input, Empty, Typography, Button } from 'antd';
+import NewCallgent from '../components/NewCallgent';
+import { useModel } from '@umijs/max';
+import CallgentCard from '../components/CallgentCard';
+import debounce from 'lodash/debounce';
 
-const Admin: React.FC = () => {
-  const intl = useIntl();
+const MyCallgent: React.FC = () => {
+  const { callgents, loading, fetchCallgents, removeCallgent, openModal } = useModel('services');
+  const [query, setQuery] = useState<string>();
+
+  const debouncedFetchCallgents = useCallback(
+    debounce((value: string) => {
+      fetchCallgents(value);
+    }, 600),
+    []
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    debouncedFetchCallgents(value);
+  };
+
   return (
     <PageContainer
-      content={intl.formatMessage({
-        id: 'pages.admin.subPage.title',
-        defaultMessage: 'This page can only be viewed by admin',
-      })}
+      loading={loading}
+      header={{
+        extra: [
+          <Input
+            key="search"
+            value={query}
+            onChange={handleSearchChange}
+            allowClear
+            placeholder="Search Callgent"
+          />,
+          <NewCallgent key="NewCallgent" />,
+        ],
+      }}
     >
-      <Card>
-        <Alert
-          message={intl.formatMessage({
-            id: 'pages.welcome.alertMessage',
-            defaultMessage: 'Faster and stronger heavy-duty components have been released.',
-          })}
-          type="success"
-          showIcon
-          banner
-          style={{
-            margin: -12,
-            marginBottom: 48,
-          }}
-        />
-        <Typography.Title level={2} style={{ textAlign: 'center' }}>
-          <SmileTwoTone /> Callgent <HeartTwoTone twoToneColor="#eb2f96" /> You
-        </Typography.Title>
-      </Card>
-      <p style={{ textAlign: 'center', marginTop: 24 }}>
-        Want to add more pages? Please refer to{' '}
-        <a href="https://pro.ant.design/docs/block-cn" target="_blank" rel="noopener noreferrer">
-          use block
-        </a>
-        。
-      </p>
+      <Row gutter={[24, 24]} justify="start">
+        {callgents.map((item) => (
+          <Col key={item.id} xs={24} md={12} lg={12} xl={8} xxl={6}>
+            <CallgentCard
+              item={item}
+              onEdit={() => openModal(item)}
+              removeCallgent={removeCallgent}
+            />
+          </Col>
+        ))}
+      </Row>
+      {callgents.length <= 0 && (
+        <Empty
+          image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+          imageStyle={{ height: 60 }}
+          description={
+            <Typography.Text>
+              Create a new callgent
+            </Typography.Text>
+          }
+        >
+          <Button type="primary" onClick={() => openModal()}>Create Now</Button>
+        </Empty>
+      )}
     </PageContainer>
   );
 };
 
-export default Admin;
+export default MyCallgent;

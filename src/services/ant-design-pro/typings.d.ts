@@ -98,4 +98,22 @@ declare namespace API {
     description?: string;
     type?: NoticeIconItemType;
   };
+
+  type Callgent = {
+    id?: string;
+    name: string;
+    updatedAt?: string;
+    description?: string;
+    avatar?: string;
+    isPublic?: boolean;
+    collect?: number;
+  }
+}
+
+
+interface ApiResponse<T> {
+  statusCode?: number;
+  message?: string | string[];
+  data: T;
+  meta?: any;
 }

@@ -92,3 +92,35 @@ export async function removeRule(options?: { [key: string]: any }) {
     },
   });
 }
+
+/**  GET /api/callgents */
+export async function getCallgents(params?: { query?: string }) {
+  return request<ApiResponse<API.Callgent[]>>('/api/callgents', {
+    method: 'GET',
+    params,
+  });
+}
+
+
+/**  POST /api/callgents */
+export async function postCallgents(body?: API.Callgent) {
+  return request<ApiResponse<API.Callgent>>('/api/callgents', {
+    method: 'POST',
+    data: body,
+  });
+}
+
+/**  PUT /api/callgents */
+export async function putCallgent(body: API.Callgent, id: string) {
+  return request<ApiResponse<API.Callgent>>('/api/callgents/' + id, {
+    method: 'PUT',
+    data: body,
+  });
+}
+
+/**  Delete /api/callgents */
+export async function deleteCallgent(id: string) {
+  return request<ApiResponse<API.Callgent>>('/api/callgents/' + id, {
+    method: 'DELETE'
+  });
+}
