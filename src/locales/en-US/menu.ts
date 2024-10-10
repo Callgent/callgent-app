@@ -8,7 +8,7 @@ export default {
   'menu.services.my-callgents': 'My Callgents',
   'menu.services.callgent-hub': 'Callgent Hub',
   'menu.integration': 'Integration',
-  'menu.integration.endpoints': 'Endpoints',
+  'menu.integration.entries': 'Entries',
   'menu.integration.AImodels': 'AI Models',
   'menu.account': 'Account',
   'menu.account.profile': 'Profile',

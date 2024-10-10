@@ -63,9 +63,9 @@ export default [
     icon: 'api',
     routes: [
       {
-        path: '/integration/endpoints',
-        name: 'endpoints',
-        component: './integration/endpoints',
+        path: '/integration/entries',
+        name: 'entries',
+        component: './integration/entries',
         icon: 'api',
       },
       {
