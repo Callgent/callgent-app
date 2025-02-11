@@ -1,0 +1,53 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"lib": [
+			"ESNext",
+			"DOM",
+			"DOM.Iterable"
+		],
+		"useDefineForClassFields": true,
+		"skipLibCheck": true,
+		"allowJs": true,
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"sourceMap": true,
+		"declaration": true,
+		"preserveWatchOutput": true,
+		"removeComments": true,
+		"allowImportingTsExtensions": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"jsx": "react-jsx",
+		"esModuleInterop": true,
+		/* Linting */
+		"strict": true,
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"useUnknownInCatchVariables": false,
+		"baseUrl": ".",
+		/* alias */
+		"paths": {
+			"@/*": [
+				"src/*"
+			],
+			"#/*": [
+				"types/*"
+			]
+		}
+	},
+	"include": [
+		"src",
+		"types",
+		"tailwind.config.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
+}
