@@ -72,7 +72,7 @@ export default function Services() {
     await fetchCallgentList({
       ...values,
       page: 1,
-      perPage: 2,
+      perPage: 12,
     });
   };
 

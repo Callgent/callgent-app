@@ -23,7 +23,7 @@ type CallgentStore = {
 const useCallgentStore = create<CallgentStore>((set) => ({
   callgentInfo: {},
   callgentList: [],
-  pageInfo: { page: 1, perPage: 2, total: 0 },
+  pageInfo: { page: 1, perPage: 12, total: 0 },
   searchInfo: { query: "", adaptor: "" }, // 默认值为空
   actions: {
     setCallgentInfo: (callgentInfo) => set({ callgentInfo }),
@@ -33,7 +33,7 @@ const useCallgentStore = create<CallgentStore>((set) => ({
     reset: () => set({
       callgentInfo: {},
       callgentList: [],
-      pageInfo: { page: 1, perPage: 2, total: 0 },
+      pageInfo: { page: 1, perPage: 12, total: 0 },
       searchInfo: { query: "", adaptor: "" },
     }),
     setSearchInfo: (searchInfo) => set({ searchInfo }),
