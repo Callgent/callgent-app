@@ -1,73 +1,87 @@
-import { useMutation } from "@tanstack/react-query";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-
 import callgentService from "@/api/services/callgentService";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { StorageEnum } from "#/enum";
-import type { CallgentInfo } from "#/entity";
+import { create } from "zustand";
+import type { CallgentInfo, PageInfo } from "#/entity";
 
-// Define the state structure and actions for the store
+// 定义新的 searchInfo 对象包含 query 和 adaptor
 type CallgentStore = {
   callgentInfo: Partial<CallgentInfo>;
-  callgentList: CallgentInfo[]; // New state for storing the list
+  callgentList: CallgentInfo[];
+  pageInfo: PageInfo;
+  searchInfo: { query: string; adaptor: string }; // 新增 searchInfo 对象
   actions: {
     setCallgentInfo: (callgentInfo: CallgentInfo) => void;
     clearCallgentInfo: () => void;
-    setCallgentList: (callgentList: CallgentInfo[]) => void; // New action to set the list
+    setCallgentList: (callgentList: CallgentInfo[]) => void;
+    setPageInfo: (pageInfo: PageInfo) => void;
+    reset: () => void;
+    setSearchInfo: (searchInfo: { query: string; adaptor: string }) => void;
   };
 };
 
-// Define the Zustand store with persistence
-const useCallgentStore = create<CallgentStore>()(
-  persist(
-    (set) => ({
+const useCallgentStore = create<CallgentStore>((set) => ({
+  callgentInfo: {},
+  callgentList: [],
+  pageInfo: { page: 1, perPage: 2, total: 0 },
+  searchInfo: { query: "", adaptor: "" }, // 默认值为空
+  actions: {
+    setCallgentInfo: (callgentInfo) => set({ callgentInfo }),
+    clearCallgentInfo: () => set({ callgentInfo: {} }),
+    setCallgentList: (callgentList) => set({ callgentList }),
+    setPageInfo: (pageInfo) => set({ pageInfo }),
+    reset: () => set({
       callgentInfo: {},
-      callgentList: [], // Initialize the list as an empty array
-      actions: {
-        setCallgentInfo: (callgentInfo) => {
-          set({ callgentInfo });
-        },
-        clearCallgentInfo() {
-          set({ callgentInfo: {} });
-        },
-        setCallgentList: (callgentList) => { // Define the setCallgentList action
-          set({ callgentList });
-        },
-      },
+      callgentList: [],
+      pageInfo: { page: 1, perPage: 2, total: 0 },
+      searchInfo: { query: "", adaptor: "" },
     }),
-    {
-      name: "callgentStore",
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        [StorageEnum.CallgentList]: state.callgentList,
-      }),
-    },
-  ),
-);
+    setSearchInfo: (searchInfo) => set({ searchInfo }),
+  },
+}));
 
 export const useCallgentInfo = () => useCallgentStore((state) => state.callgentInfo);
-export const useCallgentList = () => useCallgentStore((state) => state.callgentList); // Selector for the list
+export const useCallgentList = () => useCallgentStore((state) => state.callgentList);
+export const usePageInfo = () => useCallgentStore((state) => state.pageInfo);
+export const useSearchInfo = () => useCallgentStore((state) => state.searchInfo); // 获取 searchInfo
 export const useCallgentActions = () => useCallgentStore((state) => state.actions);
+
+
 
 /** Fetch Callgent list and store it in Zustand */
 export const useFetchCallgentList = () => {
-  const { setCallgentList } = useCallgentActions(); // Get the action to set the list
-
+  const { query, adaptor } = useSearchInfo();
+  const { setCallgentList, setPageInfo } = useCallgentActions();
   const callgentListMutation = useMutation({
-    mutationFn: callgentService.getCallgents, // API function to fetch the list
+    mutationFn: callgentService.getCallgents,
   });
-
-  const fetchCallgentList = async (searchTerm = '') => {
+  const fetchCallgentList = async (searchTerm: PageInfo) => {
     try {
-      const { data } = await callgentListMutation.mutateAsync({ query: searchTerm }); // Fetch the data
+      const { data, meta } = await callgentListMutation.mutateAsync(searchTerm);
       setCallgentList(data);
+      setPageInfo({ ...meta, query, adaptor, page: meta.currentPage });
     } catch (err) {
-      toast.error(err.message, { position: "top-center" }); // Handle error and show toast
+      toast.error(err.message, { position: "top-center" });
     }
   };
-
   return fetchCallgentList;
+};
+
+/** Fetch Callgent server list and store it in Zustand */
+export const useFetchCallgentServerList = () => {
+  const { setCallgentList, setPageInfo } = useCallgentActions();
+  const { query, adaptor } = useSearchInfo();
+  const callgentServerListMutation = useMutation({
+    mutationFn: callgentService.getServer,
+  });
+  const fetchCallgentServerList = async (searchTerm: PageInfo) => {
+    try {
+      const { data, meta } = await callgentServerListMutation.mutateAsync(searchTerm);
+      setCallgentList(data);
+      setPageInfo({ ...meta, query, adaptor });
+    } catch (err) { }
+  };
+  return fetchCallgentServerList;
 };
 
 /** Create a new Callgent */
@@ -76,9 +90,6 @@ export const useCreateCallgent = () => {
     mutationFn: callgentService.postCallgent,
     onSuccess: () => {
       toast.success("Callgent created successfully!");
-    },
-    onError: (err) => {
-      toast.error(err.message, { position: "top-center" });
     },
   });
 };
@@ -89,10 +100,7 @@ export const useUpdateCallgent = () => {
     mutationFn: ({ id, data }: { id: string; data: CallgentInfo }) => callgentService.putCallgent(id, data),
     onSuccess: () => {
       toast.success("Callgent updated successfully!");
-    },
-    onError: (err) => {
-      toast.error(err.message, { position: "top-center" });
-    },
+    }
   });
 };
 
@@ -102,9 +110,6 @@ export const useDeleteCallgent = () => {
     mutationFn: callgentService.deleteCallgent,
     onSuccess: () => {
       toast.success("Callgent deleted successfully!");
-    },
-    onError: (err) => {
-      toast.error(err.message, { position: "top-center" });
     },
   });
 };

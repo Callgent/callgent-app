@@ -2,7 +2,6 @@ import { Iconify } from "@/components/icon";
 import { Dropdown, type MenuProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { MultiTabOperation } from "#/enum";
-import { useTabLabelRender } from "../hooks/use-tab-label-render";
 import { useMultiTabsContext } from "../providers/multi-tabs-provider";
 import type { TabItemProps } from "../types";
 
@@ -10,7 +9,6 @@ export function TabItem({ tab, style, onClose }: TabItemProps) {
 	const { t } = useTranslation();
 	const { tabs, refreshTab, closeTab, closeOthersTab, closeLeft, closeRight, closeAll } = useMultiTabsContext();
 
-	const renderTabLabel = useTabLabelRender();
 	const menuItems: MenuProps["items"] = [
 		{
 			label: t(`sys.tab.${MultiTabOperation.REFRESH}`),
@@ -91,7 +89,6 @@ export function TabItem({ tab, style, onClose }: TabItemProps) {
 			}}
 		>
 			<div className="relative flex select-none items-center px-4 py-1" style={style}>
-				<div>{renderTabLabel(tab)}</div>
 				{!tab.hideTab && (
 					<Iconify
 						icon="ion:close-outline"

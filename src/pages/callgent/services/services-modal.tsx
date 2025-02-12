@@ -10,7 +10,7 @@ export type CallgentModalProps = {
   onCancel: VoidFunction;
 };
 
-export function CallgentModal({ title, show, formValue, onOk, onCancel }: CallgentModalProps) {
+export function ServicesModal({ title, show, formValue, onOk, onCancel }: CallgentModalProps) {
   const [form] = Form.useForm();
 
   useEffect(() => {

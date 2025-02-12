@@ -9,6 +9,15 @@ export interface UserInfo {
 	permissions?: Permission[];
 }
 
+export interface PageInfo {
+	total?: number;
+	query?: string;
+	adaptor?: string;
+	page?: number;
+	perPage?: number;
+	orderBy?: string;
+}
+
 export interface CallgentInfo {
 	id: string;
 	name: string;

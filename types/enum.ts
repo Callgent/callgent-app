@@ -7,6 +7,7 @@ export enum StorageEnum {
 	UserInfo = "userInfo",
 	UserToken = "userToken",
 	CallgentList = "callgentList",
+	PageInfo = 'pageInfo',
 	Settings = "settings",
 	I18N = "i18nextLng",
 }

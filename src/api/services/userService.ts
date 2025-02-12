@@ -1,7 +1,7 @@
 import apiClient from "../apiClient";
 
+import type { Result } from "#/api";
 import type { UserInfo } from "#/entity";
-import { Result } from "#/api";
 
 export interface SignInReq {
 	username: string;

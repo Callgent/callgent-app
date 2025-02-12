@@ -6,14 +6,12 @@ import userStore from "@/store/userStore";
 import { toast } from "sonner";
 import type { Result } from "#/api";
 
-// 创建 axios 实例
 const axiosInstance = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
 	headers: { "Content-Type": "application/json;charset=utf-8" },
 	withCredentials: true
 });
 
-// 请求拦截
 axiosInstance.interceptors.request.use(
 	(config) => {
 		return config;
@@ -23,17 +21,13 @@ axiosInstance.interceptors.request.use(
 	},
 );
 
-// 响应拦截
 axiosInstance.interceptors.response.use(
 	(res: Result) => {
 		if (!res.data) throw new Error(t("sys.api.apiRequestFailed"));
-
 		const { message, data } = res.data;
-		// 业务请求成功
 		if (data) {
 			return res.data;
 		}
-
 		// error
 		const errorMessage = Array.isArray(message) ? message[0] : message;
 		throw new Error(errorMessage || t("sys.api.apiRequestFailed"));

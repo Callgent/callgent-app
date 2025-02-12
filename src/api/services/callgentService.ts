@@ -1,21 +1,26 @@
-import apiClient from "../apiClient";
+import type { Result } from "#/api";
 import type { CallgentInfo } from "#/entity";
-import { Result } from "#/api";
+import apiClient from "../apiClient";
 
 export interface CallgentParams {
 	query?: string;
 }
 
 export enum CallgentApi {
-	GetAll = "/api/callgents",
+	GetAllCallgent = "/api/callgents",
 	Create = "/api/callgents",
 	Update = "/api/callgents/",
 	Delete = "/api/callgents/",
+	GetAllServer = "/api/entries/server"
 }
 
 /** GET /api/callgents */
 const getCallgents = (params?: CallgentParams) =>
-	apiClient.get<Result<CallgentInfo[]>>({ url: CallgentApi.GetAll, params });
+	apiClient.get<Result<CallgentInfo[]>>({ url: CallgentApi.GetAllCallgent, params });
+
+/** GET /api/server */
+const getServer = (params?: CallgentParams) =>
+	apiClient.get<Result<CallgentInfo[]>>({ url: CallgentApi.GetAllServer, params });
 
 /** POST /api/callgents */
 const postCallgent = (data: CallgentInfo) =>
@@ -34,4 +39,5 @@ export default {
 	postCallgent,
 	putCallgent,
 	deleteCallgent,
+	getServer,
 };

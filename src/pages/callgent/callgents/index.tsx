@@ -1,10 +1,10 @@
-import CallgentList from "./callgent-list";
-import { Button, Card, Col, Form, Input, Row, Space } from "antd";
+import { useCallgentActions, usePageInfo } from "@/store/callgentStore";
+import { useFetchCallgentList } from "@/store/callgentStore";
+import { Button, Card, Col, Form, Input, Row, Select, Space } from "antd";
 import { useState } from "react";
-import type { CallgentInfo, Organization } from "#/entity";
-import { CallgentModal, CallgentModalProps } from "./callgent-modal";
-
-type SearchFormFieldType = Pick<Organization, "name" | "status">;
+import type { CallgentInfo } from "#/entity";
+import CallgentList from "./callgent-list";
+import { CallgentModal, type CallgentModalProps } from "./callgent-modal";
 
 export default function Callgents() {
   const [searchForm] = Form.useForm();
@@ -29,10 +29,8 @@ export default function Callgents() {
     },
   });
 
-
-  const onSearchFormReset = () => {
-    searchForm.resetFields();
-  };
+  const { setSearchInfo, setPageInfo } = useCallgentActions();
+  const fetchCallgentList = useFetchCallgentList();
 
   const onCreate = () => {
     setOrganizationModalProps((prev) => ({
@@ -61,20 +59,46 @@ export default function Callgents() {
     }));
   };
 
+  const onSearchFormReset = () => {
+    searchForm.resetFields();
+    console.log("Form reset", searchForm.getFieldsValue());
+  };
+
+  const pageInfo = usePageInfo();
+  const onSearch = async () => {
+    const values = searchForm.getFieldsValue();
+    setSearchInfo(values);
+    setPageInfo({ ...pageInfo, page: 1 })
+    await fetchCallgentList({
+      ...values,
+      page: 1,
+      perPage: 2,
+    });
+  };
+
   return (
     <Space direction="vertical" size="large" className="w-full">
       <Card>
         <Form form={searchForm}>
           <Row gutter={[16, 16]}>
-            <Col span={24} lg={12}>
-              <Form.Item<SearchFormFieldType> label="callgent" name="name" className="!mb-0">
+            <Col span={24} lg={6}>
+              <Form.Item label="callgent" name="query" className="!mb-0">
                 <Input />
+              </Form.Item>
+            </Col>
+            <Col span={24} lg={6}>
+              <Form.Item label="Adaptor" name="adaptor" className="!mb-0">
+                <Select placeholder="Select adaptor">
+                  <Select.Option value="restAPI">restAPI</Select.Option>
+                  <Select.Option value="Webpage">Webpage</Select.Option>
+                  <Select.Option value="Email">Email</Select.Option>
+                </Select>
               </Form.Item>
             </Col>
             <Col span={24} lg={12}>
               <div className="flex justify-end">
                 <Button onClick={onSearchFormReset}>Reset</Button>
-                <Button type="primary" className="ml-4">
+                <Button type="primary" className="ml-4" onClick={onSearch}>
                   Search
                 </Button>
               </div>
@@ -98,6 +122,3 @@ export default function Callgents() {
     </Space>
   );
 }
-
-
-

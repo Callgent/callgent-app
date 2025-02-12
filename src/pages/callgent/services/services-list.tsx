@@ -1,15 +1,15 @@
-import { useCallgentActions, useCallgentList, useFetchCallgentList, usePageInfo, useSearchInfo } from "@/store/callgentStore";
+import { useCallgentActions, useCallgentList, useFetchCallgentServerList, usePageInfo, useSearchInfo } from "@/store/callgentStore";
 import { Col, Pagination, Row } from "antd";
 import { useEffect, useState } from "react";
 import type { CallgentInfo } from "#/entity";
-import CallgentCard from "./callgent-card";
+import CallgentCard from "./services-card";
 
 interface CallgentListComponentProps {
   onEdit: (data: CallgentInfo) => void;
 }
 
-const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit }) => {
-  const fetchCallgentList = useFetchCallgentList();
+const ServicesListComponent: React.FC<CallgentListComponentProps> = ({ onEdit }) => {
+  const fetchCallgentList = useFetchCallgentServerList();
   const callgentList = useCallgentList();
   const pageInfo = usePageInfo();  // 获取页码信息
   const searchInfo = useSearchInfo()
@@ -59,4 +59,4 @@ const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit })
   );
 };
 
-export default CallgentListComponent;
+export default ServicesListComponent;

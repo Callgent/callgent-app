@@ -11,7 +11,7 @@ interface CallgentCardProps {
   onEdit: (item: CallgentInfo) => void;
 }
 
-const CallgentCard: React.FC<CallgentCardProps> = ({
+const ServicesCard: React.FC<CallgentCardProps> = ({
   item,
   onEdit
 }) => {
@@ -57,4 +57,4 @@ const CallgentCard: React.FC<CallgentCardProps> = ({
   );
 };
 
-export default CallgentCard;
+export default ServicesCard;
