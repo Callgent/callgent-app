@@ -22,7 +22,6 @@ export default function NavVertical(props: Props) {
 
 	const settings = useSettings();
 	const { themeLayout, themeMode } = settings;
-	console.log(themeMode);
 
 	const { setSettings } = useSettingActions();
 

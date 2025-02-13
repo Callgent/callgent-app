@@ -1,35 +1,39 @@
 import { useCallgentActions, useCallgentList, useFetchCallgentServerList, usePageInfo, useSearchInfo } from "@/store/callgentStore";
 import { Col, Pagination, Row } from "antd";
 import { useEffect, useState } from "react";
-import type { CallgentInfo } from "#/entity";
 import CallgentCard from "./services-card";
 
-interface CallgentListComponentProps {
-  onEdit: (data: CallgentInfo) => void;
-}
-
-const ServicesListComponent: React.FC<CallgentListComponentProps> = ({ onEdit }) => {
+const CallgentListComponent: React.FC = () => {
   const fetchCallgentList = useFetchCallgentServerList();
   const callgentList = useCallgentList();
-  const pageInfo = usePageInfo();  // 获取页码信息
+  const { perPage, page, total } = usePageInfo();
   const searchInfo = useSearchInfo()
   const { reset } = useCallgentActions();
-  const [currentPage, setCurrentPage] = useState(pageInfo.page);
-  const pageSize = pageInfo.perPage;
+  const [currentPage, setCurrentPage] = useState(page);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     init();
   }, []);
+
   useEffect(() => {
-    setCurrentPage(pageInfo.page)
-  }, [pageInfo])
+    setCurrentPage(page)
+  }, [page])
+
   const init = () => {
     reset();
-    fetchCallgentList(pageInfo);
+    setLoading(true);
+    fetchCallgentList({ page, perPage, ...searchInfo }).finally(() => {
+      setLoading(false);
+    });
   };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchCallgentList({ ...pageInfo, ...searchInfo, page });
+    setLoading(true);
+    fetchCallgentList({ page, perPage, ...searchInfo }).finally(() => {
+      setLoading(false);
+    });
   };
 
   return (
@@ -39,7 +43,6 @@ const ServicesListComponent: React.FC<CallgentListComponentProps> = ({ onEdit })
           <Col key={item.id} xs={24} md={12} lg={12} xl={8} xxl={6}>
             <CallgentCard
               item={item}
-              onEdit={() => onEdit(item)}
             />
           </Col>
         ))}
@@ -48,15 +51,16 @@ const ServicesListComponent: React.FC<CallgentListComponentProps> = ({ onEdit })
       <div className="w-full flex justify-center mt-8">
         <Pagination
           current={currentPage}
-          pageSize={pageSize}
-          total={pageInfo.total}
+          pageSize={perPage}
+          total={total}
           onChange={handlePageChange}
           showSizeChanger={false}
           hideOnSinglePage={true}
+          disabled={loading}
         />
       </div>
     </div>
   );
 };
 
-export default ServicesListComponent;
+export default CallgentListComponent;

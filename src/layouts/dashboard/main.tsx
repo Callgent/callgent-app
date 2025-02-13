@@ -6,8 +6,6 @@ import type { CSSProperties } from "react";
 import { Outlet } from "react-router";
 import { ThemeLayout } from "#/enum";
 import { MULTI_TABS_HEIGHT } from "./config";
-import MultiTabs from "./multi-tabs";
-import { MultiTabsProvider } from "./multi-tabs/providers/multi-tabs-provider";
 
 const Main = () => {
 	const { themeStretch, themeLayout, multiTab } = useSettings();
@@ -29,13 +27,7 @@ const Main = () => {
 						themeLayout === ThemeLayout.Horizontal ? "flex-col" : "flex-row",
 					)}
 				>
-					{multiTab ? (
-						<MultiTabsProvider>
-							<MultiTabs />
-						</MultiTabsProvider>
-					) : (
-						<Outlet />
-					)}
+					<Outlet />
 				</div>
 			</div>
 		</Content>

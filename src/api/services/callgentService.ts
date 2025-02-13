@@ -11,7 +11,8 @@ export enum CallgentApi {
 	Create = "/api/callgents",
 	Update = "/api/callgents/",
 	Delete = "/api/callgents/",
-	GetAllServer = "/api/entries/server"
+	GetAllServer = "/api/entries/server",
+	GetAllTasks = "/api/events/tasks",
 }
 
 /** GET /api/callgents */
@@ -21,6 +22,10 @@ const getCallgents = (params?: CallgentParams) =>
 /** GET /api/server */
 const getServer = (params?: CallgentParams) =>
 	apiClient.get<Result<CallgentInfo[]>>({ url: CallgentApi.GetAllServer, params });
+
+/** GET /api/tasks */
+const getTasks = (params?: CallgentParams) =>
+	apiClient.get<Result<CallgentInfo[]>>({ url: CallgentApi.GetAllTasks, params });
 
 /** POST /api/callgents */
 const postCallgent = (data: CallgentInfo) =>
@@ -40,4 +45,5 @@ export default {
 	putCallgent,
 	deleteCallgent,
 	getServer,
+	getTasks
 };

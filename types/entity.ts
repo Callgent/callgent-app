@@ -19,19 +19,19 @@ export interface PageInfo {
 }
 
 export interface CallgentInfo {
-	id: string;
-	name: string;
+	id?: string;
+	name?: string;
 	avatar?: string;
 	summary?: string;
 	instruction?: string;
 
-	liked: number;
-	viewed: number;
-	forked: number;
-	favorite: number;
+	liked?: number;
+	viewed?: number;
+	forked?: number;
+	favorite?: number;
 
-	official: boolean;
-	featured: boolean;
+	official?: boolean;
+	featured?: boolean;
 
 	forkedPk?: number;
 	mainTagId?: number;

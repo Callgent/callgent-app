@@ -5,16 +5,15 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import userService, { type SignInReq } from "@/api/services/userService";
 
+import { deleteCookie } from "@/router/utils";
 import { toast } from "sonner";
 import type { UserInfo } from "#/entity";
 import { StorageEnum } from "#/enum";
-import { deleteCookie } from "@/router/utils";
 
 const { VITE_APP_HOMEPAGE: HOMEPAGE, VITE_COOKIE_NAME } = import.meta.env;
 
 type UserStore = {
 	userInfo: Partial<UserInfo>;
-	// 使用 actions 命名空间来存放所有的 action
 	actions: {
 		setUserInfo: (userInfo: UserInfo) => void;
 		clearUserInfoAndToken: () => void;
@@ -37,8 +36,8 @@ const useUserStore = create<UserStore>()(
 			},
 		}),
 		{
-			name: "userStore", // name of the item in the storage (must be unique)
-			storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+			name: "userStore",
+			storage: createJSONStorage(() => localStorage),
 			partialize: (state) => ({
 				[StorageEnum.UserInfo]: state.userInfo,
 			}),

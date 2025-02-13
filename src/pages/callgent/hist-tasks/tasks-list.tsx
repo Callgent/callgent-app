@@ -1,15 +1,10 @@
-import { useCallgentActions, useCallgentList, useFetchCallgentList, usePageInfo, useSearchInfo } from "@/store/callgentStore";
+import { useCallgentActions, useCallgentList, useFetchCallgentTasks, usePageInfo, useSearchInfo } from "@/store/callgentStore";
 import { Col, Pagination, Row } from "antd";
 import { useEffect, useState } from "react";
-import type { CallgentInfo } from "#/entity";
-import CallgentCard from "./callgent-card";
+import CallgentCard from "./tasks-card";
 
-interface CallgentListComponentProps {
-  onEdit: (data: CallgentInfo) => void;
-}
-
-const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit }) => {
-  const fetchCallgentList = useFetchCallgentList();
+const TasksListComponent: React.FC = () => {
+  const fetchCallgentList = useFetchCallgentTasks();
   const callgentList = useCallgentList();
   const { perPage, page, total } = usePageInfo();
   const searchInfo = useSearchInfo()
@@ -48,7 +43,6 @@ const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit })
           <Col key={item.id} xs={24} md={12} lg={12} xl={8} xxl={6}>
             <CallgentCard
               item={item}
-              onEdit={() => onEdit(item)}
             />
           </Col>
         ))}
@@ -69,4 +63,4 @@ const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit })
   );
 };
 
-export default CallgentListComponent;
+export default TasksListComponent;

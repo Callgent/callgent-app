@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 import { IconButton } from "@/components/icon";
 import { useLoginStateContext } from "@/pages/sys/login/providers/LoginStateProvider";
 import { useRouter } from "@/router/hooks";
-import { useUserActions, useUserInfo, useFetchUserInfo } from "@/store/userStore";
+import { useFetchUserInfo, useUserActions, useUserInfo } from "@/store/userStore";
 import { useTheme } from "@/theme/hooks";
 
 /**
@@ -21,7 +21,10 @@ export default function AccountDropdown() {
 	const init = async () => {
 		await userInfo()
 	}
-	useEffect(() => { init() }, [])
+
+	useEffect(() => {
+		init()
+	}, [])
 	const { clearUserInfoAndToken } = useUserActions();
 	const { backToLogin } = useLoginStateContext();
 	const { t } = useTranslation();
@@ -29,8 +32,6 @@ export default function AccountDropdown() {
 		try {
 			clearUserInfoAndToken();
 			backToLogin();
-		} catch (error) {
-			console.log(error);
 		} finally {
 			replace("/login");
 		}

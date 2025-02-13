@@ -7,51 +7,32 @@ import CallgentList from "./callgent-list";
 import { CallgentModal, type CallgentModalProps } from "./callgent-modal";
 
 export default function Callgents() {
+  const { setSearchInfo, setPageInfo, reset } = useCallgentActions();
+  const fetchCallgentList = useFetchCallgentList();
   const [searchForm] = Form.useForm();
-  const [organizationModalPros, setOrganizationModalProps] = useState<CallgentModalProps>({
-    formValue: {
-      id: "",
-      name: "",
-      liked: 0,
-      viewed: 0,
-      featured: true,
-      favorite: 0,
-      forked: 0,
-      official: true
-    },
+
+  const [CallgentModalPros, setCallgentModalProps] = useState<CallgentModalProps>({
+    formValue: { name: "" },
     title: "New",
     show: false,
     onOk: () => {
-      setOrganizationModalProps((prev) => ({ ...prev, show: false }));
+      setCallgentModalProps((prev) => ({ ...prev, show: false }));
     },
     onCancel: () => {
-      setOrganizationModalProps((prev) => ({ ...prev, show: false }));
+      setCallgentModalProps((prev) => ({ ...prev, show: false }));
     },
   });
 
-  const { setSearchInfo, setPageInfo } = useCallgentActions();
-  const fetchCallgentList = useFetchCallgentList();
-
   const onCreate = () => {
-    setOrganizationModalProps((prev) => ({
+    setCallgentModalProps((prev) => ({
       ...prev,
       show: true,
-      title: "Create New",
-      formValue: {
-        ...prev.formValue,
-        name: "",
-        liked: 0,
-        viewed: 0,
-        featured: true,
-        favorite: 0,
-        forked: 0,
-        official: true
-      },
+      title: "Create New"
     }));
   };
 
   const onEdit = (formValue: CallgentInfo) => {
-    setOrganizationModalProps((prev) => ({
+    setCallgentModalProps((prev) => ({
       ...prev,
       show: true,
       title: "Edit",
@@ -59,21 +40,20 @@ export default function Callgents() {
     }));
   };
 
-  const onSearchFormReset = () => {
+  // Reset
+  const onSearchFormReset = async () => {
+    reset();
     searchForm.resetFields();
-    console.log("Form reset", searchForm.getFieldsValue());
+    await fetchCallgentList({})
   };
 
-  const pageInfo = usePageInfo();
+  // search
+  const { perPage } = usePageInfo();
   const onSearch = async () => {
     const values = searchForm.getFieldsValue();
     setSearchInfo(values);
-    setPageInfo({ ...pageInfo, page: 1 })
-    await fetchCallgentList({
-      ...values,
-      page: 1,
-      perPage: 12,
-    });
+    setPageInfo({ page: 1, perPage });
+    await fetchCallgentList({ page: 1, perPage, ...values });
   };
 
   return (
@@ -118,7 +98,7 @@ export default function Callgents() {
         <CallgentList onEdit={onEdit} />
       </Card>
 
-      <CallgentModal {...organizationModalPros} />
+      <CallgentModal {...CallgentModalPros} />
     </Space>
   );
 }

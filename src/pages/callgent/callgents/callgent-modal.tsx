@@ -1,26 +1,43 @@
 import { Form, Input, Modal } from "antd";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { CallgentInfo } from "#/entity";
-
-export type CallgentModalProps = {
-  formValue: CallgentInfo;
-  title: string;
-  show: boolean;
-  onOk: VoidFunction;
-  onCancel: VoidFunction;
-};
+import { useCreateCallgent, useUpdateCallgent } from "@/store/callgentStore";
 
 export function CallgentModal({ title, show, formValue, onOk, onCancel }: CallgentModalProps) {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    form.setFieldsValue({ ...formValue });
+    form.setFieldsValue(formValue);
   }, [formValue, form]);
 
+  const createCallgent = useCreateCallgent()
+  const updateCallgent = useUpdateCallgent()
+  const submit = async () => {
+    const values = form.getFieldsValue();
+    setLoading(true);
+    try {
+      if (formValue.id) {
+        await updateCallgent(formValue.id, values)
+      } else {
+        await createCallgent(values);
+      }
+    } finally {
+      setLoading(false);
+      onOk();
+    }
+  };
+
   return (
-    <Modal title={title} open={show} onOk={onOk} onCancel={onCancel} height={500}>
+    <Modal
+      title={title}
+      open={show}
+      onOk={submit}
+      onCancel={onCancel}
+      okButtonProps={{ loading }}
+      forceRender
+    >
       <Form
-        initialValues={formValue}
         form={form}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 18 }}
@@ -33,3 +50,11 @@ export function CallgentModal({ title, show, formValue, onOk, onCancel }: Callge
     </Modal>
   );
 }
+
+export type CallgentModalProps = {
+  formValue: CallgentInfo;
+  title: string;
+  show: boolean;
+  onOk: () => void;
+  onCancel: () => void;
+};
