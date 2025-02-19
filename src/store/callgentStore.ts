@@ -15,8 +15,7 @@ const initState = {
 const useCallgentStore = create<CallgentStore>((set) => ({
   ...initState,
   actions: {
-    setCallgentInfo: (callgentInfo) => set({ callgentInfo }),
-    clearCallgentInfo: () => set({ callgentInfo: {} }),
+    clearCallgentInfo: () => set({}),
     setCallgentList: (callgentList) => set({ callgentList }),
     setPageInfo: (pageInfo) => set({ pageInfo }),
     reset: () => set(initState),
@@ -24,7 +23,6 @@ const useCallgentStore = create<CallgentStore>((set) => ({
   },
 }));
 
-export const useCallgentInfo = () => useCallgentStore((state) => state.callgentInfo);
 export const useCallgentList = () => useCallgentStore((state) => state.callgentList);
 export const usePageInfo = () => useCallgentStore((state) => state.pageInfo);
 export const useSearchInfo = () => useCallgentStore((state) => state.searchInfo);
@@ -98,7 +96,6 @@ export const useCreateCallgent = () => {
   return createCallgent;
 };
 
-/** Update an existing Callgent */
 /** Update an existing Callgent */
 export const useUpdateCallgent = () => {
   const updateCallgentMutation = useMutation({

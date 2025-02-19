@@ -17,6 +17,9 @@ export interface PageInfo {
 	perPage?: number;
 	orderBy?: string;
 }
+export interface Adaptor {
+	[key: string]: string;
+};
 
 export interface CallgentInfo {
 	id?: string;
@@ -39,8 +42,46 @@ export interface CallgentInfo {
 	createdBy?: string;
 	createdAt?: string;
 	updatedAt?: string;
+	hint?: string;
+	title?: string;
+	type?: string;
+	host?: HostType;
+	add?: boolean;
+	edit?: boolean;
+	delete?: boolean;
+	import?: boolean;
+	lock?: boolean;
+	adaptorKey?: string;
+	icon_url?: string;
+	children?: CallgentInfo[];
+	realms?: Array<Realm>;
+	securities?: any;
+	level?: number;
 }
 
+export interface HostType {
+	email?: string;
+}
+
+export interface Scheme {
+	type: string;
+	in: string;
+	name: string;
+	provider: string;
+}
+
+export interface Realm {
+	realmKey: string;
+	authType: string;
+	realm: string;
+	scheme: Scheme;
+	perUser: boolean;
+	enabled: boolean;
+}
+
+export interface Realms {
+	realms: Realm[];
+}
 
 export interface Organization {
 	id: string;

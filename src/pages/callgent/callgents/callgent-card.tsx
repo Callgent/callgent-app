@@ -4,6 +4,7 @@ import { Avatar, Card, Popconfirm, Rate, Typography } from 'antd';
 import type React from 'react';
 import { useState } from 'react';
 import type { CallgentInfo } from '#/entity';
+import { useNavigate } from 'react-router';
 
 const { Paragraph } = Typography;
 
@@ -15,6 +16,7 @@ interface CallgentCardProps {
 const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const navigate = useNavigate();
 
   const showPopconfirm = () => {
     setOpenConfirm(true);
@@ -36,6 +38,10 @@ const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
     }
   };
 
+  const handleCardClick = () => {
+    navigate(`/callgent/callgenttree?callgentId=${item.id}`);
+  };
+
   return (
     <Card
       className="max-w[500] min-w-[300] w-full"
@@ -55,13 +61,13 @@ const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
       ]}
     >
       <Card.Meta
-        avatar={<Avatar src={item.avatar || '/images/avatar.svg'} />}
-        title={item.name}
+        avatar={<Avatar onClick={handleCardClick} className='cursor-pointer' src={item.avatar || '/images/avatar.svg'} />}
+        title={<div onClick={handleCardClick} className='cursor-pointer'>{item.name}</div>}
         description={
-          <>
+          <div onClick={handleCardClick} className='cursor-pointer'>
             <Paragraph ellipsis>{item.summary || 'no description'}</Paragraph>
             <span>{item.updatedAt?.split('T')[0]}</span>
-          </>
+          </div>
         }
       />
     </Card>

@@ -5,6 +5,7 @@ import { SvgIcon } from "@/components/icon";
 import { CircleLoading } from "@/components/loading";
 
 import type { AppRouteObject } from "#/router";
+import CallgentInfo from "@/pages/callgent/callgent-tree";
 
 const Callgents = lazy(() => import("@/pages/callgent/callgents"));
 const Services = lazy(() => import("@/pages/callgent/services"));
@@ -42,6 +43,11 @@ const callgent: AppRouteObject = {
       path: "histtasks",
       element: <HistTasks />,
       meta: { label: "sys.menu.callgent.histtasks", key: "/callgent/histtasks" },
+    },
+    {
+      path: "callgenttree",
+      element: <CallgentInfo />,
+      meta: { label: "sys.menu.callgent.callgentinfo", key: "/callgent/callgentinfo", hideMenu: true },
     },
   ],
 };
