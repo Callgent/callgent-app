@@ -1,17 +1,17 @@
 import { Modal } from 'antd';
 import { ActionForm } from './TreeActionForm';
-import { useCurrentNode, useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
+import { useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
 
 export const TreeActionModal = () => {
-  const { isModalOpen, action } = useTreeActionStore();
+  const { isModalOpen, action, currentNode } = useTreeActionStore();
   const { closeModal } = useTreeActions()
-  const currentNode = useCurrentNode();
 
   const titleMap = {
     add: 'Create ' + currentNode?.modelTitle,
     edit: 'Edit ' + currentNode?.modelTitle,
     import: 'Import Api',
     lock: 'Manage Auth',
+    select: 'Manage Auth',
   };
 
   return (

@@ -1,107 +1,117 @@
 import type { Result } from "#/api";
-import type { CallgentInfo } from "#/entity";
+import type { CallgentInfo, Realm } from "#/entity";
 import apiClient from "../apiClient";
-import { useMutation } from "@tanstack/react-query";
 
 export interface CallgentParams {
 	query?: string;
 }
 
-export enum CallgentApi {
-	GetAllCallgent = "/api/callgents",
-	GetCallgentTree = "/api/bff/callgent-tree/",
-	Create = "/api/callgents",
-	Update = "/api/callgents/",
-	Delete = "/api/callgents/",
-	GetAllServer = "/api/entries/server",
-	GetAllTasks = "/api/events/tasks",
-}
-
 /** GET /api/callgents */
-const getCallgents = (params?: CallgentParams) =>
-	apiClient.get<Result<CallgentInfo[]>>({ url: CallgentApi.GetAllCallgent, params });
+export const getCallgents = (params?: CallgentParams) =>
+	apiClient.get<Result<CallgentInfo[]>>({
+		url: "/api/callgents",
+		params
+	});
 
-/** GET /api/callgentTree */
-const getCallgentTree = (id: string) =>
-	apiClient.get<Result<CallgentInfo>>({ url: CallgentApi.GetCallgentTree + id });
+/** GET /api/bff/callgent-tree/:id */
+export const getCallgentTree = (id: string) =>
+	apiClient.get<Result<CallgentInfo>>({
+		url: `/api/bff/callgent-tree/${id}`
+	});
 
-/** GET /api/server */
-const getServer = (params?: CallgentParams) =>
-	apiClient.get<Result<CallgentInfo[]>>({ url: CallgentApi.GetAllServer, params });
+/** GET /api/entries/server */
+export const getServer = (params?: CallgentParams) =>
+	apiClient.get<Result<CallgentInfo[]>>({
+		url: "/api/entries/server",
+		params
+	});
 
-/** GET /api/tasks */
-const getTasks = (params?: CallgentParams) =>
-	apiClient.get<Result<CallgentInfo[]>>({ url: CallgentApi.GetAllTasks, params });
+/** GET /api/events/tasks */
+export const getTasks = (params?: CallgentParams) =>
+	apiClient.get<Result<CallgentInfo[]>>({
+		url: "/api/events/tasks",
+		params
+	});
 
 /** POST /api/callgents */
-const postCallgent = (data: CallgentInfo) =>
-	apiClient.post<Result<CallgentInfo>>({ url: CallgentApi.Create, data });
+export const postCallgent = (data: CallgentInfo) =>
+	apiClient.post<Result<CallgentInfo>>({
+		url: "/api/callgents",
+		data
+	});
 
 /** PUT /api/callgents/:id */
-const putCallgent = (id: string, data: CallgentInfo) =>
-	apiClient.put<Result<CallgentInfo>>({ url: `${CallgentApi.Update}${id}`, data });
+export const putCallgent = (id: string, data: CallgentInfo) =>
+	apiClient.put<Result<CallgentInfo>>({
+		url: `/api/callgents/${id}`,
+		data
+	});
 
 /** DELETE /api/callgents/:id */
-const deleteCallgent = (id: string) =>
-	apiClient.delete<Result<CallgentInfo>>({ url: `${CallgentApi.Delete}${id}` });
-
-/** add entries **/
-export const useCreateCallgentEntry = () => {
-	return useMutation({
-		mutationFn: (params: { adaptor: string; formValues: any }) =>
-			apiClient.post<any>({
-				url: `/api/entries/${params.adaptor}/create`,
-				data: params.formValues
-			})
+export const deleteCallgent = (id: string) =>
+	apiClient.delete<Result<CallgentInfo>>({
+		url: `/api/callgents/${id}`
 	});
-};
 
-/** add entries **/
-export const useEditCallgentEntry = () => {
-	return useMutation({
-		mutationFn: (params: { id: string; formValues: any }) =>
-			apiClient.put<any>({
-				url: `/api/entries/${params.id}`,
-				data: params.formValues
-			})
+/** Create callgent entry - POST /api/entries/:adaptor/create */
+export const createCallgentEntry = async (params: { adaptor: string; formValues: any }) =>
+	apiClient.post<any>({
+		url: `/api/entries/${params.adaptor}/create`,
+		data: params.formValues
 	});
-};
 
-/** add entries **/
-export const useImportEntry = () => {
-	return useMutation({
-		mutationFn: (params: { formValues: any }) =>
-			apiClient.post<any>({
-				url: "/api/bff/endpoints/import",
-				data: params.formValues
-			})
+/** Edit callgent entry - PUT /api/entries/:id */
+export const editCallgentEntry = async (params: { id: string; formValues: any }) =>
+	apiClient.put<any>({
+		url: `/api/entries/${params.id}`,
+		data: params.formValues
 	});
-};
 
-/** fetch adaptors **/
-export const useFetchAdaptors = () => {
-	return useMutation({
-		mutationFn: () => apiClient.get<any>({
-			url: '/api/entries/adaptors?client=true'
-		})
+/** Import entry - POST /api/bff/endpoints/import */
+export const importEntry = async (params: { formValues: any }) =>
+	apiClient.post<any>({
+		url: "/api/bff/endpoints/import",
+		data: params.formValues
 	});
-};
 
-/** del entry **/
-export const useDeleteEntry = () => {
-	return useMutation({
-		mutationFn: (id: string) => apiClient.delete<any>({
-			url: '/api/entries/' + id
-		})
+/** Fetch adaptors - GET /api/entries/adaasdptors?client=true */
+export const fetchAdaptors = () =>
+	apiClient.get<any>({
+		url: "/api/entries/adaptors?client=true"
 	});
-};
 
-export default {
-	getCallgents,
-	getCallgentTree,
-	postCallgent,
-	putCallgent,
-	deleteCallgent,
-	getServer,
-	getTasks
-};
+/** Delete entry - DELETE /api/entries/:id */
+export const deleteEntry = async (id: string) =>
+	apiClient.delete<any>({
+		url: `/api/entries/${id}`
+	});
+
+/** Post /api/callgent-realms */
+export const postRealms = async (data: Realm) =>
+	apiClient.post<any>({
+		url: `/api/callgent-realms`,
+		data
+	});
+
+/** Put /api/callgent-realms */
+export const putRealms = async (data: Realm) =>
+	apiClient.put<any>({
+		url: `/api/callgent-realms/${data.callgentId}/${data.realmKey}`,
+		data: {
+			realm: data?.realm,
+			scheme: data?.scheme
+		}
+	});
+
+/** Delete /api/callgent-realms */
+export const deleteRealms = async (data: { callgentId?: string, realmKey?: string }) =>
+	apiClient.delete<any>({
+		url: `/api/callgent-realms/${data.callgentId}/${data.realmKey}`
+	});
+
+/** Select /api/callgent-realms */
+export const selectRealms = async (data: CallgentInfo, realmKey?: string) =>
+	apiClient.post<any>({
+		url: `/api/callgent-realms/securities/${data?.type ? 'entry' : 'function'}/${data?.id}`,
+		data: [{ realmKey: realmKey }]
+	});

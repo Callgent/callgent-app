@@ -1,14 +1,12 @@
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-import userService, { type SignInReq } from "@/api/services/userService";
 
 import { deleteCookie } from "@/router/utils";
 import { toast } from "sonner";
 import type { UserInfo } from "#/entity";
 import { StorageEnum } from "#/enum";
+import { findUserInfo, signin, SignInReq } from "@/api/services/userService";
 
 const { VITE_APP_HOMEPAGE: HOMEPAGE, VITE_COOKIE_NAME } = import.meta.env;
 
@@ -51,12 +49,9 @@ export const useUserActions = () => useUserStore((state) => state.actions);
 
 export const useSignIn = () => {
 	const navigatge = useNavigate();
-	const signInMutation = useMutation({
-		mutationFn: userService.signin,
-	});
 	const signIn = async (loginData: SignInReq) => {
 		try {
-			await signInMutation.mutateAsync(loginData);
+			await signin(loginData);
 			navigatge(HOMEPAGE, { replace: true });
 			toast.success("Sign in success!");
 		} catch (err) {
@@ -72,13 +67,9 @@ export const useSignIn = () => {
 // getUserInfo API 
 export const useFetchUserInfo = () => {
 	const { setUserInfo } = useUserActions();
-	const userInfoMutation = useMutation({
-		mutationFn: userService.findUserInfo,
-	});
-
 	const fetchUserInfo = async () => {
 		try {
-			const { data } = await userInfoMutation.mutateAsync();
+			const { data } = await findUserInfo();
 			setUserInfo({
 				...data,
 				avatar: data.avatar || '/images/avatar.svg'

@@ -17,9 +17,12 @@ export interface PageInfo {
 	perPage?: number;
 	orderBy?: string;
 }
+
 export interface Adaptor {
 	[key: string]: string;
 };
+
+export type TreeAction = 'add' | 'edit' | 'import' | 'lock' | 'select';
 
 export interface CallgentInfo {
 	id?: string;
@@ -68,13 +71,15 @@ export interface Scheme {
 	in: string;
 	name: string;
 	provider: string;
+	secret: string;
 }
 
 export interface Realm {
 	realmKey: string;
 	authType: string;
 	realm: string;
-	scheme: Scheme;
+	callgentId?: string;
+	scheme?: Scheme;
 	perUser: boolean;
 	enabled: boolean;
 }
@@ -118,4 +123,25 @@ export interface Role {
 	order?: number;
 	desc?: string;
 	permission?: Permission[];
+}
+
+export type AuthType = 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
+
+export interface FormValues {
+	callgentId: string;
+	authType: AuthType;
+	realm: string;
+	scheme: {
+		type: AuthType;
+		in?: 'header' | 'query' | 'cookie';
+		name?: string;
+		provider?: string;
+		secret?: string;
+	};
+	secret: Record<string, any>;
+}
+
+export interface NewAuthProps {
+	initialData?: Realm | false;
+	callgentId?: string;
 }

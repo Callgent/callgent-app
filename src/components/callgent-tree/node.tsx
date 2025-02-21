@@ -1,11 +1,11 @@
-import { memo, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
-import { CallgentInfo as CallgentInfoType } from '#/entity';
+import { CallgentInfo as CallgentInfoType, TreeAction } from '#/entity';
 import { Add, Delete, Edit, Import, Lock } from './icon';
-import { useCallgentTree, useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
+import { useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
 import { Popconfirm } from 'antd';
 import { useDeleteCallgent } from '@/store/callgentStore';
-import { useDeleteEntry } from '@/api/services/callgentService';
+import { deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
 
 interface TreeNodeProps {
@@ -16,7 +16,7 @@ interface TreeNodeProps {
   callgentId?: string;
 }
 
-const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }: TreeNodeProps) => {
+const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: TreeNodeProps) => {
   if (nodes.length === 0) {
     return null
   }
@@ -36,7 +36,7 @@ const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id!);
 
-  const handleAction = (actionType: 'add' | 'edit' | 'import' | 'lock') => {
+  const handleAction = (actionType: TreeAction) => {
     switch (actionType) {
       case 'add':
       case 'import':
@@ -56,10 +56,11 @@ const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }
         });
         break;
       case 'lock':
+      case 'select':
         openModal({
           id: node.id!,
           modelTitle: "Manage Auth",
-          type: node.id,
+          type: level !== 1 ? 'select' : "edit",
           data: node,
         });
         break;
@@ -68,12 +69,11 @@ const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }
   }
   const [openConfirm, setOpenConfirm] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const callgentTree = useCallgentTree();
+  const { callgentTree } = useTreeActionStore();
   const handleCancel = () => {
     setOpenConfirm(false);
   };
   const delCallgent = useDeleteCallgent();
-  const deleteEntry = useDeleteEntry();
 
   const deleteCallgent = async () => {
     setConfirmLoading(true);
@@ -81,7 +81,7 @@ const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }
       if (level === 1) {
         await delCallgent(node.id!);
       } else {
-        await deleteEntry.mutateAsync(node.id!)
+        await deleteEntry(node.id!)
       }
       const newTree = deleteNode(callgentTree, node.id!);
       setCallgentTree(newTree);
@@ -93,6 +93,7 @@ const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }
   const showPopconfirm = () => {
     setOpenConfirm(true);
   };
+  const docsUrl = import.meta.env.VITE_DOCS_URL;
   return (
     <div>
       {nodes.map(node => (
@@ -116,7 +117,7 @@ const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }
                   />
                   {node.adaptorKey === 'Webpage' ? (
                     <Link
-                      to={`/chatbox?callgentId=${callgentId}&entryId=${node.id}`}
+                      to={`${docsUrl}/chatbox?callgentId=${callgentId}&entryId=${node.id}`}
                       className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1 hover:text-blue-600"
                       data-testid="webpage-link"
                     >
@@ -132,11 +133,11 @@ const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }
             </div>
             <div className="node-right flex gap-2 items-center">
               {node.lock && (
-                <div onClick={() => handleAction('lock')}>
+                <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')}>
                   <Lock
                     data={{
                       level,
-                      realms: node.realms,
+                      realms: callgentTree[0]?.realms || [],
                       securities: node.securities
                     }}
                   />
@@ -207,8 +208,6 @@ const TreeNode = memo(({ nodes, level = 1, expandedNodes, onToggle, callgentId }
       ))}
     </div>
   );
-}, () => {
-  return false;
-});
+};
 
 export default TreeNode;

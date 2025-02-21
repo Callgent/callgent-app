@@ -1,27 +1,21 @@
-import { useCreateCallgentEntry, useEditCallgentEntry, useImportEntry } from '@/api/services/callgentService';
-import { useAdaptors, useCallgentTree, useCurrentNode, useFetchCallgentTree, useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
+import { createCallgentEntry, editCallgentEntry, importEntry } from '@/api/services/callgentService';
+import { useFetchCallgentTree, useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
 import { Form, Input, Button, Select, Divider } from 'antd';
 import { useState } from 'react';
+import Auth from './tree-autch';
 
 export const ActionForm = () => {
   const { action } = useTreeActionStore();
-
-  const createCallgentEntry = useCreateCallgentEntry();
-  const editCallgentEntry = useEditCallgentEntry();
-  const importEntry = useImportEntry();
-
   const { closeModal } = useTreeActions();
-  const callgentTree = useCallgentTree();
-  const currentNode = useCurrentNode();
-  const adaptors = useAdaptors();
-
+  const { callgentTree, currentNode, adaptors } = useTreeActionStore();
   const [loading, setLoading] = useState(false);
 
   const formItemLayout = {
     labelCol: { span: 24 },
     wrapperCol: { span: 24 },
   };
-  const fetchCallgentTree = useFetchCallgentTree()
+  const fetchCallgentTree = useFetchCallgentTree();
+
   const onSubmit = async (values: any) => {
     setLoading(true);
     const state = useTreeActionStore.getState();
@@ -33,28 +27,28 @@ export const ActionForm = () => {
     try {
       switch (state.action) {
         case 'add':
-          await createCallgentEntry.mutateAsync({
+          await createCallgentEntry({
             adaptor: adaptorKey,
             formValues: {
               host,
               callgentId: callgentTree[0]?.id,
               type: state.currentNode?.type,
             },
-          })
-          await fetchCallgentTree(callgentTree[0].id!)
+          });
+          await fetchCallgentTree(callgentTree[0].id!);
           break;
         case 'edit':
-          await editCallgentEntry.mutateAsync({
+          await editCallgentEntry({
             id: currentNode.id,
             formValues: { host },
-          })
-          await fetchCallgentTree(callgentTree[0].id!)
+          });
+          await fetchCallgentTree(callgentTree[0].id!);
           break;
         case 'import':
-          await importEntry.mutateAsync({
+          await importEntry({
             formValues: { text, entryId: currentNode.id },
-          })
-          await fetchCallgentTree(callgentTree[0].id!)
+          });
+          await fetchCallgentTree(callgentTree[0].id!);
           break;
       }
       closeModal();
@@ -68,10 +62,16 @@ export const ActionForm = () => {
     add: (
       <>
         <Divider />
-        <Form.Item label="CLIENT Entry adaptor" name="adaptorKey" rules={[{ required: true, message: 'Please select an adapter' }]}>
+        <Form.Item
+          label="CLIENT Entry adaptor"
+          name="adaptorKey"
+          rules={[{ required: true, message: 'Please select an adapter' }]}
+        >
           <Select placeholder="Select an adapter" style={{ width: '100%' }}>
             {adaptors.map((item) => (
-              <Select.Option value={item.name} key={item.name}>{item.name}</Select.Option>
+              <Select.Option value={item.name} key={item.name}>
+                {item.name}
+              </Select.Option>
             ))}
           </Select>
         </Form.Item>
@@ -91,7 +91,11 @@ export const ActionForm = () => {
     import: (
       <>
         <Divider />
-        <Form.Item label="Import Description" name="text" rules={[{ required: true, message: 'Please enter import description' }]}>
+        <Form.Item
+          label="Import Description"
+          name="text"
+          rules={[{ required: true, message: 'Please enter import description' }]}
+        >
           <Input.TextArea placeholder="Enter import description" rows={3} />
         </Form.Item>
       </>
@@ -99,24 +103,36 @@ export const ActionForm = () => {
     lock: (
       <>
         <Divider />
-        <Form.Item label="Authorization Description" name="text" rules={[{ required: true, message: 'Please enter authorization details' }]}>
-          <Input.TextArea placeholder="Enter authorization details" rows={3} />
-        </Form.Item>
+        <Auth />
       </>
-    )
+    ),
+    select: (
+      <>
+        <Divider />
+        <Auth />
+      </>
+    ),
   };
 
   return action ? (
-    <Form {...formItemLayout} onFinish={onSubmit} initialValues={{
-      adaptorKey: adaptors.length > 0 ? adaptors[0].name : undefined,
-      host: action === 'edit' ? currentNode?.data?.name : undefined,
-    }}>
-      {formContent[action]}
-      <Form.Item wrapperCol={{ span: 24 }} style={{ textAlign: 'right' }}>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          {action === 'add' ? 'Create' : action === 'edit' ? 'Update' : 'Import'}
-        </Button>
-      </Form.Item>
-    </Form>
+    (action === 'lock' || action === 'select') ? (
+      formContent[action]
+    ) : (
+      <Form
+        {...formItemLayout}
+        onFinish={onSubmit}
+        initialValues={{
+          adaptorKey: adaptors.length > 0 ? adaptors[0].name : undefined,
+          host: action === 'edit' ? currentNode?.data?.name : undefined,
+        }}
+      >
+        {formContent[action]}
+        <Form.Item wrapperCol={{ span: 24 }} style={{ textAlign: 'right' }}>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            {action === 'add' ? 'Create' : action === 'edit' ? 'Update' : 'Import'}
+          </Button>
+        </Form.Item>
+      </Form>
+    )
   ) : null;
 };

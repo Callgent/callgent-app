@@ -3,22 +3,27 @@ import { useLocation, useNavigate } from 'react-router';
 import { CallgentInfo as CallgentInfoType } from '#/entity';
 import TreeNode from './node';
 import { TreeActionModal } from './model';
-import { useCallgentTree, useFetchAdaptor, useFetchCallgentTree, useTreeActions } from '@/store/callgentTreeStore';
+import useTreeActionStore, { useFetchAdaptor, useFetchCallgentTree, useTreeActions } from '@/store/callgentTreeStore';
 import { enhanceNode, setAdaptor } from '@/utils/callgent-tree';
+import { CircleLoading } from '../loading';
 
 export default function CallgentInfo() {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const callgentTree = useCallgentTree();
+  const { callgentTree } = useTreeActionStore();
   const fetchCallgentTree = useFetchCallgentTree();
   const fetchAdaptor = useFetchAdaptor();
 
-  const getAllIds = useCallback((node: CallgentInfoType): string[] => [
-    node.id!,
-    ...(node.children?.flatMap(getAllIds) || [])
-  ], []);
+  const getAllIds = useCallback((node: CallgentInfoType): string[] => {
+    if (!node.id) return [];
+    const shouldExpand = !node?.type || node?.type !== 'SERVER';
+    const childIds = (shouldExpand && node.children) ? node.children.flatMap(getAllIds) : [];
+    const currendId = shouldExpand ? node.id : ''
+    return [currendId, ...childIds];
+  }, []);
 
   const handleToggle = useCallback((id: string) => {
     setExpandedNodes(prev => {
@@ -30,15 +35,23 @@ export default function CallgentInfo() {
 
   const { setCallgentTree, setCallgentAdaptor } = useTreeActions();
   const loadData = useCallback(async (id: string) => {
-    const tree = await fetchCallgentTree(id);
-    if (tree) {
-      const enhancedData = enhanceNode(tree, 1);
-      setCallgentTree([enhancedData])
-      setExpandedNodes(new Set(getAllIds(tree)));
+    setIsLoading(true);
+    try {
+      const tree = await fetchCallgentTree(id);
+      if (tree) {
+        const enhancedData = enhanceNode(tree, 1);
+        setCallgentTree([enhancedData]);
+        setExpandedNodes(new Set(getAllIds(tree)));
+      }
+      const featchAdaptor = await fetchAdaptor();
+      const adaptor = setAdaptor(featchAdaptor);
+      setCallgentAdaptor(adaptor);
+    } catch (error) {
+      console.error("Failed to load data:", error);
+      navigate("/callgent/callgents", { replace: true });
+    } finally {
+      setIsLoading(false);
     }
-    const featchAdaptor = await fetchAdaptor();
-    const adaptor = setAdaptor(featchAdaptor);
-    setCallgentAdaptor(adaptor);
   }, [getAllIds, navigate]);
 
   useEffect(() => {
@@ -49,7 +62,11 @@ export default function CallgentInfo() {
     } else {
       navigate("/callgent/callgents", { replace: true });
     }
-  }, [location.search]);
+  }, [location.search, loadData]);
+
+  if (isLoading) {
+    return <CircleLoading />;
+  }
 
   return (
     <div className="w-full rounded-md py-2 px-4 bg-[#F6F7F8] dark:bg-[#323234]">

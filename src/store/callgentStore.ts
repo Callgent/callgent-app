@@ -1,9 +1,8 @@
-import callgentService from "@/api/services/callgentService";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { create } from "zustand";
 import type { CallgentInfo, PageInfo } from "#/entity";
 import type { CallgentStore } from "#/store";
+import { getCallgents, getServer, getTasks, postCallgent, putCallgent, deleteCallgent } from "@/api/services/callgentService";
 
 const initState = {
   callgentInfo: {},
@@ -23,20 +22,12 @@ const useCallgentStore = create<CallgentStore>((set) => ({
   },
 }));
 
-export const useCallgentList = () => useCallgentStore((state) => state.callgentList);
-export const usePageInfo = () => useCallgentStore((state) => state.pageInfo);
-export const useSearchInfo = () => useCallgentStore((state) => state.searchInfo);
-export const useCallgentActions = () => useCallgentStore((state) => state.actions);
-
 /** Fetch Callgent list and store it in Zustand */
 export const useFetchCallgentList = () => {
   const { setCallgentList, setPageInfo } = useCallgentActions();
-  const callgentListMutation = useMutation({
-    mutationFn: callgentService.getCallgents,
-  });
   const fetchCallgentList = async (searchTerm: PageInfo) => {
     try {
-      const { data, meta } = await callgentListMutation.mutateAsync(searchTerm);
+      const { data, meta } = await getCallgents(searchTerm);
       setCallgentList(data);
       setPageInfo({ page: meta.currentPage, perPage: meta.perPage, total: meta.total });
     } catch (err) {
@@ -49,13 +40,11 @@ export const useFetchCallgentList = () => {
 /** Fetch Callgent server list and store it in Zustand */
 export const useFetchCallgentServerList = () => {
   const { setCallgentList, setPageInfo } = useCallgentActions();
-  const { query, adaptor } = useSearchInfo();
-  const callgentServerListMutation = useMutation({
-    mutationFn: callgentService.getServer,
-  });
+  const { searchInfo } = useCallgentStore()
+  const { query, adaptor } = searchInfo;
   const fetchCallgentServerList = async (searchTerm: PageInfo) => {
     try {
-      const { data, meta } = await callgentServerListMutation.mutateAsync(searchTerm);
+      const { data, meta } = await getServer(searchTerm);
       setCallgentList(data);
       setPageInfo({ ...meta, query, adaptor });
     } catch (err) { }
@@ -66,13 +55,11 @@ export const useFetchCallgentServerList = () => {
 /** Fetch Callgent server list and store it in Zustand */
 export const useFetchCallgentTasks = () => {
   const { setCallgentList, setPageInfo } = useCallgentActions();
-  const { query, adaptor } = useSearchInfo();
-  const callgentServerListMutation = useMutation({
-    mutationFn: callgentService.getTasks,
-  });
+  const { searchInfo } = useCallgentStore()
+  const { query, adaptor } = searchInfo;
   const fetchCallgentTasks = async (searchTerm: PageInfo) => {
     try {
-      const { data, meta } = await callgentServerListMutation.mutateAsync(searchTerm);
+      const { data, meta } = await getTasks(searchTerm);
       setCallgentList(data);
       setPageInfo({ ...meta, query, adaptor });
     } catch (err) { }
@@ -82,15 +69,11 @@ export const useFetchCallgentTasks = () => {
 
 /** Create a new Callgent */
 export const useCreateCallgent = () => {
-  const createCallgentMutation = useMutation({
-    mutationFn: callgentService.postCallgent,
-    onSuccess: () => {
-      toast.success("Callgent created successfully!");
-    },
-  });
   const fetchCallgentList = useFetchCallgentList();
   const createCallgent = async (values: CallgentInfo) => {
-    await createCallgentMutation.mutateAsync(values);
+    await postCallgent(values).then(() => {
+      toast.success("Callgent created successfully!")
+    }).catch(() => { });
     await fetchCallgentList({ page: 1 })
   }
   return createCallgent;
@@ -98,18 +81,14 @@ export const useCreateCallgent = () => {
 
 /** Update an existing Callgent */
 export const useUpdateCallgent = () => {
-  const updateCallgentMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: CallgentInfo }) => callgentService.putCallgent(id, data),
-    onSuccess: () => {
-      toast.success("Callgent updated successfully!");
-    },
-  });
-
   const { setCallgentList } = useCallgentActions();
-  const callgentList = useCallgentList();
+  const { callgentList } = useCallgentStore();
   const updateCallgent = async (id: string, values: CallgentInfo) => {
     // Perform the mutation to update the callgent
-    const { data } = await updateCallgentMutation.mutateAsync({ id, data: values });
+    const { data } = await putCallgent(id, values);
+    if (data) {
+      toast.success("Callgent updated successfully!");
+    }
     const updatedList = callgentList.map(item =>
       item.id === id ? { ...item, ...data } : item
     );
@@ -122,19 +101,17 @@ export const useUpdateCallgent = () => {
 
 /** Delete a Callgent */
 export const useDeleteCallgent = () => {
-  const fetchCallgentList = useFetchCallgentList();
-  const deleteCallgentMutation = useMutation({
-    mutationFn: callgentService.deleteCallgent,
-    onSuccess: () => {
+  const { actions, callgentList } = useCallgentStore();
+  const deleteCallgent_ = async (id: string) => {
+    await deleteCallgent(id).then(() => {
       toast.success("Callgent deleted successfully!");
-      fetchCallgentList({ page: 1 });
-    },
-  });
-  const deleteCallgent = async (id: string) => {
-    await deleteCallgentMutation.mutateAsync(id);
+      const updatedList = callgentList.filter(item => item.id !== id);
+      actions.setCallgentList(updatedList);
+    }).catch(() => { });
   };
-  return deleteCallgent;
+  return deleteCallgent_;
 };
 
 
 export default useCallgentStore;
+export const useCallgentActions = () => useCallgentStore((state) => state.actions);

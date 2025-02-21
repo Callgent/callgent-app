@@ -1,13 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { Button, Card, Col, Form, Input, InputNumber, Modal, Popconfirm, Radio, Row, Select, Space, Tag } from "antd";
-import Table, { type ColumnsType } from "antd/es/table";
-import type { TableRowSelection } from "antd/es/table/interface";
+import { Button, Card, Col, Form, Input, InputNumber, Modal, Radio, Row, Select, Space, Tag } from "antd";
 import { useEffect, useState } from "react";
-
-import orgService from "@/api/services/orgService";
-import { IconButton, Iconify } from "@/components/icon";
-
-import OrganizationChart from "./organization-chart";
 
 import type { Organization } from "#/entity";
 
@@ -31,82 +23,8 @@ export default function OrganizationPage() {
 		},
 	});
 
-	const columns: ColumnsType<Organization> = [
-		{ title: "Name", dataIndex: "name", width: 300 },
-		{ title: "Order", dataIndex: "order", align: "center", width: 60 },
-		{
-			title: "Status",
-			dataIndex: "status",
-			align: "center",
-			width: 120,
-			render: (status) => <Tag color={status === "enable" ? "success" : "error"}>{status}</Tag>,
-		},
-		{ title: "Desc", dataIndex: "desc", align: "center", width: 300 },
-		{
-			title: "Action",
-			key: "operation",
-			align: "center",
-			width: 100,
-			render: (_, record) => (
-				<div className="flex w-full justify-center text-gray">
-					<IconButton onClick={() => onEdit(record)}>
-						<Iconify icon="solar:pen-bold-duotone" size={18} />
-					</IconButton>
-					<Popconfirm title="Delete the Organization" okText="Yes" cancelText="No" placement="left">
-						<IconButton>
-							<Iconify icon="mingcute:delete-2-fill" size={18} className="text-error" />
-						</IconButton>
-					</Popconfirm>
-				</div>
-			),
-		},
-	];
-
-	// rowSelection objects indicates the need for row selection
-	const rowSelection: TableRowSelection<Organization> = {
-		onChange: (selectedRowKeys, selectedRows) => {
-			console.log(`selectedRowKeys: ${selectedRowKeys}`, "selectedRows: ", selectedRows);
-		},
-		onSelect: (record, selected, selectedRows) => {
-			console.log(record, selected, selectedRows);
-		},
-		onSelectAll: (selected, selectedRows, changeRows) => {
-			console.log(selected, selectedRows, changeRows);
-		},
-	};
-
-	const { data } = useQuery({
-		queryKey: ["orgs"],
-		queryFn: orgService.getOrgList,
-	});
-
 	const onSearchFormReset = () => {
 		searchForm.resetFields();
-	};
-
-	const onCreate = () => {
-		setOrganizationModalProps((prev) => ({
-			...prev,
-			show: true,
-			title: "Create New",
-			formValue: {
-				...prev.formValue,
-				id: "",
-				name: "",
-				order: 1,
-				desc: "",
-				status: "enable",
-			},
-		}));
-	};
-
-	const onEdit = (formValue: Organization) => {
-		setOrganizationModalProps((prev) => ({
-			...prev,
-			show: true,
-			title: "Edit",
-			formValue,
-		}));
 	};
 
 	return (
@@ -142,30 +60,6 @@ export default function OrganizationPage() {
 					</Row>
 				</Form>
 			</Card>
-
-			<Card
-				title="Organization List"
-				extra={
-					<Button type="primary" onClick={onCreate}>
-						New
-					</Button>
-				}
-			>
-				<Table
-					rowKey="id"
-					size="small"
-					scroll={{ x: "max-content" }}
-					pagination={false}
-					columns={columns}
-					dataSource={data}
-					rowSelection={{ ...rowSelection }}
-				/>
-			</Card>
-
-			<Card title="Organization Chart">
-				<OrganizationChart organizations={data} />
-			</Card>
-
 			<OrganizationModal {...organizationModalPros} />
 		</Space>
 	);

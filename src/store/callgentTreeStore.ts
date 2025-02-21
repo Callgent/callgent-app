@@ -1,7 +1,6 @@
 import { create } from 'zustand';
-import { useMutation } from '@tanstack/react-query';
-import callgentService, { useFetchAdaptors } from '@/api/services/callgentService';
-import { TreeActionState } from '#/store';
+import { fetchAdaptors, getCallgentTree } from '@/api/services/callgentService';
+import { ModalNode, TreeActionState } from '#/store';
 import { CallgentInfo } from '#/entity';
 import { enhanceNode } from '@/utils/callgent-tree';
 
@@ -19,33 +18,19 @@ export const useTreeActionStore = create<TreeActionState>((set) => ({
   actions: {
     setCallgentTree: (callgentTree: CallgentInfo[]) => set({ callgentTree }),
     setCallgentAdaptor: (adaptors: any) => set({ adaptors }),
-    setAction: (action: 'add' | 'edit' | 'import' | 'lock' | null) => set({ action }),
-    openModal: (node: {
-      id: string;
-      parentId?: string;
-      type?: string;
-      modelTitle?: string;
-      data?: any;
-    }) => set({ isModalOpen: true, currentNode: node }),
-    closeModal: () => set({ isModalOpen: false, action: null, currentNode: null })
-  },
+    openModal: (node: ModalNode) => set({ isModalOpen: true, currentNode: node }),
+    closeModal: () => set({ isModalOpen: false, action: null, currentNode: null }),
+  }
 }));
-
-export const useCurrentNode = () => useTreeActionStore((state) => state.currentNode);
-export const useAdaptors = () => useTreeActionStore((state) => state.adaptors);
-export const useCallgentTree = () => useTreeActionStore((state) => state.callgentTree);
 
 // api
 export const useFetchCallgentTree = () => {
   const { setCallgentTree } = useTreeActions();
-  const callgentServerListMutation = useMutation({
-    mutationFn: callgentService.getCallgentTree,
-  });
   const fetchCallgentServerList = async (id: string) => {
     try {
-      const { data } = await callgentServerListMutation.mutateAsync(id);
+      const { data } = await getCallgentTree(id);
       const enhancedData = enhanceNode(data, 1);
-      setCallgentTree([enhancedData])
+      setCallgentTree([enhancedData]);
       setCallgentTree([enhancedData]);
       return data;
     } catch (err) {
@@ -58,10 +43,9 @@ export const useFetchCallgentTree = () => {
 // api
 export const useFetchAdaptor = () => {
   const { setCallgentAdaptor } = useTreeActions();
-  const callgentServerListMutation = useFetchAdaptors()
   const fetchCallgentAdaptor = async () => {
     try {
-      const { data } = await callgentServerListMutation.mutateAsync();
+      const { data } = await fetchAdaptors()
       setCallgentAdaptor(data);
       return data;
     } catch (err) {
@@ -72,3 +56,4 @@ export const useFetchAdaptor = () => {
 };
 
 export const useTreeActions = () => useTreeActionStore((state) => state.actions);
+export default useTreeActionStore;

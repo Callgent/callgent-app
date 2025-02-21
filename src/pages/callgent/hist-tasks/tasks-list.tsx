@@ -1,13 +1,12 @@
-import { useCallgentActions, useCallgentList, useFetchCallgentTasks, usePageInfo, useSearchInfo } from "@/store/callgentStore";
+import useCallgentStore, { useCallgentActions, useFetchCallgentTasks } from "@/store/callgentStore";
 import { Col, Pagination, Row } from "antd";
 import { useEffect, useState } from "react";
 import CallgentCard from "./tasks-card";
 
 const TasksListComponent: React.FC = () => {
+  const { callgentList, pageInfo, searchInfo } = useCallgentStore()
+  const { perPage, page, total } = pageInfo;
   const fetchCallgentList = useFetchCallgentTasks();
-  const callgentList = useCallgentList();
-  const { perPage, page, total } = usePageInfo();
-  const searchInfo = useSearchInfo()
   const { reset } = useCallgentActions();
   const [currentPage, setCurrentPage] = useState(page);
   const [loading, setLoading] = useState(false);

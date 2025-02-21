@@ -1,4 +1,4 @@
-import { useCallgentActions, useCallgentList, useFetchCallgentList, usePageInfo, useSearchInfo } from "@/store/callgentStore";
+import useCallgentStore, { useCallgentActions, useFetchCallgentList } from "@/store/callgentStore";
 import { Col, Pagination, Row } from "antd";
 import { useEffect, useState } from "react";
 import type { CallgentInfo } from "#/entity";
@@ -10,9 +10,8 @@ interface CallgentListComponentProps {
 
 const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit }) => {
   const fetchCallgentList = useFetchCallgentList();
-  const callgentList = useCallgentList();
-  const { perPage, page, total } = usePageInfo();
-  const searchInfo = useSearchInfo()
+  const { callgentList, searchInfo, pageInfo } = useCallgentStore()
+  const { perPage, page, total } = pageInfo;
   const { reset } = useCallgentActions();
   const [currentPage, setCurrentPage] = useState(page);
   const [loading, setLoading] = useState(false);

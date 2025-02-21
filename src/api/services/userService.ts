@@ -11,24 +11,31 @@ export interface SignInReq {
 export interface SignUpReq extends SignInReq {
 	email: string;
 }
+
 export type SignInRes = { data: string };
 
-export enum UserApi {
-	SignIn = "/api/auth/login",
-	SignUp = "/auth/signup",
-	Logout = "/auth/logout",
-	Refresh = "/auth/refresh",
-	User = "/user",
-}
+/** POST /api/auth/login */
+export const signin = (data: SignInReq) =>
+	apiClient.post<SignInRes>({
+		url: "/api/auth/login",
+		data
+	});
 
-const signin = (data: SignInReq) => apiClient.post<SignInRes>({ url: UserApi.SignIn, data });
-const signup = (data: SignUpReq) => apiClient.post<SignInRes>({ url: UserApi.SignUp, data });
-const logout = () => apiClient.get({ url: UserApi.Logout });
-const findUserInfo = () => apiClient.get<Result<UserInfo>>({ url: "/api/users/info" });
+/** POST /auth/signup */
+export const signup = (data: SignUpReq) =>
+	apiClient.post<SignInRes>({
+		url: "/auth/signup",
+		data
+	});
 
-export default {
-	signin,
-	signup,
-	findUserInfo,
-	logout,
-};
+/** GET /auth/logout */
+export const logout = () =>
+	apiClient.get({
+		url: "/auth/logout"
+	});
+
+/** GET /api/users/info */
+export const findUserInfo = () =>
+	apiClient.get<Result<UserInfo>>({
+		url: "/api/users/info"
+	});

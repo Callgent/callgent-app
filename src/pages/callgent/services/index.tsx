@@ -1,4 +1,4 @@
-import { useCallgentActions, useFetchCallgentServerList, usePageInfo } from "@/store/callgentStore";
+import useCallgentStore, { useCallgentActions, useFetchCallgentServerList } from "@/store/callgentStore";
 import { Button, Card, Col, Form, Input, Row, Select, Space } from "antd";
 import CallgentList from "./services-list";
 
@@ -15,7 +15,8 @@ export default function Callgents() {
   };
 
   // search
-  const { perPage } = usePageInfo();
+  const { pageInfo } = useCallgentStore()
+  const { perPage } = pageInfo;
   const onSearch = async () => {
     const values = searchForm.getFieldsValue();
     setSearchInfo(values);

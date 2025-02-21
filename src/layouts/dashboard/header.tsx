@@ -7,7 +7,7 @@ import Logo from "@/components/logo";
 import { useSettings } from "@/store/settingStore";
 
 import AccountDropdown from "../components/account-dropdown";
-import NoticeButton from "../components/notice";
+// import NoticeButton from "../components/notice";
 import SearchBar from "../components/search-bar";
 import SettingButton from "../components/setting-button";
 
@@ -57,7 +57,8 @@ export default function Header() {
 					<div className="flex">
 						<SearchBar />
 						<LocalePicker />
-						<NoticeButton />
+						{/* // FIXME */}
+						{/* <NoticeButton /> */}
 						<SettingButton />
 						<AccountDropdown />
 					</div>

@@ -1,24 +1,20 @@
-import { useMutation } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
 import { useTranslation } from "react-i18next";
 
-import userService from "@/api/services/userService";
 
 import { ReturnButton } from "./components/ReturnButton";
 import { LoginStateEnum, useLoginStateContext } from "./providers/LoginStateProvider";
+import { signup } from "@/api/services/userService";
 
 function RegisterForm() {
 	const { t } = useTranslation();
-	const signUpMutation = useMutation({
-		mutationFn: userService.signup,
-	});
 
 	const { loginState, backToLogin } = useLoginStateContext();
 	if (loginState !== LoginStateEnum.REGISTER) return null;
 
 	const onFinish = async (values: any) => {
 		console.log("Received values of form: ", values);
-		await signUpMutation.mutateAsync(values);
+		await signup(values);
 		backToLogin();
 	};
 

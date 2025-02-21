@@ -1,8 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Avatar, Col, Progress, Row, Space, Table, Tag, Timeline, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
-
-import { fakeAvatars } from "@/_mock/utils";
 import Card from "@/components/card";
 import { IconButton, Iconify, SvgIcon } from "@/components/icon";
 import Scrollbar from "@/components/scrollbar";
@@ -20,12 +18,19 @@ interface DataType {
 }
 
 export default function ProfileTab() {
-	const { username } = useUserInfo();
+	const fakeAvatars = (count: number) => {
+		const result = [];
+		for (let index = 0; index < count; index += 1) {
+			result.push(faker.image.avatarGitHub());
+		}
+		return result;
+	};
+	const { name } = useUserInfo();
 	const AboutItems = [
 		{
 			icon: <Iconify icon="fa-solid:user" size={18} />,
 			label: "Full Name",
-			val: username,
+			val: name,
 		},
 		{
 			icon: <Iconify icon="eos-icons:role-binding" size={18} />,
@@ -50,7 +55,7 @@ export default function ProfileTab() {
 		{
 			icon: <Iconify icon="ic:baseline-email" size={18} />,
 			label: "Email",
-			val: username,
+			val: name,
 		},
 	];
 

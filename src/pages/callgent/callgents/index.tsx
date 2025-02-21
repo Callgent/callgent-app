@@ -1,4 +1,4 @@
-import { useCallgentActions, usePageInfo } from "@/store/callgentStore";
+import useCallgentStore, { useCallgentActions } from "@/store/callgentStore";
 import { useFetchCallgentList } from "@/store/callgentStore";
 import { Button, Card, Col, Form, Input, Row, Select, Space } from "antd";
 import { useState } from "react";
@@ -48,7 +48,7 @@ export default function Callgents() {
   };
 
   // search
-  const { perPage } = usePageInfo();
+  const { perPage } = useCallgentStore(state => state.pageInfo);
   const onSearch = async () => {
     const values = searchForm.getFieldsValue();
     setSearchInfo(values);
