@@ -78,6 +78,12 @@ export const ActionForm = () => {
         <Form.Item label="Name" name="host" rules={[{ required: true, message: 'Please enter node name' }]}>
           <Input placeholder="Enter node name" />
         </Form.Item>
+        <Form.Item label="summary" name="summary" rules={[{ required: false, message: 'Please enter node summary' }]}>
+          <Input.TextArea placeholder="Enter node summary" />
+        </Form.Item>
+        <Form.Item label="instruction" name="instruction" rules={[{ required: false, message: 'Please enter node instruction' }]}>
+          <Input.TextArea placeholder="Enter node instruction" />
+        </Form.Item>
       </>
     ),
     edit: (
@@ -85,6 +91,12 @@ export const ActionForm = () => {
         <Divider />
         <Form.Item label="Name" name="host" rules={[{ required: true, message: 'Please enter a new name' }]}>
           <Input placeholder="Enter new name" />
+        </Form.Item>
+        <Form.Item label="summary" name="summary" rules={[{ required: false, message: 'Please enter node summary' }]}>
+          <Input.TextArea placeholder="Enter node summary" />
+        </Form.Item>
+        <Form.Item label="instruction" name="instruction" rules={[{ required: false, message: 'Please enter node instruction' }]}>
+          <Input.TextArea placeholder="Enter node instruction" />
         </Form.Item>
       </>
     ),

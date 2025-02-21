@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { CallgentInfo as CallgentInfoType, TreeAction } from '#/entity';
 import { Add, Delete, Edit, Import, Lock } from './icon';
 import { useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
-import { Popconfirm } from 'antd';
+import { Popconfirm, Tooltip } from 'antd';
 import { useDeleteCallgent } from '@/store/callgentStore';
 import { deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
@@ -98,39 +98,41 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
     <div>
       {nodes.map(node => (
         <div className="w-full" data-testid="tree-node" key={node?.id}>
-          <div className="flex justify-between items-center p-2 rounded mb-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
-            <div className="flex flex-1 overflow-hidden" title={node.name}>
-              <button
-                className="w-[95%] text-left bg-transparent cursor-pointer border-none text-base"
-                onClick={() => node.id && onToggle(node.id)}
-                title={node.hint}
-                aria-label={`Toggle ${node.name}`}
-              >
-                <span className="flex items-center overflow-hidden flex-1">
-                  <img
-                    src={iconSrc}
-                    className="mr-2 dark:invert-[75%] h-5 w-5"
-                    alt={`${node.name} icon`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/icons/default.svg';
-                    }}
-                  />
-                  {node.adaptorKey === 'Webpage' ? (
-                    <Link
-                      to={`${docsUrl}/chatbox?callgentId=${callgentId}&entryId=${node.id}`}
-                      className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1 hover:text-blue-600"
-                      data-testid="webpage-link"
-                    >
-                      {node.name}
-                    </Link>
-                  ) : (
-                    <span className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1">
-                      {node.name}
-                    </span>
-                  )}
-                </span>
-              </button>
-            </div>
+          <div className="flex justify-between items-center p-2 rounded mb-1 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700">
+            <Tooltip title={`${node?.name}${node.summary ? ":" + node.summary : ''} ${node?.instruction ? ("/" + node?.instruction) : ""}`}>
+              <div className="flex flex-1 overflow-hidden">
+                <button
+                  className="w-[95%] text-left bg-transparent cursor-pointer border-none text-base"
+                  onClick={() => node.id && onToggle(node.id)}
+                  title={node.hint}
+                  aria-label={`Toggle ${node.name}`}
+                >
+                  <span className="flex items-center overflow-hidden flex-1">
+                    <img
+                      src={iconSrc}
+                      className="mr-2 dark:invert-[75%] h-5 w-5"
+                      alt={`${node.name} icon`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/icons/default.svg';
+                      }}
+                    />
+                    {node.adaptorKey === 'Webpage' ? (
+                      <Link
+                        to={`${docsUrl}/chatbox?callgentId=${callgentId}&entryId=${node.id}`}
+                        className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1 hover:text-blue-600"
+                        data-testid="webpage-link"
+                      >
+                        {node.name}
+                      </Link>
+                    ) : (
+                      <span className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1">
+                        {node.name}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              </div>
+            </Tooltip>
             <div className="node-right flex gap-2 items-center">
               {node.lock && (
                 <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')}>
