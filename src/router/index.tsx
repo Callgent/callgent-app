@@ -8,17 +8,28 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Navigate, type RouteObject, createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import type { AppRouteObject } from "#/router";
+import CallgentApi from "@/pages/callgent/callgent-api";
 
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
-const PUBLIC_ROUTE: AppRouteObject = {
-	path: "/login",
-	element: (
-		<ErrorBoundary FallbackComponent={PageError}>
-			<Login />
-		</ErrorBoundary>
-	),
-};
+const PUBLIC_ROUTE: AppRouteObject[] = [
+	{
+		path: "/login",
+		element: (
+			<ErrorBoundary FallbackComponent={PageError}>
+				<Login />
+			</ErrorBoundary>
+		),
+	},
+	{
+		path: "/callgentapi",
+		element: (
+			<ErrorBoundary FallbackComponent={PageError}>
+				<CallgentApi />
+			</ErrorBoundary>
+		),
+	},
+]
 
 const NO_MATCHED_ROUTE: AppRouteObject = {
 	path: "*",
@@ -38,7 +49,7 @@ export default function Router() {
 		children: [{ index: true, element: <Navigate to={HOMEPAGE} replace /> }, ...permissionRoutes],
 	};
 
-	const routes = [PUBLIC_ROUTE, PROTECTED_ROUTE, ERROR_ROUTE, NO_MATCHED_ROUTE] as RouteObject[];
+	const routes = [...PUBLIC_ROUTE, PROTECTED_ROUTE, ERROR_ROUTE, NO_MATCHED_ROUTE] as RouteObject[];
 
 	const router = createBrowserRouter(routes);
 

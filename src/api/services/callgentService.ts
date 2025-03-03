@@ -115,3 +115,16 @@ export const selectRealms = async (data: CallgentInfo, realmKey?: string) =>
 		url: `/api/callgent-realms/securities/${data?.type ? 'entry' : 'function'}/${data?.id}`,
 		data: [{ realmKey: realmKey }]
 	});
+
+/** get /api/callgent-api */
+export const getCallgentApi = async (id: string) =>
+	apiClient.get<any>({
+		url: `/api/endpoints/${id}`
+	});
+
+/** put /api/callgent-api */
+export const putCallgentApi = async (id: string, data: any) =>
+	apiClient.put<any>({
+		url: `/api/endpoints/${id}`,
+		data
+	});

@@ -37,3 +37,52 @@ export const deleteNode = (nodes: CallgentInfo[], id: string): CallgentInfo[] =>
     return acc;
   }, []);
 };
+
+export const callgentApi = (data: any) => {
+  return {
+    openapi: data.openapi || "3.1.0",
+    info: {
+      title: data.name || "Unnamed API",
+      description: data.description || "",
+      version: "1.0.0",
+    },
+    paths: {
+      [data.path]: {
+        [data.method.toLowerCase()]: {
+          summary: data?.summary,
+          description: data?.description,
+          parameters: data.params && Object.keys(data.params).length > 0
+            ? Object.entries(data.params).map(([name, schema]) => ({
+              name,
+              in: "query",
+              schema,
+            }))
+            : undefined,
+          responses: data?.responses,
+        },
+      },
+    },
+  };
+}
+
+export const restoreDataFromOpenApi = (openApiSpec: any) => {
+  const path = Object.keys(openApiSpec.paths)[0];
+  const method = Object.keys(openApiSpec.paths[path])[0];
+  const operation = openApiSpec.paths[path][method];
+  const data = {
+    path: path,
+    method: method.toUpperCase(),
+    summary: operation.summary || "",
+    description:
+      openApiSpec.info.description || operation.description || "",
+    params:
+      operation.parameters && operation.parameters.length > 0
+        ? Object.fromEntries(
+          operation.parameters.map((param: any) => [param.name, param.schema])
+        )
+        : {},
+    responses: operation?.responses || {},
+  };
+
+  return data;
+};

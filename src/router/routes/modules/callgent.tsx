@@ -6,6 +6,7 @@ import { CircleLoading } from "@/components/loading";
 
 import type { AppRouteObject } from "#/router";
 import CallgentInfo from "@/pages/callgent/callgent-tree";
+import CallgentApi from "@/pages/callgent/callgent-api";
 
 const Callgents = lazy(() => import("@/pages/callgent/callgents"));
 const Services = lazy(() => import("@/pages/callgent/services"));

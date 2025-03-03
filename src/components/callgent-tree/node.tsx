@@ -7,6 +7,7 @@ import { Popconfirm, Tooltip } from 'antd';
 import { useDeleteCallgent } from '@/store/callgentStore';
 import { deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
+import NodeComponent from './node-component';
 
 interface TreeNodeProps {
   nodes: CallgentInfoType[];
@@ -93,7 +94,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
   const showPopconfirm = () => {
     setOpenConfirm(true);
   };
-  const docsUrl = import.meta.env.VITE_DOCS_URL;
+
   return (
     <div>
       {nodes.map(node => (
@@ -116,19 +117,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
                         (e.target as HTMLImageElement).src = '/icons/default.svg';
                       }}
                     />
-                    {node.adaptorKey === 'Webpage' ? (
-                      <Link
-                        to={`${docsUrl}/chatbox?callgentId=${callgentId}&entryId=${node.id}`}
-                        className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1 hover:text-blue-600"
-                        data-testid="webpage-link"
-                      >
-                        {node.name}
-                      </Link>
-                    ) : (
-                      <span className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1">
-                        {node.name}
-                      </span>
-                    )}
+                    <NodeComponent node={node} callgentId={callgentId!} level={level} />
                   </span>
                 </button>
               </div>

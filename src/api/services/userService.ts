@@ -24,7 +24,7 @@ export const signin = (data: SignInReq) =>
 /** POST /auth/signup */
 export const signup = (data: SignUpReq) =>
 	apiClient.post<SignInRes>({
-		url: "/auth/signup",
+		url: "/api/auth/register",
 		data
 	});
 
