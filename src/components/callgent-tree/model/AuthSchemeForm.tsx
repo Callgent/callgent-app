@@ -41,7 +41,7 @@ const ApiKeyForm: React.FC = () => {
       </Form.Item>
 
       <Form.Item label="Secret" name={['scheme', 'secret']}>
-        <Input placeholder="Enter secret" />
+        <Input placeholder="Enter secret, leave empty for user to fill in" />
       </Form.Item>
     </>
   );
