@@ -60,6 +60,9 @@ export interface CallgentInfo {
 	realms?: Array<Realm>;
 	securities?: any;
 	level?: number;
+	modelTitle?: string;
+	path?: string;
+	data?: CallgentInfo;
 }
 
 export interface HostType {
@@ -75,6 +78,7 @@ export interface Scheme {
 }
 
 export interface Realm {
+	id?: string;
 	realmKey: string;
 	authType: string;
 	realm: string;
@@ -82,6 +86,12 @@ export interface Realm {
 	scheme?: Scheme;
 	perUser: boolean;
 	enabled: boolean;
+	type?: string;
+	pricingEnabled?: boolean;
+	pricing?: {
+		perRequest?: number;
+		perResponse?: string;
+	}
 }
 
 export interface Realms {
@@ -138,10 +148,11 @@ export interface FormValues {
 		provider?: string;
 		secret?: string;
 	};
-	secret: Record<string, any>;
 }
 
 export interface NewAuthProps {
 	initialData?: Realm | false;
 	callgentId?: string;
+	realmKey?: string;
+	selectId?: string;
 }

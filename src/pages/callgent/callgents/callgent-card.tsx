@@ -39,7 +39,7 @@ const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
   };
 
   const handleCardClick = () => {
-    navigate(`/callgent/callgenttree?callgentId=${item.id}`);
+    navigate(`/callgent/tree?callgentId=${item.id}`);
   };
 
   return (

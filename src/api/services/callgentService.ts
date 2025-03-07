@@ -96,24 +96,25 @@ export const postRealms = async (data: Realm) =>
 /** Put /api/callgent-realms */
 export const putRealms = async (data: Realm) =>
 	apiClient.put<any>({
-		url: `/api/callgent-realms/${data.callgentId}/${data.realmKey}`,
+		url: `/api/callgent-realms/${data.id}`,
 		data: {
 			realm: data?.realm,
-			scheme: data?.scheme
-		}
+			scheme: data?.scheme,
+			pricing: data?.pricing
+		},
 	});
 
 /** Delete /api/callgent-realms */
-export const deleteRealms = async (data: { callgentId?: string, realmKey?: string }) =>
+export const deleteRealms = async (data: { id?: string }) =>
 	apiClient.delete<any>({
-		url: `/api/callgent-realms/${data.callgentId}/${data.realmKey}`
+		url: `/api/callgent-realms/${data.id}`
 	});
 
 /** Select /api/callgent-realms */
-export const selectRealms = async (data: CallgentInfo, realmKey?: string) =>
+export const selectRealms = async (data: CallgentInfo, realmKey: { realmKey: string }[]) =>
 	apiClient.post<any>({
-		url: `/api/callgent-realms/securities/${data?.type ? 'entry' : 'function'}/${data?.id}`,
-		data: [{ realmKey: realmKey }]
+		url: `/api/callgent-realms/securities/${!data?.data?.path ? 'entry' : 'function'}/${data?.id}`,
+		data: realmKey
 	});
 
 /** get /api/callgent-api */

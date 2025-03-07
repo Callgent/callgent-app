@@ -81,9 +81,6 @@ const Auth: React.FC<any> = () => {
           <NewAuth
             initialData={item}
             callgentId={callgentTree[0].id}
-            onUpdate={(updatedItem) => updateRealms('edit', updatedItem, item.realmKey)}
-            onDelete={() => remove(item.realmKey)}
-            isNew={item.realmKey.startsWith('newRealm')}
           />
         ),
         closable: false,
@@ -92,7 +89,7 @@ const Auth: React.FC<any> = () => {
     : [{
       key: 'new',
       label: 'Add New Auth',
-      children: <NewAuth callgentId={callgentTree[0]?.id} isNew={true} />,
+      children: <NewAuth callgentId={callgentTree[0]?.id} />,
       closable: false,
     }];
 

@@ -1,13 +1,12 @@
-import { createCallgentEntry, editCallgentEntry, importEntry } from '@/api/services/callgentService';
+import { createCallgentEntry, editCallgentEntry, importEntry, selectRealms } from '@/api/services/callgentService';
 import { useFetchCallgentTree, useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
-import { Form, Input, Button, Select, Divider } from 'antd';
+import { Form, Input, Button, Select, Divider, Checkbox } from 'antd';
 import { useState } from 'react';
-import Auth from './tree-autch';
 
 export const ActionForm = () => {
   const { action } = useTreeActionStore();
   const { closeModal } = useTreeActions();
-  const { callgentTree, currentNode, adaptors } = useTreeActionStore();
+  const { callgentTree, currentNode, adaptors, realms } = useTreeActionStore();
   const [loading, setLoading] = useState(false);
 
   const formItemLayout = {
@@ -39,7 +38,7 @@ export const ActionForm = () => {
           break;
         case 'edit':
           await editCallgentEntry({
-            id: currentNode.id,
+            id: currentNode.id!,
             formValues: { host },
           });
           await fetchCallgentTree(callgentTree[0].id!);
@@ -48,6 +47,14 @@ export const ActionForm = () => {
           await importEntry({
             formValues: { text, entryId: currentNode.id },
           });
+          await fetchCallgentTree(callgentTree[0].id!);
+          break;
+        case 'select':
+          const selectRealm = values?.selectedOptions || [];
+          const result = selectRealm.map((item: string) => ({ apiKey: item }));
+          console.log(currentNode, result);
+
+          await selectRealms(currentNode, result);
           await fetchCallgentTree(callgentTree[0].id!);
           break;
       }
@@ -112,36 +119,44 @@ export const ActionForm = () => {
         </Form.Item>
       </>
     ),
-    lock: (
-      <>
-        <Divider />
-        <Auth />
-      </>
-    ),
     select: (
       <>
         <Divider />
-        <Auth />
+        <Form.Item label="Name" name="host" rules={[{ required: false, message: 'Please enter a new name' }]}>
+          <Input placeholder="Enter new name" disabled={true} />
+        </Form.Item>
+        <Form.Item
+          label="Select Options"
+          name="selectedOptions"
+          rules={[{ required: false, message: 'Please select at least one option' }]}
+        >
+          <Checkbox.Group style={{ width: '100%' }}>
+            {realms.map((option) => (
+              <Checkbox key={option.realmKey} value={option.realmKey}>
+                {option.realm}
+              </Checkbox>
+            ))}
+          </Checkbox.Group>
+        </Form.Item>
       </>
     ),
+    lock: null
   };
 
   return action ? (
-    (action === 'lock' || action === 'select') ? (
-      formContent[action]
-    ) : (
+    (
       <Form
         {...formItemLayout}
         onFinish={onSubmit}
         initialValues={{
           adaptorKey: adaptors.length > 0 ? adaptors[0].name : undefined,
-          host: action === 'edit' ? currentNode?.data?.name : undefined,
+          host: (action === 'edit' || action === 'select') ? currentNode?.data?.name : undefined,
         }}
       >
         {formContent[action]}
         <Form.Item wrapperCol={{ span: 24 }} style={{ textAlign: 'right' }}>
           <Button type="primary" htmlType="submit" loading={loading}>
-            {action === 'add' ? 'Create' : action === 'edit' ? 'Update' : 'Import'}
+            {action === 'add' ? 'Create' : action === 'edit' ? 'Update' : action === 'import' ? 'Import' : 'select'}
           </Button>
         </Form.Item>
       </Form>

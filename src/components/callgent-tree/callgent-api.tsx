@@ -49,7 +49,6 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
       const id = queryParams.get("endpointsId");
       await putCallgentApi(id!, restoreData);
       setParsedSpec(dataToSave)
-      console.log(restoreData);
       toast.success("OpenAPI spec saved successfully!");
     } catch (e) {
       toast.error(`Error saving OpenAPI spec: ${e.message}`, {

@@ -1,4 +1,4 @@
-import type { CallgentInfo, PageInfo, TreeAction } from "#/entity";
+import type { CallgentInfo, PageInfo, Realm, TreeAction } from "#/entity";
 
 export interface CallgentStore {
   callgentList: CallgentInfo[];
@@ -15,27 +15,17 @@ export interface CallgentStore {
 
 export interface TreeActionState {
   callgentTree: CallgentInfo[];
+  realms: Realm[];
   action: TreeAction | null;
   modelTitle: string;
-  currentNode: {
-    id: string;
-    modelTitle?: string;
-    parentId?: string;
-    type?: string;
-    data?: any;
-  } | null;
+  currentNode: CallgentInfo | null;
   adaptors: any[],
   isModalOpen: boolean;
   actions: {
     setCallgentTree: (callgentTree: CallgentInfo[]) => void;
+    setCallgentRealms: (realms: Realm[]) => void;
     setCallgentAdaptor: (adaptor: any) => void;
-    openModal: (node: {
-      id: string;
-      parentId?: string;
-      modelTitle?: string;
-      type?: string;
-      data?: any;
-    }) => void;
+    openModal: (node: ModalNode) => void;
     closeModal: () => void;
   }
 }

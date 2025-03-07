@@ -6,7 +6,7 @@ import { CircleLoading } from "@/components/loading";
 
 import type { AppRouteObject } from "#/router";
 import CallgentInfo from "@/pages/callgent/callgent-tree";
-import CallgentApi from "@/pages/callgent/callgent-api";
+import CallgentAuth from "@/pages/callgent/callgent-auth";
 
 const Callgents = lazy(() => import("@/pages/callgent/callgents"));
 const Services = lazy(() => import("@/pages/callgent/services"));
@@ -46,9 +46,14 @@ const callgent: AppRouteObject = {
       meta: { label: "sys.menu.callgent.histtasks", key: "/callgent/histtasks" },
     },
     {
-      path: "callgenttree",
+      path: "tree",
       element: <CallgentInfo />,
-      meta: { label: "sys.menu.callgent.callgentinfo", key: "/callgent/callgentinfo", hideMenu: true },
+      meta: { label: "sys.menu.callgent.callgentinfo", key: "/callgent/info", hideMenu: true },
+    },
+    {
+      path: "auth",
+      element: <CallgentAuth />,
+      meta: { label: "sys.menu.callgent.callgentauth", key: "/callgent/auth", hideMenu: true },
     },
   ],
 };

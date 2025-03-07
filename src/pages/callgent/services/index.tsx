@@ -54,7 +54,6 @@ export default function Callgents() {
           </Row>
         </Form>
       </Card>
-
       <Card title="Callgent List">
         <CallgentList />
       </Card>

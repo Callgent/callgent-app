@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router';
 import { CallgentInfo as CallgentInfoType, TreeAction } from '#/entity';
 import { Add, Delete, Edit, Import, Lock } from './icon';
 import { useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
@@ -8,6 +7,8 @@ import { useDeleteCallgent } from '@/store/callgentStore';
 import { deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
 import NodeComponent from './node-component';
+import { useNavigate } from 'react-router';
+import { createSearchParams } from '@/utils';
 
 interface TreeNodeProps {
   nodes: CallgentInfoType[];
@@ -23,6 +24,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
   }
   const { openModal, setCallgentTree } = useTreeActions();
   const node = nodes[0]
+  const navigate = useNavigate();
   const iconSrc = useMemo(() => {
     if (node.icon_url) return node.icon_url;
     switch (level) {
@@ -33,10 +35,8 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
       default: return '/icons/Recruitment.svg';
     }
   }, []);
-
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id!);
-
   const handleAction = (actionType: TreeAction) => {
     switch (actionType) {
       case 'add':
@@ -57,14 +57,20 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
         });
         break;
       case 'lock':
+        const params = createSearchParams({
+          id: callgentId,
+          nodeId: node?.id,
+          realmKey: "apiKey:header::api.api.abbb:init",
+        });
+        navigate(`/callgent/auth?${params.toString()}`)
+        break;
       case 'select':
         openModal({
           id: node.id!,
           modelTitle: "Manage Auth",
-          type: level !== 1 ? 'select' : "edit",
+          type: 'select',
           data: node,
         });
-        break;
     }
     useTreeActionStore.setState({ action: actionType });
   }
@@ -100,7 +106,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
       {nodes.map(node => (
         <div className="w-full" data-testid="tree-node" key={node?.id}>
           <div className="flex justify-between items-center p-2 rounded mb-1 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700">
-            <Tooltip title={`${node?.name}${node.summary ? ":" + node.summary : ''} ${node?.instruction ? ("/" + node?.instruction) : ""}`}>
+            <Tooltip title={node.summary} placement="topLeft">
               <div className="flex flex-1 overflow-hidden">
                 <button
                   className="w-[95%] text-left bg-transparent cursor-pointer border-none text-base"
@@ -110,6 +116,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
                 >
                   <span className="flex items-center overflow-hidden flex-1">
                     <img
+                      title={node?.securities ? '' : '1sss23'}
                       src={iconSrc}
                       className="mr-2 dark:invert-[75%] h-5 w-5"
                       alt={`${node.name} icon`}
@@ -124,7 +131,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
             </Tooltip>
             <div className="node-right flex gap-2 items-center">
               {node.lock && (
-                <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')}>
+                <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')} >
                   <Lock
                     data={{
                       level,
