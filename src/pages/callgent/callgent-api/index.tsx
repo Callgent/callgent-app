@@ -18,10 +18,6 @@ export default function CallgentApi() {
       if (!endpointsId) {
         const data = {
           openapi: "3.0.0",
-          name: "callgent",
-          info: {
-            "title": "CallgentApi",
-          },
           paths: {}
         }
         setOpenApi(data);

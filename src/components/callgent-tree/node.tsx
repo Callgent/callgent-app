@@ -135,7 +135,8 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
             </Tooltip>
             <div className="node-right flex gap-2 items-center">
               {node.lock && (
-                <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')} >
+                <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')}
+                  className='hover:bg-gray-200 dark:hover:bg-gray-500 p-1 rounded'>
                   <Lock
                     data={{
                       level,
@@ -148,7 +149,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
               {node.add && (
                 <div
                   onClick={() => handleAction('add')}
-                  className="p-1 hover:bg-gray-200 rounded"
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-500 rounded"
                   role="button"
                   aria-label="Add node"
                 >
@@ -158,7 +159,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
               {node.virtualApi && (
                 <div
                   onClick={() => handleAction('virtualApi')}
-                  className="p-1 hover:bg-gray-200 rounded"
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-500 rounded"
                   role="button"
                   aria-label="Add node"
                 >
@@ -168,7 +169,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
               {node.import && node.type === "SERVER" && (
                 <div
                   onClick={() => handleAction('import')}
-                  className="p-1 hover:bg-gray-200 rounded"
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-500 rounded"
                   role="button"
                   aria-label="Import data"
                 >
@@ -178,7 +179,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
               {node.edit && (
                 <div
                   onClick={() => handleAction('edit')}
-                  className="p-1 hover:bg-gray-200 rounded"
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-500 rounded"
                   role="button"
                   aria-label="Edit node"
                 >
@@ -186,7 +187,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
                 </div>
               )}
               {node?.delete &&
-                <div>
+                <div className='hover:bg-gray-200 dark:hover:bg-gray-500 p-1 rounded'>
                   <Popconfirm
                     key="delete"
                     title={level === 1 ? 'Delete the callgent' : 'Delete the entry'}
