@@ -25,6 +25,7 @@ const ApiKeyForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
           <Select.Option value="header">header</Select.Option>
           <Select.Option value="query">query</Select.Option>
           <Select.Option value="cookie">cookie</Select.Option>
+          <Select.Option value="body">body</Select.Option>
         </Select>
       </Form.Item>
 
@@ -46,8 +47,8 @@ const ApiKeyForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
         <Input placeholder="Enter secret, leave empty for user to fill in" />
       </Form.Item>
 
-      <Form.Item label="ValidationUrl" name={['scheme', 'validationUr']}>
-        <Input placeholder="Enter validationUr, leave empty for user to fill in" />
+      <Form.Item label="ValidationUrl" name={['scheme', 'validationUrl']}>
+        <Input placeholder="Enter validationUrl, leave empty for user to fill in" />
       </Form.Item>
 
       <Form.Item
@@ -123,11 +124,20 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
           <Select.Option value="header">header</Select.Option>
           <Select.Option value="query">query</Select.Option>
           <Select.Option value="cookie">cookie</Select.Option>
+          <Select.Option value="body">body</Select.Option>
         </Select>
       </Form.Item>
 
       <Form.Item
-        label="Realm"
+        label="Scheme Name"
+        name={['scheme', 'name']}
+        rules={[{ required: true, message: 'Please enter scheme name' }]}
+      >
+        <Input placeholder="Enter scheme realm, e.g. 'x-api-key'" />
+      </Form.Item>
+
+      <Form.Item
+        label="Realm Name"
         name='realm'
         rules={[{ required: true, message: 'Please enter scheme name' }]}
       >

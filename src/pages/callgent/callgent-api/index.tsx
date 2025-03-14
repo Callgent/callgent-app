@@ -13,15 +13,23 @@ export default function CallgentApi() {
 
   const init = async () => {
     const queryParams = new URLSearchParams(location.search);
-    const id = queryParams.get("endpointsId");
-    if (!id) {
-      navigate("/callgent/callgents", { replace: true });
-      return;
-    }
+    const endpointsId = queryParams.get("endpointsId");
     try {
-      const { data } = await getCallgentApi(id);
-      const normalizedOpenApi = callgentApi(data);
-      setOpenApi(normalizedOpenApi);
+      if (!endpointsId) {
+        const data = {
+          openapi: "3.0.0",
+          name: "callgent",
+          info: {
+            "title": "CallgentApi",
+          },
+          paths: {}
+        }
+        setOpenApi(data);
+      } else {
+        const { data } = await getCallgentApi(endpointsId);
+        const normalizedOpenApi = callgentApi(data);
+        setOpenApi(normalizedOpenApi);
+      }
     } catch (error) {
       console.error("Failed to load API data:", error);
       navigate("/callgent/callgents", { replace: true });

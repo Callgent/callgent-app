@@ -129,3 +129,8 @@ export const putCallgentApi = async (id: string, data: any) =>
 		url: `/api/endpoints/${id}`,
 		data
 	});
+
+/** post /api/callgent-api */
+export const postEndpointsApi = async (data: any) =>
+	apiClient.post({ url: '/api/endpoints', data });
+

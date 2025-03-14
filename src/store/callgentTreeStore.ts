@@ -22,6 +22,7 @@ export const useTreeActionStore = create<TreeActionState>((set) => ({
     setCallgentAdaptor: (adaptors: any) => set({ adaptors }),
     openModal: (node: ModalNode) => set({ isModalOpen: true, currentNode: node }),
     closeModal: () => set({ isModalOpen: false, action: null, currentNode: null }),
+    setCurrentNode: (node: CallgentInfo) => set({ currentNode: node }),
   }
 }));
 

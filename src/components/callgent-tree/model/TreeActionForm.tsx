@@ -51,9 +51,7 @@ export const ActionForm = () => {
           break;
         case 'select':
           const selectRealm = values?.selectedOptions || [];
-          const result = selectRealm.map((item: string) => ({ apiKey: item }));
-          console.log(currentNode, result);
-
+          const result = selectRealm.map((item: string) => ({ realmId: item }));
           await selectRealms(currentNode, result);
           await fetchCallgentTree(callgentTree[0].id!);
           break;
@@ -132,15 +130,16 @@ export const ActionForm = () => {
         >
           <Checkbox.Group style={{ width: '100%' }}>
             {realms.map((option) => (
-              <Checkbox key={option.realmKey} value={option.realmKey}>
-                {option.realm}
+              <Checkbox key={option.id} value={option.id}>
+                {option.realmKey}
               </Checkbox>
             ))}
           </Checkbox.Group>
         </Form.Item>
       </>
     ),
-    lock: null
+    lock: null,
+    virtualApi: null,
   };
 
   return action ? (

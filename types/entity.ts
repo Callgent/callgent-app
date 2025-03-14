@@ -22,7 +22,7 @@ export interface Adaptor {
 	[key: string]: string;
 };
 
-export type TreeAction = 'add' | 'edit' | 'import' | 'lock' | 'select';
+export type TreeAction = 'add' | 'edit' | 'import' | 'lock' | 'select' | 'virtualApi';
 
 export interface CallgentInfo {
 	id?: string;
@@ -49,11 +49,6 @@ export interface CallgentInfo {
 	title?: string;
 	type?: string;
 	host?: HostType;
-	add?: boolean;
-	edit?: boolean;
-	delete?: boolean;
-	import?: boolean;
-	lock?: boolean;
 	adaptorKey?: string;
 	icon_url?: string;
 	children?: CallgentInfo[];
@@ -63,6 +58,13 @@ export interface CallgentInfo {
 	modelTitle?: string;
 	path?: string;
 	data?: CallgentInfo;
+
+	add?: boolean;
+	edit?: boolean;
+	delete?: boolean;
+	import?: boolean;
+	lock?: boolean;
+	virtualApi?: boolean;
 }
 
 export interface HostType {

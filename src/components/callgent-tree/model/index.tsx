@@ -11,7 +11,8 @@ export const TreeActionModal = () => {
     edit: 'Edit ' + currentNode?.modelTitle,
     import: 'Import Api',
     lock: 'Manage Auth',
-    select: 'Manage Auth',
+    virtualApi: 'Manage virtualApi',
+    select: 'Manage select',
   };
 
   return (

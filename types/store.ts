@@ -26,6 +26,7 @@ export interface TreeActionState {
     setCallgentRealms: (realms: Realm[]) => void;
     setCallgentAdaptor: (adaptor: any) => void;
     openModal: (node: ModalNode) => void;
+    setCurrentNode: (node: CallgentInfo) => void;
     closeModal: () => void;
   }
 }

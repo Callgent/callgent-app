@@ -5,7 +5,7 @@ export const enhanceNode = (node: CallgentInfo, level: number): CallgentInfo => 
   if (level === 2) {
     enhancedNode = { ...enhancedNode, add: true };
   } else if (level === 3 && node?.type === "SERVER") {
-    enhancedNode = { ...enhancedNode, edit: true, delete: true, import: true, lock: true };
+    enhancedNode = { ...enhancedNode, edit: true, delete: true, import: true, lock: true, virtualApi: true };
   } else if (level === 3 || level === 1) {
     enhancedNode = { ...enhancedNode, edit: true, delete: true, lock: true };
   } else if (level === 4) {
@@ -40,12 +40,17 @@ export const deleteNode = (nodes: CallgentInfo[], id: string): CallgentInfo[] =>
 
 export const callgentApi = (data: any) => {
   return {
-    openapi: data.openapi || "3.1.0",
+    openapi: data.openapi || "3.0.0",
     info: {
       title: data.name || "Unnamed API",
       description: data.description || "",
       version: "1.0.0",
     },
+    servers: data?.servers || [],
+    components: data?.components || {},
+    security: data?.security || [],
+    tags: data?.tags || [],
+    externalDocs: data?.externalDocs || {},
     paths: {
       [data.path]: {
         [data.method.toLowerCase()]: {
@@ -69,20 +74,31 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
   const path = Object.keys(openApiSpec.paths)[0];
   const method = Object.keys(openApiSpec.paths[path])[0];
   const operation = openApiSpec.paths[path][method];
-  const data = {
-    path: path,
-    method: method.toUpperCase(),
-    summary: operation.summary || "",
-    description:
-      openApiSpec.info.description || operation.description || "",
-    params:
-      operation.parameters && operation.parameters.length > 0
+  const data = Object.fromEntries(
+    Object.entries({
+      path: path,
+      method: method.toUpperCase(),
+      summary: operation.summary || "",
+      name: openApiSpec.name || "",
+      servers: openApiSpec?.servers || [],
+      components: openApiSpec?.components || {},
+      securities: openApiSpec?.security || [],
+      tags: openApiSpec?.tags || [],
+      externalDocs: openApiSpec?.externalDocs || {},
+      description: openApiSpec.info.description || operation.description || "",
+      params: operation.parameters && operation.parameters.length > 0
         ? Object.fromEntries(
           operation.parameters.map((param: any) => [param.name, param.schema])
         )
         : {},
-    responses: operation?.responses || {},
-  };
+      responses: operation?.responses || {},
+      rawJson: openApiSpec?.rawJson || {}
+    }).filter(([_, value]) =>
+      value !== "" && value !== null && value !== undefined &&
+      !(Array.isArray(value) && value.length === 0) &&
+      !(typeof value === 'object' && Object.keys(value).length === 0)
+    )
+  );
 
   return data;
 };

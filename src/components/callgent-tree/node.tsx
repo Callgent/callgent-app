@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { CallgentInfo as CallgentInfoType, TreeAction } from '#/entity';
-import { Add, Delete, Edit, Import, Lock } from './icon';
+import { Add, Delete, Edit, Import, Lock, VirtualApi } from './icon';
 import { useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
 import { Popconfirm, Tooltip } from 'antd';
 import { useDeleteCallgent } from '@/store/callgentStore';
@@ -22,7 +22,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
   if (nodes.length === 0) {
     return null
   }
-  const { openModal, setCallgentTree } = useTreeActions();
+  const { openModal, setCallgentTree, setCurrentNode } = useTreeActions();
   const node = nodes[0]
   const navigate = useNavigate();
   const iconSrc = useMemo(() => {
@@ -71,6 +71,10 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
           type: 'select',
           data: node,
         });
+        break;
+      case 'virtualApi':
+        setCurrentNode(node);
+        navigate(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
     }
     useTreeActionStore.setState({ action: actionType });
   }
@@ -149,6 +153,16 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
                   aria-label="Add node"
                 >
                   <Add />
+                </div>
+              )}
+              {node.virtualApi && (
+                <div
+                  onClick={() => handleAction('virtualApi')}
+                  className="p-1 hover:bg-gray-200 rounded"
+                  role="button"
+                  aria-label="Add node"
+                >
+                  <VirtualApi />
                 </div>
               )}
               {node.import && node.type === "SERVER" && (
