@@ -54,7 +54,7 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
         await putCallgentApi(id!, restoreData);
       } else if (callgentId && entryId) {
         const restoreData = restoreDataFromOpenApi(dataToSave);
-        await postEndpointsApi({ rawJson: {}, ...restoreData, callgentId: callgentId, entryId: entryId });
+        await postEndpointsApi({ ...restoreData, callgentId: callgentId, entryId: entryId });
       } else {
         navigate("/callgent/callgents", { replace: true });
       }

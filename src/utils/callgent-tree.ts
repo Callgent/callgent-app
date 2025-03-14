@@ -41,16 +41,6 @@ export const deleteNode = (nodes: CallgentInfo[], id: string): CallgentInfo[] =>
 export const callgentApi = (data: any) => {
   return {
     openapi: data.openapi || "3.0.0",
-    info: {
-      title: data.name || "Unnamed API",
-      description: data.description || "",
-      version: "1.0.0",
-    },
-    servers: data?.servers || [],
-    components: data?.components || {},
-    security: data?.security || [],
-    tags: data?.tags || [],
-    externalDocs: data?.externalDocs || {},
     paths: {
       [data.path]: {
         [data.method.toLowerCase()]: {
@@ -74,31 +64,15 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
   const path = Object.keys(openApiSpec.paths)[0];
   const method = Object.keys(openApiSpec.paths[path])[0];
   const operation = openApiSpec.paths[path][method];
-  const data = Object.fromEntries(
-    Object.entries({
-      path: path,
-      method: method.toUpperCase(),
-      summary: operation?.summary || "",
-      name: openApiSpec?.name || "",
-      servers: openApiSpec?.servers || [],
-      components: openApiSpec?.components || {},
-      securities: openApiSpec?.security || [],
-      tags: openApiSpec?.tags || [],
-      externalDocs: openApiSpec?.externalDocs || {},
-      description: openApiSpec?.info?.description || operation?.description || "",
-      params: operation?.parameters && operation?.parameters.length > 0
-        ? Object.fromEntries(
-          operation.parameters.map((param: any) => [param.name, param.schema])
-        )
-        : {},
-      responses: operation?.responses || {},
-      rawJson: openApiSpec?.rawJson || {}
-    }).filter(([_, value]) =>
-      value !== "" && value !== null && value !== undefined &&
-      !(Array.isArray(value) && value.length === 0) &&
-      !(typeof value === 'object' && Object.keys(value).length === 0)
-    )
-  );
-
-  return data;
+  return {
+    path: path,
+    method: method.toUpperCase(),
+    operationId: openApiSpec?.operationId || method + path,
+    responses: operation?.responses || {},
+    params: operation?.parameters && operation?.parameters.length > 0
+      ? Object.fromEntries(
+        operation.parameters.map((param: any) => [param.name, param.schema])
+      )
+      : {},
+  };
 };

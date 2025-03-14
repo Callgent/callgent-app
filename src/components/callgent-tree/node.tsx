@@ -135,8 +135,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
             </Tooltip>
             <div className="node-right flex gap-2 items-center">
               {node.lock && (
-                <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')}
-                  className='hover:bg-gray-200 dark:hover:bg-gray-500 p-1 rounded'>
+                <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')}>
                   <Lock
                     data={{
                       level,
