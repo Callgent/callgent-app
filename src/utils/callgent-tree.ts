@@ -78,15 +78,15 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
     Object.entries({
       path: path,
       method: method.toUpperCase(),
-      summary: operation.summary || "",
-      name: openApiSpec.name || "",
+      summary: operation?.summary || "",
+      name: openApiSpec?.name || "",
       servers: openApiSpec?.servers || [],
       components: openApiSpec?.components || {},
       securities: openApiSpec?.security || [],
       tags: openApiSpec?.tags || [],
       externalDocs: openApiSpec?.externalDocs || {},
-      description: openApiSpec.info.description || operation.description || "",
-      params: operation.parameters && operation.parameters.length > 0
+      description: openApiSpec?.info?.description || operation?.description || "",
+      params: operation?.parameters && operation?.parameters.length > 0
         ? Object.fromEntries(
           operation.parameters.map((param: any) => [param.name, param.schema])
         )
