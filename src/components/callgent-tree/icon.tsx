@@ -63,7 +63,7 @@ export function Lock({ data }: { data: CallgentInfo }) {
         )
     } else if (data?.realms?.length! > 0) {
         return (
-            <>{data?.securities.length > 0 ? LockIcon : UnlockIcon}</>
+            <>{data?.securities?.length > 0 ? LockIcon : UnlockIcon}</>
         )
     } else {
         return null

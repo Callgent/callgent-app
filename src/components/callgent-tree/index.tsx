@@ -69,7 +69,7 @@ export default function CallgentInfo() {
   }
 
   return (
-    <div className="w-full rounded-md py-2 px-4 bg-[#F6F7F8] dark:bg-[#323234]">
+    <div className="w-full rounded-md py-2 bg-[#F6F7F8] dark:bg-[#323234]">
       <TreeNode
         nodes={callgentTree}
         level={1}

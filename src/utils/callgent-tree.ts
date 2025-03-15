@@ -44,6 +44,7 @@ export const callgentApi = (data: any) => {
     paths: {
       [data.path]: {
         [data.method.toLowerCase()]: {
+          operationId: data?.operationId,
           summary: data?.summary,
           description: data?.description,
           parameters: data.params && Object.keys(data.params).length > 0
@@ -65,14 +66,16 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
   const method = Object.keys(openApiSpec.paths[path])[0];
   const operation = openApiSpec.paths[path][method];
   return {
+    operationId: operation?.operationId || method + path,
     path: path,
     method: method.toUpperCase(),
-    operationId: openApiSpec?.operationId || method + path,
+    summary: operation?.summary,
+    description: operation?.description,
+    params: {
+      parameters: operation?.parameters || [],
+      requestObject: operation?.requestBody || {}
+    },
     responses: operation?.responses || {},
-    params: operation?.parameters && operation?.parameters.length > 0
-      ? Object.fromEntries(
-        operation.parameters.map((param: any) => [param.name, param.schema])
-      )
-      : {},
+    rawJson: openApiSpec,
   };
 };
