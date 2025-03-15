@@ -118,7 +118,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
                   aria-label={`Toggle ${node.name}`}
                 >
                   <span className="flex items-center overflow-hidden flex-1">
-                    <div className={`mx-2 ${(node?.children !== undefined && node?.children.length > 0) ? 'block' : 'hidden'}`}>
+                    <div className={`mx-2 ${(node?.children !== undefined && node?.children.length > 0) ? 'block' : 'opacity-0'}`}>
                       {isExpanded ? (<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" className="bi bi-chevron-down" viewBox="0 0 16 16">
                         <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
                       </svg>) : (<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" className="bi bi-chevron-right" viewBox="0 0 16 16">
