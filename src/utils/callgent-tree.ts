@@ -47,13 +47,8 @@ export const callgentApi = (data: any) => {
           operationId: data?.operationId,
           summary: data?.summary,
           description: data?.description,
-          parameters: data.params && Object.keys(data.params).length > 0
-            ? Object.entries(data.params).map(([name, schema]) => ({
-              name,
-              in: "query",
-              schema,
-            }))
-            : undefined,
+          parameters: data?.params?.parameters || [],
+          requestBody: data?.params?.requestObject || {},
           responses: data?.responses,
         },
       },
