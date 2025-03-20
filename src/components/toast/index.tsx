@@ -1,4 +1,4 @@
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { themeVars } from "@/theme/theme.css";
 import { rgbAlpha } from "@/utils/theme";
 import { Toaster } from "sonner";

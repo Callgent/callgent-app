@@ -1,5 +1,5 @@
 import { createCallgentEntry, editCallgentEntry, importEntry, selectRealms } from '@/api/services/callgentService';
-import { useFetchCallgentTree, useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
+import { useFetchCallgentTree, useTreeActions, useTreeActionStore } from '@/models/callgentTreeStore';
 import { Form, Input, Button, Select, Divider, Checkbox } from 'antd';
 import { useState } from 'react';
 

@@ -1,6 +1,6 @@
 import { Modal } from 'antd';
 import { ActionForm } from './TreeActionForm';
-import { useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
+import { useTreeActions, useTreeActionStore } from '@/models/callgentTreeStore';
 
 export const TreeActionModal = () => {
   const { isModalOpen, action, currentNode } = useTreeActionStore();

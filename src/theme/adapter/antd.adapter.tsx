@@ -7,7 +7,7 @@ import { baseThemeTokens } from "../tokens/base";
 import { darkColorTokens, lightColorTokens, presetsColors } from "../tokens/color";
 import type { UILibraryAdapter } from "../type";
 
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { removePx } from "@/utils/theme";
 import { lightShadowTokens } from "../tokens/shadow";
 import { darkShadowTokens } from "../tokens/shadow";

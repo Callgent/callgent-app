@@ -4,7 +4,7 @@ import { useMatches, useNavigate } from "react-router";
 import Scrollbar from "@/components/scrollbar";
 import { useFlattenedRoutes, usePathname, usePermissionRoutes, useRouteToMenuFn } from "@/router/hooks";
 import { menuFilter } from "@/router/utils";
-import { useSettingActions, useSettings } from "@/store/settingStore";
+import { useSettingActions, useSettings } from "@/models/settingStore";
 import { NAV_WIDTH } from "../config";
 import NavLogo from "./nav-logo";
 import { ThemeLayout, ThemeMode } from "#/enum";

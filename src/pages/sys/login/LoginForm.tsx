@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { AiFillGithub, AiFillGoogleCircle } from "react-icons/ai";
 
 import type { SignInReq } from "@/api/services/userService";
-import { useSignIn } from "@/store/userStore";
+import { useSignIn } from "@/models/userStore";
 
 import { LoginStateEnum, useLoginStateContext } from "./providers/LoginStateProvider";
 

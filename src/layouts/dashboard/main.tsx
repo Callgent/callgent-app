@@ -1,4 +1,4 @@
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { themeVars } from "@/theme/theme.css";
 import { cn } from "@/utils";
 import { Content } from "antd/es/layout/layout";

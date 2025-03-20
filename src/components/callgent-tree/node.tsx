@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { CallgentInfo as CallgentInfoType, TreeAction } from '#/entity';
 import { Add, Delete, Edit, Import, Lock, VirtualApi } from './icon';
-import { useTreeActions, useTreeActionStore } from '@/store/callgentTreeStore';
+import { useTreeActions, useTreeActionStore } from '@/models/callgentTreeStore';
 import { Popconfirm, Tooltip } from 'antd';
-import { useDeleteCallgent } from '@/store/callgentStore';
+import { useDeleteCallgent } from '@/models/callgentStore';
 import { deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
 import NodeComponent from './node-component';

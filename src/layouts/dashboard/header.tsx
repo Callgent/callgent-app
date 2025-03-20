@@ -4,7 +4,7 @@ import { type CSSProperties, useState } from "react";
 import { IconButton, SvgIcon } from "@/components/icon";
 import LocalePicker from "@/components/locale-picker";
 import Logo from "@/components/logo";
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 
 import AccountDropdown from "../components/account-dropdown";
 // import NoticeButton from "../components/notice";

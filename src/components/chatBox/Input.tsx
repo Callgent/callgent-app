@@ -1,5 +1,5 @@
 import { postRequestApi } from '@/api/services/callgentService';
-import useChatBoxStore from '@/store/chatBox';
+import useChatBoxStore from '@/models/chatBox';
 import { getSearchParamsAsJson } from '@/utils';
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';

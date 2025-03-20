@@ -4,7 +4,7 @@ import { Navigate, Outlet } from "react-router";
 
 import { Iconify } from "@/components/icon";
 import { CircleLoading } from "@/components/loading";
-import { useUserInfo, useUserPermission } from "@/store/userStore";
+import { useUserInfo, useUserPermission } from "@/models/userStore";
 import { flattenTrees } from "@/utils/tree";
 
 import { Tag } from "antd";

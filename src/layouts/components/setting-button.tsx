@@ -9,7 +9,7 @@ import CyanBlur from "@/assets/images/background/cyan-blur.png";
 import RedBlur from "@/assets/images/background/red-blur.png";
 import { varHover } from "@/components/animate/variants/action";
 import { IconButton, SvgIcon } from "@/components/icon";
-import { useSettingActions, useSettings } from "@/store/settingStore";
+import { useSettingActions, useSettings } from "@/models/settingStore";
 import { presetsColors } from "@/theme/tokens/color";
 
 import { themeVars } from "@/theme/theme.css";

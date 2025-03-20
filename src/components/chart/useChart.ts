@@ -3,7 +3,7 @@ import { removePx } from "@/utils/theme";
 import type { ApexOptions } from "apexcharts";
 import { mergeDeepRight } from "ramda";
 
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { breakpointsTokens } from "@/theme/tokens/breakpoints";
 import { paletteColors, presetsColors } from "@/theme/tokens/color";
 

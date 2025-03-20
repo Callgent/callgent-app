@@ -6,7 +6,7 @@ import { type CSSProperties, useRef, useState } from "react";
 import { useEvent } from "react-use";
 
 import { Iconify } from "@/components/icon";
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { ThemeMode } from "#/enum";
 import KanbanTask from "./kanban-task";
 import { type Column, type Task, TaskPriority } from "./types";

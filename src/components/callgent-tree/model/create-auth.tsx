@@ -1,4 +1,4 @@
-import { useFetchCallgentTree, useTreeActions } from '@/store/callgentTreeStore';
+import { useFetchCallgentTree, useTreeActions } from '@/models/callgentTreeStore';
 import { deleteRealms, postRealms, putRealms } from '@/api/services/callgentService';
 import { AuthType, FormValues, NewAuthProps, Realm } from '#/entity';
 import { Form, Select, Button, Space, Popconfirm } from 'antd';

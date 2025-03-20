@@ -1,4 +1,4 @@
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { hexToRgbChannel, rgbAlpha } from "@/utils/theme";
 import { useEffect } from "react";
 import { ThemeMode } from "#/enum";

@@ -1,7 +1,7 @@
 import { Form, Input, Modal } from "antd";
 import { useState, useEffect } from "react";
 import type { CallgentInfo } from "#/entity";
-import { useCreateCallgent, useUpdateCallgent } from "@/store/callgentStore";
+import { useCreateCallgent, useUpdateCallgent } from "@/models/callgentStore";
 
 export function CallgentModal({ title, show, formValue, onOk, onCancel }: CallgentModalProps) {
   const [form] = Form.useForm();

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { Iconify, SvgIcon } from "@/components/icon";
 
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { cn } from "@/utils";
 import type { GetProp, MenuProps } from "antd";
 import { ThemeLayout } from "#/enum";

@@ -1,4 +1,4 @@
-import { useSettingActions, useSettings } from "@/store/settingStore";
+import { useSettingActions, useSettings } from "@/models/settingStore";
 import type { ThemeMode } from "#/enum";
 import { themeVars } from "../theme.css";
 import { baseThemeTokens } from "../tokens/base";

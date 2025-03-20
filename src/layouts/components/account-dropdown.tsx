@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 import { IconButton } from "@/components/icon";
 import { useLoginStateContext } from "@/pages/sys/login/providers/LoginStateProvider";
 import { useRouter } from "@/router/hooks";
-import { useFetchUserInfo, useUserActions, useUserInfo } from "@/store/userStore";
+import { useFetchUserInfo, useUserActions, useUserInfo } from "@/models/userStore";
 import { useTheme } from "@/theme/hooks";
 
 /**

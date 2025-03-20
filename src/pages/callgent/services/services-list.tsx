@@ -1,4 +1,4 @@
-import useCallgentStore, { useCallgentActions, useFetchCallgentServerList } from "@/store/callgentStore";
+import useCallgentStore, { useCallgentActions, useFetchCallgentServerList } from "@/models/callgentStore";
 import { Col, Pagination, Row } from "antd";
 import { useEffect, useState } from "react";
 import CallgentCard from "./services-card";

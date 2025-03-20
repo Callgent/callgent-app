@@ -1,6 +1,6 @@
 import Character3 from "@/assets/images/characters/character_3.png";
 import { Iconify } from "@/components/icon";
-import { useUserInfo } from "@/store/userStore";
+import { useUserInfo } from "@/models/userStore";
 import { themeVars } from "@/theme/theme.css";
 import { Col, Row } from "antd";
 

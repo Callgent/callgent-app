@@ -1,6 +1,6 @@
 import { up } from "@/hooks";
 import { useMediaQuery } from "@/hooks";
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { ThemeLayout } from "#/enum";
 import NavHorizontal from "./nav-horizontal";
 import NavVertical from "./nav-vertical";

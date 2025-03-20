@@ -1,4 +1,4 @@
-import useChatBoxStore from "@/store/chatBox";
+import useChatBoxStore from "@/models/chatBox";
 import Markdown from "../markdown";
 
 export default function Chat(): JSX.Element {

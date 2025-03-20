@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Realm } from '#/entity';
-import useTreeActionStore from '@/store/callgentTreeStore';
+import useTreeActionStore from '@/models/callgentTreeStore';
 import NewAuth from './create-auth';
 import { Tabs } from 'antd';
 

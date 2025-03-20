@@ -1,7 +1,7 @@
 import { AutoComplete, Form, Input, InputNumber, Modal, Radio, TreeSelect } from "antd";
 import { useCallback, useEffect, useState } from "react";
 
-import { useUserPermission } from "@/store/userStore";
+import { useUserPermission } from "@/models/userStore";
 
 import type { Permission } from "#/entity";
 import { BasicStatus, PermissionType } from "#/enum";

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { CallgentInfo as CallgentInfoType } from '#/entity';
 import TreeNode from './node';
 import { TreeActionModal } from './model';
-import useTreeActionStore, { useFetchAdaptor, useFetchCallgentTree, useTreeActions } from '@/store/callgentTreeStore';
+import useTreeActionStore, { useFetchAdaptor, useFetchCallgentTree, useTreeActions } from '@/models/callgentTreeStore';
 import { enhanceNode, setAdaptor } from '@/utils/callgent-tree';
 import { CircleLoading } from '../loading';
 

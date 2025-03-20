@@ -1,5 +1,5 @@
-import useCallgentStore, { useCallgentActions } from "@/store/callgentStore";
-import { useFetchCallgentList } from "@/store/callgentStore";
+import useCallgentStore, { useCallgentActions } from "@/models/callgentStore";
+import { useFetchCallgentList } from "@/models/callgentStore";
 import { Button, Card, Col, Form, Input, Row, Select, Space } from "antd";
 import { useState } from "react";
 import type { CallgentInfo } from "#/entity";

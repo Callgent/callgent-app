@@ -5,7 +5,7 @@ import { getCallgentTree } from "@/api/services/callgentService";
 import NewAuth from "@/components/callgent-tree/model/create-auth";
 import { Realm } from "#/entity";
 import Card from "@/components/card";
-import useTreeActionStore, { useTreeActions } from "@/store/callgentTreeStore";
+import useTreeActionStore, { useTreeActions } from "@/models/callgentTreeStore";
 
 export default function CallgentAuth() {
   const navigate = useNavigate();

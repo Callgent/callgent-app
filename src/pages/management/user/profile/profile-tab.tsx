@@ -4,7 +4,7 @@ import type { ColumnsType } from "antd/es/table";
 import Card from "@/components/card";
 import { IconButton, Iconify, SvgIcon } from "@/components/icon";
 import Scrollbar from "@/components/scrollbar";
-import { useUserInfo } from "@/store/userStore";
+import { useUserInfo } from "@/models/userStore";
 import { themeVars } from "@/theme/theme.css";
 
 interface DataType {

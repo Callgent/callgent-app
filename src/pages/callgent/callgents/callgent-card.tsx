@@ -1,4 +1,4 @@
-import { useDeleteCallgent } from '@/store/callgentStore';
+import { useDeleteCallgent } from '@/models/callgentStore';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Avatar, Card, Popconfirm, Rate, Typography } from 'antd';
 import type React from 'react';

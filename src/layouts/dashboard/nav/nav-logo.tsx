@@ -1,4 +1,4 @@
-import { useSettings } from "@/store/settingStore";
+import { useSettings } from "@/models/settingStore";
 import { cn } from "@/utils";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { ThemeLayout } from "#/enum";

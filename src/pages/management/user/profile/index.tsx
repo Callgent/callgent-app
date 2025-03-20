@@ -1,7 +1,7 @@
 import CoverImage from "@/assets/images/cover/cover_4.jpg";
 import Card from "@/components/card";
 import { Iconify } from "@/components/icon";
-import { useUserInfo } from "@/store/userStore";
+import { useUserInfo } from "@/models/userStore";
 import { themeVars } from "@/theme/theme.css";
 import { type CSSProperties, useState } from "react";
 import ConnectionsTab from "./connections-tab";
