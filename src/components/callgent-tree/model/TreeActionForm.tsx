@@ -83,11 +83,11 @@ export const ActionForm = () => {
         <Form.Item label="Name" name="host" rules={[{ required: true, message: 'Please enter node name' }]}>
           <Input placeholder="Enter node name" />
         </Form.Item>
-        <Form.Item label="summary" name="summary" rules={[{ required: false, message: 'Please enter node summary' }]}>
-          <Input.TextArea placeholder="Enter node summary" />
+        <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please enter node whatFor' }]}>
+          <Input.TextArea placeholder="Enter node whatFor" />
         </Form.Item>
-        <Form.Item label="instruction" name="instruction" rules={[{ required: false, message: 'Please enter node instruction' }]}>
-          <Input.TextArea placeholder="Enter node instruction" />
+        <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please enter node how2Use' }]}>
+          <Input.TextArea placeholder="Enter node how2Use" />
         </Form.Item>
       </>
     ),
@@ -97,11 +97,11 @@ export const ActionForm = () => {
         <Form.Item label="Name" name="host" rules={[{ required: true, message: 'Please enter a new name' }]}>
           <Input placeholder="Enter new name" />
         </Form.Item>
-        <Form.Item label="summary" name="summary" rules={[{ required: false, message: 'Please enter node summary' }]}>
-          <Input.TextArea placeholder="Enter node summary" />
+        <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please enter node whatFor' }]}>
+          <Input.TextArea placeholder="Enter node whatFor" />
         </Form.Item>
-        <Form.Item label="instruction" name="instruction" rules={[{ required: false, message: 'Please enter node instruction' }]}>
-          <Input.TextArea placeholder="Enter node instruction" />
+        <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please enter node how2Use' }]}>
+          <Input.TextArea placeholder="Enter node how2Use" />
         </Form.Item>
       </>
     ),
