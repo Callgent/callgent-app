@@ -65,7 +65,7 @@ const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
         title={<div onClick={handleCardClick} className='cursor-pointer'>{item.name}</div>}
         description={
           <div onClick={handleCardClick} className='cursor-pointer'>
-            <Paragraph ellipsis>{item.summary || 'no description'}</Paragraph>
+            <Paragraph ellipsis>{item.whatFor || 'no description'}</Paragraph>
             <span>{item.updatedAt?.split('T')[0]}</span>
           </div>
         }

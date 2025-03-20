@@ -23,13 +23,16 @@ export const ActionForm = () => {
       return null;
     }
     const { host, adaptorKey, text } = values;
+    console.log(values);
+
     try {
       switch (state.action) {
         case 'add':
+          delete values?.adaptorKey
           await createCallgentEntry({
             adaptor: adaptorKey,
             formValues: {
-              host,
+              ...values,
               callgentId: callgentTree[0]?.id,
               type: state.currentNode?.type,
             },
@@ -39,7 +42,7 @@ export const ActionForm = () => {
         case 'edit':
           await editCallgentEntry({
             id: currentNode.id!,
-            formValues: { host },
+            formValues: values,
           });
           await fetchCallgentTree(callgentTree[0].id!);
           break;
@@ -83,11 +86,11 @@ export const ActionForm = () => {
         <Form.Item label="Name" name="host" rules={[{ required: true, message: 'Please enter node name' }]}>
           <Input placeholder="Enter node name" />
         </Form.Item>
-        <Form.Item label="summary" name="summary" rules={[{ required: false, message: 'Please enter node summary' }]}>
-          <Input.TextArea placeholder="Enter node summary" />
+        <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please describe the purpose of this entries' }]}>
+          <Input.TextArea placeholder="Describe the purpose of this entries (e.g., its function or goal)" />
         </Form.Item>
-        <Form.Item label="instruction" name="instruction" rules={[{ required: false, message: 'Please enter node instruction' }]}>
-          <Input.TextArea placeholder="Enter node instruction" />
+        <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
+          <Input.TextArea placeholder="Provide usage instructions for this entries (e.g., steps to operate it)" />
         </Form.Item>
       </>
     ),
@@ -97,11 +100,11 @@ export const ActionForm = () => {
         <Form.Item label="Name" name="host" rules={[{ required: true, message: 'Please enter a new name' }]}>
           <Input placeholder="Enter new name" />
         </Form.Item>
-        <Form.Item label="summary" name="summary" rules={[{ required: false, message: 'Please enter node summary' }]}>
-          <Input.TextArea placeholder="Enter node summary" />
+        <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please describe the purpose of this entries' }]}>
+          <Input.TextArea placeholder="Describe the purpose of this entries (e.g., its function or goal)" />
         </Form.Item>
-        <Form.Item label="instruction" name="instruction" rules={[{ required: false, message: 'Please enter node instruction' }]}>
-          <Input.TextArea placeholder="Enter node instruction" />
+        <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
+          <Input.TextArea placeholder="Provide usage instructions for this entries (e.g., steps to operate it)" />
         </Form.Item>
       </>
     ),

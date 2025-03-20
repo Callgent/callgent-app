@@ -14,3 +14,12 @@ export const createSearchParams = (paramsObj: Record<string, string | undefined>
 	});
 	return params;
 };
+
+export const getSearchParamsAsJson = (): Record<string, string | undefined> => {
+	const params = new URLSearchParams(window.location.search);
+	const paramsObj: Record<string, string | undefined> = {};
+	params.forEach((value, key) => {
+		paramsObj[key] = value;
+	});
+	return paramsObj;
+};

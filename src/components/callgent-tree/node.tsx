@@ -109,7 +109,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
       {nodes.map(node => (
         <div className="w-full" data-testid="tree-node" key={node?.id}>
           <div className="flex justify-between items-center p-2 rounded mb-1 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700">
-            <Tooltip title={node.summary} placement="topLeft">
+            <Tooltip title={node.whatFor} placement="topLeft">
               <div className="flex flex-1 overflow-hidden">
                 <button
                   className="w-[95%] text-left bg-transparent cursor-pointer border-none text-base"
@@ -126,9 +126,9 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
                       </svg>)}
                     </div>
                     <img
-                      title={node?.securities ? '' : '1sss23'}
+                      title={node?.securities || ''}
                       src={iconSrc}
-                      className="mr-2 dark:invert-[75%] h-5 w-5"
+                      className="mr-2 dark:invert-[75%]"
                       alt={`${node.name} icon`}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/icons/default.svg';

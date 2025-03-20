@@ -22,12 +22,12 @@ const ServicesCard: React.FC<CallgentCardProps> = ({ item }) => {
         title={item.name}
         description={
           <>
-            <Tooltip title={item.summary || 'No description available'}>
+            <Tooltip title={item.whatFor || 'No description available'}>
               <Paragraph
                 className="line-clamp-2"
                 ellipsis={{ rows: 2, expandable: false }}
               >
-                {item.summary || 'No description available'}
+                {item.whatFor || 'No description available'}
               </Paragraph>
             </Tooltip>
             <span>{item.updatedAt?.split('T')[0]}</span>

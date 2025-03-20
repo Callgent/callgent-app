@@ -13,6 +13,13 @@ export interface CallgentStore {
   };
 };
 
+export interface ChatBoxStore {
+  chatBox: { role: string; message: string }[];
+  actions: {
+    addMessage: (newMessage: { role: string; message: string }) => void;
+  };
+};
+
 export interface TreeActionState {
   callgentTree: CallgentInfo[];
   realms: Realm[];

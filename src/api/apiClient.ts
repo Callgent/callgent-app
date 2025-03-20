@@ -38,13 +38,14 @@ axiosInstance.interceptors.response.use(
 		const errMsg = response?.data?.message || message || t("sys.api.errorMessage");
 		toast.error(errMsg, {
 			position: "top-center",
+			closeButton: true
 		});
 
 		const status = response?.status;
 		if (status === 401) {
 			userStore.getState().actions.clearUserInfoAndToken();
 		}
-		return Promise.reject(error);
+		return Promise.resolve({ message: response?.data?.message });
 	},
 );
 

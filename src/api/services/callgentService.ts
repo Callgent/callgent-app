@@ -134,3 +134,11 @@ export const putCallgentApi = async (id: string, data: any) =>
 export const postEndpointsApi = async (data: any) =>
 	apiClient.post({ url: '/api/endpoints', data });
 
+/** post /api/request */
+export const postRequestApi = async (callgentId: string, data: any) =>
+	apiClient.post({
+		url: `/api/rest/request/${callgentId}/`, data, headers: {
+			"Content-Type": "multipart/form-data",
+		}
+	});
+

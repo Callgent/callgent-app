@@ -9,6 +9,7 @@ import { Navigate, type RouteObject, createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import type { AppRouteObject } from "#/router";
 import CallgentApi from "@/pages/callgent/callgent-api";
+import ChatBox from "@/pages/callgent/chat-box";
 
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
@@ -28,6 +29,14 @@ const PUBLIC_ROUTE: AppRouteObject[] = [
 				<CallgentApi />
 			</ErrorBoundary>
 		),
+	},
+	{
+		path: "chatbox",
+		element: (
+			<ErrorBoundary FallbackComponent={PageError}>
+				<ChatBox />
+			</ErrorBoundary>
+		)
 	},
 ]
 

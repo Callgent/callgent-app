@@ -28,8 +28,8 @@ export interface CallgentInfo {
 	id?: string;
 	name?: string;
 	avatar?: string;
-	summary?: string;
-	instruction?: string;
+	whatFor?: string;
+	how2Use?: string;
 
 	liked?: number;
 	viewed?: number;

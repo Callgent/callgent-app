@@ -32,6 +32,7 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
       setError(e.message);
       toast.error(e.message, {
         position: "top-center",
+        closeButton: true
       });
     } finally {
       setRunLoading(false);
@@ -60,10 +61,6 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
       }
       setParsedSpec(dataToSave)
       toast.success("OpenAPI spec saved successfully!");
-    } catch (e) {
-      toast.error(`Error saving OpenAPI spec: ${e.message}`, {
-        position: "top-center",
-      });
     } finally {
       setSaveLoading(false);
     }

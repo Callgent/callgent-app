@@ -45,7 +45,7 @@ export const callgentApi = (data: any) => {
       [data.path]: {
         [data.method.toLowerCase()]: {
           operationId: data?.operationId,
-          summary: data?.summary,
+          whatFor: data?.whatFor,
           description: data?.description,
           parameters: data?.params?.parameters || [],
           requestBody: data?.params?.requestObject || {},
@@ -64,7 +64,7 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
     operationId: operation?.operationId || method + path,
     path: path,
     method: method.toUpperCase(),
-    summary: operation?.summary,
+    whatFor: operation?.whatFor,
     description: operation?.description,
     params: {
       parameters: operation?.parameters || [],

@@ -16,9 +16,9 @@ type FieldType = {
 	about: string;
 };
 export default function GeneralTab() {
-	const { avatar, username, email } = useUserInfo();
+	const { avatar, name, email } = useUserInfo();
 	const initFormValues = {
-		name: username,
+		name: name,
 		email,
 		phone: faker.phone.number(),
 		address: faker.location.county(),
