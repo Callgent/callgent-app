@@ -1,4 +1,4 @@
-import { createCallgentEntry, editCallgentEntry, importEntry, selectRealms } from '@/api/services/callgentService';
+import { createCallgentEntry, editCallgentEntry, importEntry, putCallgent, selectRealms } from '@/api/services/callgentService';
 import { useFetchCallgentTree, useTreeActions, useTreeActionStore } from '@/models/callgentTreeStore';
 import { Form, Input, Button, Select, Divider, Checkbox } from 'antd';
 import { useState } from 'react';
@@ -8,7 +8,6 @@ export const ActionForm = () => {
   const { closeModal } = useTreeActions();
   const { callgentTree, currentNode, adaptors, realms } = useTreeActionStore();
   const [loading, setLoading] = useState(false);
-
   const formItemLayout = {
     labelCol: { span: 24 },
     wrapperCol: { span: 24 },
@@ -22,9 +21,7 @@ export const ActionForm = () => {
       setLoading(false);
       return null;
     }
-    const { host, adaptorKey, text } = values;
-    console.log(values);
-
+    const { adaptorKey, text } = values;
     try {
       switch (state.action) {
         case 'add':
@@ -40,10 +37,14 @@ export const ActionForm = () => {
           await fetchCallgentTree(callgentTree[0].id!);
           break;
         case 'edit':
-          await editCallgentEntry({
-            id: currentNode.id!,
-            formValues: values,
-          });
+          if (currentNode?.modelTitle !== 'Callgent') {
+            await editCallgentEntry({
+              id: currentNode.id!,
+              formValues: values,
+            });
+          } else {
+            await putCallgent(currentNode.id!, values)
+          }
           await fetchCallgentTree(callgentTree[0].id!);
           break;
         case 'import':
@@ -71,7 +72,7 @@ export const ActionForm = () => {
       <>
         <Divider />
         <Form.Item
-          label="CLIENT Entry adaptor"
+          label={`${currentNode?.modelTitle || ''} adaptor`}
           name="adaptorKey"
           rules={[{ required: true, message: 'Please select an adapter' }]}
         >
@@ -83,28 +84,36 @@ export const ActionForm = () => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label="Name" name="host" rules={[{ required: true, message: 'Please enter node name' }]}>
+        <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Please enter node name' }]}>
           <Input placeholder="Enter node name" />
         </Form.Item>
+        <Form.Item label="Host" name="host" rules={[{ required: true, message: 'Please enter node host' }]}>
+          <Input placeholder="Enter node host" />
+        </Form.Item>
         <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please describe the purpose of this entries' }]}>
-          <Input.TextArea placeholder="Describe the purpose of this entries (e.g., its function or goal)" />
+          <Input.TextArea placeholder="Describe the purpose of this node (e.g., its function or goal)" />
         </Form.Item>
         <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
-          <Input.TextArea placeholder="Provide usage instructions for this entries (e.g., steps to operate it)" />
+          <Input.TextArea placeholder="Provide usage instructions for this node (e.g., steps to operate it)" />
         </Form.Item>
       </>
     ),
     edit: (
       <>
         <Divider />
-        <Form.Item label="Name" name="host" rules={[{ required: true, message: 'Please enter a new name' }]}>
-          <Input placeholder="Enter new name" />
+        <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Please enter node name' }]}>
+          <Input placeholder="Enter node name" />
         </Form.Item>
+        {currentNode?.modelTitle !== 'Callgent' && (
+          <Form.Item label="Host" name="host" rules={[{ required: true, message: 'Please enter node host' }]}>
+            <Input placeholder="Enter node host" />
+          </Form.Item>
+        )}
         <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please describe the purpose of this entries' }]}>
-          <Input.TextArea placeholder="Describe the purpose of this entries (e.g., its function or goal)" />
+          <Input.TextArea placeholder="Describe the purpose of this node (e.g., its function or goal)" />
         </Form.Item>
         <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
-          <Input.TextArea placeholder="Provide usage instructions for this entries (e.g., steps to operate it)" />
+          <Input.TextArea placeholder="Provide usage instructions for this node (e.g., steps to operate it)" />
         </Form.Item>
       </>
     ),
@@ -144,15 +153,15 @@ export const ActionForm = () => {
     lock: null,
     virtualApi: null,
   };
-
   return action ? (
     (
       <Form
         {...formItemLayout}
         onFinish={onSubmit}
         initialValues={{
+          ...currentNode?.data || {},
           adaptorKey: adaptors.length > 0 ? adaptors[0].name : undefined,
-          host: (action === 'edit' || action === 'select') ? currentNode?.data?.name : undefined,
+          host: (action === 'edit' || action === 'select') ? currentNode?.data?.host : undefined,
         }}
       >
         {formContent[action]}

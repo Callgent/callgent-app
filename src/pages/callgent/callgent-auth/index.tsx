@@ -1,21 +1,19 @@
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate } from "react-router";
 import { Tabs, Spin } from "antd";
 import { getCallgentTree } from "@/api/services/callgentService";
-import NewAuth from "@/components/callgent-tree/model/create-auth";
 import { Realm } from "#/entity";
-import Card from "@/components/card";
 import useTreeActionStore, { useTreeActions } from "@/models/callgentTreeStore";
+import NewAuth from "@/components/callgent-tree/auth/create-auth";
+import Card from "@/components/layouts/card";
+import { getSearchParamsAsJson } from "@/utils";
 
 export default function CallgentAuth() {
   const navigate = useNavigate();
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const { id, realmKey = "new", nodeId } = Object.fromEntries(params.entries());
-  const [activeKey, setActiveKey] = useState<string>(realmKey);
+  const { id } = getSearchParamsAsJson();
   const [loading, setLoading] = useState<boolean>(false);
-  const { realms } = useTreeActionStore();
-  const { setCallgentRealms } = useTreeActions();
+  const { realms, realmKey } = useTreeActionStore();
+  const { setCallgentRealms, setRealmKey } = useTreeActions();
   const redirectToCallgents = useCallback(() => {
     navigate("/callgent/callgents", { replace: true });
   }, [navigate]);
@@ -30,7 +28,7 @@ export default function CallgentAuth() {
       const { data } = await getCallgentTree(id);
       const newRealms = data?.realms || [];
       setCallgentRealms(newRealms);
-      setActiveKey(newRealms[0]?.realmKey || "new");
+      setRealmKey(newRealms[0]?.id || "new");
     } catch (error) {
       redirectToCallgents();
     } finally {
@@ -44,9 +42,9 @@ export default function CallgentAuth() {
 
   const tabItems = [
     ...(realms.map((item: Realm) => ({
-      key: item.realmKey,
-      label: item.realm,
-      children: <NewAuth initialData={item} callgentId={id!} realmKey={realmKey} selectId={nodeId} />,
+      key: item.id!,
+      label: item.authType,
+      children: <NewAuth callgentId={id!} />,
       closable: false,
     }))),
     {
@@ -68,8 +66,8 @@ export default function CallgentAuth() {
           className="w-full h-full overflow-auto"
           type="editable-card"
           items={tabItems}
-          activeKey={activeKey}
-          onChange={setActiveKey}
+          activeKey={realmKey}
+          onChange={setRealmKey}
           hideAdd={true}
         />
       )}

@@ -1,5 +1,5 @@
 import CoverImage from "@/assets/images/cover/cover_4.jpg";
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { Iconify } from "@/components/icon";
 import { useUserInfo } from "@/models/userStore";
 import { themeVars } from "@/theme/theme.css";

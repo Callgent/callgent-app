@@ -17,10 +17,12 @@
   --c-scrollbar: #aaa;
   --c-scrollbar-hover: #777;
 }
+
 html {
   background-color: var(--c-bg);
   overflow: auto;
 }
+
 html.dark {
   --c-bg: transparent;
   --c-scrollbar: #555;
@@ -32,18 +34,22 @@ html.dark {
   width: 7px;
   cursor: pointer !important;
 }
+
 ::-webkit-scrollbar:horizontal {
   height: 7px;
 }
+
 ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-corner {
   background: var(--c-bg);
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--c-scrollbar);
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--c-scrollbar-hover);
 }

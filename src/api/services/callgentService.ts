@@ -130,15 +130,22 @@ export const putCallgentApi = async (id: string, data: any) =>
 		data
 	});
 
+/** del /api/endpoints */
+export const delCallgentApi = async (id: string) =>
+	apiClient.delete<any>({
+		url: `/api/endpoints/${id}`
+	});
+
 /** post /api/callgent-api */
 export const postEndpointsApi = async (data: any) =>
 	apiClient.post({ url: '/api/endpoints', data });
 
 /** post /api/request */
-export const postRequestApi = async (callgentId: string, data: any) =>
+export const postRequestApi = async (callgentId: string, data: any, taskId: string) =>
 	apiClient.post({
 		url: `/api/rest/request/${callgentId}/`, data, headers: {
 			"Content-Type": "multipart/form-data",
+			"x-callgent-taskId": taskId
 		}
 	});
 

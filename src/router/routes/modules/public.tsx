@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { SvgIcon } from "@/components/icon";
 import type { AppRouteObject } from "#/router";
-import { CircleLoading } from "@/components/loading";
+import { CircleLoading } from "@/components/layouts/loading";
 import { Outlet } from "react-router";
 
 const HomePage = lazy(() => import("@/pages/dashboard/workbench"));

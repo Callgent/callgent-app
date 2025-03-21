@@ -1,4 +1,4 @@
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 
 export default function Billing() {
   return (

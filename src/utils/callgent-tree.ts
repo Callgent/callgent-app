@@ -9,11 +9,12 @@ export const enhanceNode = (node: CallgentInfo, level: number): CallgentInfo => 
   } else if (level === 3 || level === 1) {
     enhancedNode = { ...enhancedNode, edit: true, delete: true, lock: true };
   } else if (level === 4) {
-    enhancedNode = { ...enhancedNode, lock: true };
+    enhancedNode = { ...enhancedNode, lock: true, delete: true };
   }
   if (node.children) {
     enhancedNode.children = node.children.map(child => enhanceNode(child, level + 1));
   }
+  enhancedNode.selectedOptions = node?.securities?.map((obj: string) => Object.keys(obj)[0]) || [];
   return enhancedNode;
 };
 

@@ -1,7 +1,7 @@
 import { Layout } from "antd";
 import { type CSSProperties, Suspense, useMemo } from "react";
 
-import { CircleLoading } from "@/components/loading";
+import { CircleLoading } from "@/components/layouts/loading";
 import { useSettings } from "@/models/settingStore";
 import { cn } from "@/utils";
 

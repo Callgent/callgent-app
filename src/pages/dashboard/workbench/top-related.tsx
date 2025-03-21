@@ -1,6 +1,6 @@
 import { Tag, Typography } from "antd";
 
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { Iconify } from "@/components/icon";
 import Scrollbar from "@/components/scrollbar";
 import { themeVars } from "@/theme/theme.css";

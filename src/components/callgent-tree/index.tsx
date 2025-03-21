@@ -5,7 +5,7 @@ import TreeNode from './node';
 import { TreeActionModal } from './model';
 import useTreeActionStore, { useFetchAdaptor, useFetchCallgentTree, useTreeActions } from '@/models/callgentTreeStore';
 import { enhanceNode, setAdaptor } from '@/utils/callgent-tree';
-import { CircleLoading } from '../loading';
+import { CircleLoading } from '../layouts/loading';
 
 export default function CallgentInfo() {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());

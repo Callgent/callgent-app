@@ -2,7 +2,7 @@ import { Dropdown } from "antd";
 
 import useLocale, { LANGUAGE_MAP } from "@/locales/use-locale";
 
-import { IconButton, SvgIcon } from "../icon";
+import { IconButton, SvgIcon } from "../../icon";
 
 import type { MenuProps } from "antd";
 import type { LocalEnum } from "#/enum";

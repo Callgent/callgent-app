@@ -45,7 +45,7 @@ axiosInstance.interceptors.response.use(
 		if (status === 401) {
 			userStore.getState().actions.clearUserInfoAndToken();
 		}
-		return Promise.resolve({ message: response?.data?.message });
+		return Promise.reject(response);
 	},
 );
 

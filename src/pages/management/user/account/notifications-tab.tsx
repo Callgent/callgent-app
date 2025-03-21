@@ -1,6 +1,6 @@
 import { Button, Col, Row, Switch, Typography } from "antd";
 
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { toast } from "sonner";
 
 export default function NotificationsTab() {

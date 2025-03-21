@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
-import { Avatar, Col, Divider, Row, Tag } from "antd";
+import { Col, Divider, Row, Tag } from "antd";
 import dayjs from "dayjs";
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { IconButton, Iconify } from "@/components/icon";
 
 export default function ProjectsTab() {

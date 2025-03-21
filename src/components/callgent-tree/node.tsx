@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { CallgentInfo as CallgentInfoType, TreeAction } from '#/entity';
-import { Add, Delete, Edit, Import, Lock, VirtualApi } from './icon';
+import { Add, Delete, Edit, Import, Lock, VirtualApi } from '../icon/icon-tree';
 import { useTreeActions, useTreeActionStore } from '@/models/callgentTreeStore';
 import { Popconfirm, Tooltip } from 'antd';
 import { useDeleteCallgent } from '@/models/callgentStore';
-import { deleteEntry } from '@/api/services/callgentService';
+import { delCallgentApi, deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
 import NodeComponent from './node-component';
 import { useNavigate } from 'react-router';
@@ -91,6 +91,9 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
     try {
       if (level === 1) {
         await delCallgent(node.id!);
+        navigate('/callgent/callgents')
+      } else if (level === 4) {
+        await delCallgentApi(node.id!)
       } else {
         await deleteEntry(node.id!)
       }
@@ -109,7 +112,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
       {nodes.map(node => (
         <div className="w-full" data-testid="tree-node" key={node?.id}>
           <div className="flex justify-between items-center p-2 rounded mb-1 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700">
-            <Tooltip title={node.whatFor} placement="topLeft">
+            <Tooltip title={node.whatFor || node?.summary || node?.description} placement="topLeft">
               <div className="flex flex-1 overflow-hidden">
                 <button
                   className="w-[95%] text-left bg-transparent cursor-pointer border-none text-base"
@@ -139,7 +142,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
                 </button>
               </div>
             </Tooltip>
-            <div className="node-right flex gap-2 items-center">
+            <div className="node-right flex gap-2 items-center mr-2">
               {node.lock && (
                 <div onClick={() => handleAction(level === 1 ? 'lock' : 'select')}>
                   <Lock
@@ -195,7 +198,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
                 <div className='hover:bg-gray-200 dark:hover:bg-gray-500 p-1 rounded'>
                   <Popconfirm
                     key="delete"
-                    title={level === 1 ? 'Delete the callgent' : 'Delete the entry'}
+                    title='Delete the content'
                     description="Are you sure you want to delete this content?"
                     open={openConfirm}
                     okButtonProps={{ loading: confirmLoading }}

@@ -1,7 +1,7 @@
 import { Space, Tag, Typography } from "antd";
 import Table, { type ColumnsType } from "antd/es/table";
 
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { IconButton, Iconify } from "@/components/icon";
 import Scrollbar from "@/components/scrollbar";
 

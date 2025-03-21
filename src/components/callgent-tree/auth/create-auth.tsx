@@ -1,23 +1,24 @@
-import { useFetchCallgentTree, useTreeActions } from '@/models/callgentTreeStore';
+import useTreeActionStore, { useFetchCallgentTree, useTreeActions } from '@/models/callgentTreeStore';
 import { deleteRealms, postRealms, putRealms } from '@/api/services/callgentService';
 import { AuthType, FormValues, NewAuthProps, Realm } from '#/entity';
 import { Form, Select, Button, Space, Popconfirm } from 'antd';
 import React, { useState, useEffect } from 'react';
-import AuthSchemeForm from './AuthSchemeForm';
+import AuthSchemeForm from './scheme-form';
 
-const NewAuth: React.FC<NewAuthProps> = ({ initialData, callgentId }) => {
+const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
   const [form] = Form.useForm();
+  const defaultValues: FormValues = {
+    callgentId: callgentId || '',
+    authType: 'apiKey',
+    scheme: { type: 'apiKey', in: 'header', name: '', provider: '', secret: '' }
+  };
+  const { realms, realmKey } = useTreeActionStore();
+  const { closeModal, setRealmKey } = useTreeActions();
+  const initialData = realms.find(item => realmKey === item.id);
   const [isEditable, setIsEditable] = useState(initialData ? false : true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const featchCallgentTree = useFetchCallgentTree();
-  const { closeModal } = useTreeActions();
-  const defaultValues: FormValues = {
-    callgentId: callgentId || '',
-    authType: 'apiKey',
-    realm: '',
-    scheme: { type: 'apiKey', in: 'header', name: '', provider: '', secret: '' }
-  };
 
   useEffect(() => {
     setIsEditable(isEditable);
@@ -37,10 +38,12 @@ const NewAuth: React.FC<NewAuthProps> = ({ initialData, callgentId }) => {
     delete values?.pricingEnabled;
     setIsSubmitting(true);
     try {
-
       if (isEditable && !initialData) {
-        await postRealms({ ...values, callgentId });
+        // add
+        const { data } = await postRealms({ ...values, callgentId });
+        setRealmKey(data?.id || 'new');
       } else {
+        // edit
         await putRealms({ ...values, id: initialData && initialData.id || '', callgentId });
       }
       await featchCallgentTree(callgentId!);
@@ -60,14 +63,21 @@ const NewAuth: React.FC<NewAuthProps> = ({ initialData, callgentId }) => {
       setIsDeleting(true);
       try {
         await deleteRealms({ callgentId, ...initialData });
-        await featchCallgentTree(callgentId!);
+        const data = await featchCallgentTree(callgentId!);
+        setRealmKey(data?.realms![0]?.id || 'new')
       } finally {
         setIsDeleting(false);
       }
     }
   };
   const formValues = Form.useWatch([], form);
-
+  useEffect(() => {
+    setIsEditable(false)
+    if (realmKey === 'new') {
+      form.resetFields();
+      setIsEditable(true)
+    }
+  }, [realmKey])
   return (
     <div className="h-full flex flex-col">
       <Form

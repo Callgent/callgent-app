@@ -1,4 +1,4 @@
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { down, useMediaQuery } from "@/hooks";
 import { useSettings } from "@/models/settingStore";
 import { faker } from "@faker-js/faker";

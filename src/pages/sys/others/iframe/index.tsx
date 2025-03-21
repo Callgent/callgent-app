@@ -1,4 +1,4 @@
-import { CircleLoading } from "@/components/loading";
+import { CircleLoading } from "@/components/layouts/loading";
 import { useState } from "react";
 
 type Props = {

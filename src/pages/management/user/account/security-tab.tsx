@@ -1,6 +1,6 @@
 import { Button, Form, Input } from "antd";
 
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { toast } from "sonner";
 
 type FieldType = {

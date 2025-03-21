@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { Button, Col, Form, Input, Row, Space, Switch } from "antd";
 
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { UploadAvatar } from "@/components/upload";
 import { useUserInfo } from "@/models/userStore";
 import { toast } from "sonner";

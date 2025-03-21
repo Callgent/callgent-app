@@ -1,4 +1,4 @@
-import Logo from "@/components/logo";
+import Logo from "@/components/layouts/logo";
 
 import SettingButton from "./setting-button";
 

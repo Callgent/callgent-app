@@ -1,5 +1,5 @@
 import { Modal } from 'antd';
-import { ActionForm } from './TreeActionForm';
+import { ActionForm } from './action-form';
 import { useTreeActions, useTreeActionStore } from '@/models/callgentTreeStore';
 
 export const TreeActionModal = () => {

@@ -30,6 +30,9 @@ export interface CallgentInfo {
 	avatar?: string;
 	whatFor?: string;
 	how2Use?: string;
+	summary?: string;
+	description?: string;
+	selectedOptions?: Array<string>;
 
 	liked?: number;
 	viewed?: number;
@@ -142,7 +145,6 @@ export type AuthType = 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
 export interface FormValues {
 	callgentId: string;
 	authType: AuthType;
-	realm: string;
 	scheme: {
 		type: AuthType;
 		in?: 'header' | 'query' | 'cookie';

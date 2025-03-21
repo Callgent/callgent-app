@@ -1,7 +1,7 @@
 import { Layout } from "antd";
 import DashboardImg from "@/assets/images/background/dashboard.png";
 import Overlay from "@/assets/images/background/overlay.jpg";
-import LocalePicker from "@/components/locale-picker";
+import LocalePicker from "@/components/layouts/locale-picker";
 import SettingButton from "@/layouts/components/setting-button";
 import { themeVars } from "@/theme/theme.css";
 import { rgbAlpha } from "@/utils/theme";

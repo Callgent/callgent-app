@@ -1,7 +1,7 @@
 import { Select, Typography } from "antd";
 import { useState } from "react";
 
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import Chart from "@/components/chart/chart";
 import useChart from "@/components/chart/useChart";
 

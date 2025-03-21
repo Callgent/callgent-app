@@ -1,7 +1,7 @@
 import { Typography } from "antd";
 import type { ReactNode } from "react";
 
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { Iconify } from "@/components/icon";
 
 const dataSource = [

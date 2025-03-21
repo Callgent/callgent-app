@@ -23,6 +23,7 @@ export interface ChatBoxStore {
 export interface TreeActionState {
   callgentTree: CallgentInfo[];
   realms: Realm[];
+  realmKey: string;
   action: TreeAction | null;
   modelTitle: string;
   currentNode: CallgentInfo | null;
@@ -34,6 +35,7 @@ export interface TreeActionState {
     setCallgentAdaptor: (adaptor: any) => void;
     openModal: (node: ModalNode) => void;
     setCurrentNode: (node: CallgentInfo) => void;
+    setRealmKey: (realmKey: string) => void;
     closeModal: () => void;
   }
 }

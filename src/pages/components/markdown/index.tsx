@@ -1,7 +1,7 @@
 import { Card, Typography } from "antd";
 import { useState } from "react";
 
-import Markdown from "@/components/markdown";
+import Markdown from "@/components/layouts/markdown";
 import { themeVars } from "@/theme/theme.css";
 
 const TEXT = `

@@ -1,4 +1,4 @@
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { Iconify } from "@/components/icon";
 import { themeVars } from "@/theme/theme.css";
 import { faker } from "@faker-js/faker";

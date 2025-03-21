@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Space } from "antd";
 import { getCallgentApi } from "@/api/services/callgentService";
-import SwaggerApi from "@/components/callgent-tree/callgent-api";
+import SwaggerApi from "@/components/callgent-tree/sep-api/callgent-api";
 import { callgentApi } from "@/utils/callgent-tree";
-import { CircleLoading } from "@/components/loading";
+import { CircleLoading } from "@/components/layouts/loading";
 
 export default function CallgentApi() {
   const location = useLocation();

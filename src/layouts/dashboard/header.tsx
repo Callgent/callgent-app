@@ -2,8 +2,8 @@ import { Drawer } from "antd";
 import { type CSSProperties, useState } from "react";
 
 import { IconButton, SvgIcon } from "@/components/icon";
-import LocalePicker from "@/components/locale-picker";
-import Logo from "@/components/logo";
+import LocalePicker from "@/components/layouts/locale-picker";
+import Logo from "@/components/layouts/logo";
 import { useSettings } from "@/models/settingStore";
 
 import AccountDropdown from "../components/account-dropdown";

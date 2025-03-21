@@ -1,7 +1,6 @@
 import { Form, Input, InputNumber, Modal, Radio, Tree } from "antd";
 import { useEffect } from "react";
 
-import { PERMISSION_LIST } from "@/_mock/assets";
 import { flattenTrees } from "@/utils/tree";
 
 import type { Permission, Role } from "#/entity";
@@ -14,7 +13,7 @@ export type RoleModalProps = {
 	onOk: VoidFunction;
 	onCancel: VoidFunction;
 };
-const PERMISSIONS: Permission[] = PERMISSION_LIST as Permission[];
+const PERMISSIONS: Permission[] = [] as Permission[];
 export function RoleModal({ title, show, formValue, onOk, onCancel }: RoleModalProps) {
 	const [form] = Form.useForm();
 

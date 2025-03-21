@@ -2,7 +2,7 @@ import { postRequestApi } from '@/api/services/callgentService';
 import useChatBoxStore from '@/models/chatBox';
 import { getSearchParamsAsJson } from '@/utils';
 import React, { useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 const InputField: React.FC = () => {
     const { actions } = useChatBoxStore();
@@ -13,11 +13,16 @@ const InputField: React.FC = () => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const navigate = useNavigate();
     const params = getSearchParamsAsJson();
-
+    const { taskId } = getSearchParamsAsJson();
+    const location = useLocation();
+    const addQueryParam = (key: string, value: string) => {
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set(key, value);
+        navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
+    };
     const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
         const items = e.clipboardData.items;
         const files: File[] = [];
-
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             if (item.kind === 'file') {
@@ -45,8 +50,13 @@ const InputField: React.FC = () => {
             formData.append('files', file);
         });
         try {
-            const { message } = await postRequestApi(params.callgentId, formData);
-            addMessage({ role: 'bot', message: message });
+            const app = await postRequestApi(params.callgentId, formData, taskId || '');
+            addQueryParam('taskId', app?.data?.data || '')
+            addMessage({ role: 'bot', message: app?.message });
+        } catch (error) {
+            const { data } = error;
+            addQueryParam('taskId', data?.data?.taskId || '')
+            addMessage({ role: 'bot', message: data?.message || 'error' });
         } finally {
             setIsLoading(false);
             setInput('');
@@ -66,7 +76,7 @@ const InputField: React.FC = () => {
             <div className="w-full">
                 <textarea
                     ref={textareaRef}
-                    placeholder="Describe the UI you'd like to generate."
+                    placeholder="Describe your needs, for example: create a new callgent."
                     className="resize-none w-full border-none border-transparent bg-transparent focus:outline-none focus:ring-0 bg-[#F4F4F4] dark:bg-[#2F2F2F]"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}

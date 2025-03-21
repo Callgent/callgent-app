@@ -1,5 +1,5 @@
 import useChatBoxStore from "@/models/chatBox";
-import Markdown from "../markdown";
+import Markdown from "../layouts/markdown";
 
 export default function Chat(): JSX.Element {
     const { chatBox } = useChatBoxStore();

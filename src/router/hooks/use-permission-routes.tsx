@@ -3,8 +3,8 @@ import { Suspense, lazy, useMemo } from "react";
 import { Navigate, Outlet } from "react-router";
 
 import { Iconify } from "@/components/icon";
-import { CircleLoading } from "@/components/loading";
-import { useUserInfo, useUserPermission } from "@/models/userStore";
+import { CircleLoading } from "@/components/layouts/loading";
+import { useUserPermission } from "@/models/userStore";
 import { flattenTrees } from "@/utils/tree";
 
 import { Tag } from "antd";

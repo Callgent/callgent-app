@@ -1,10 +1,10 @@
+import { Iconify } from "@/components/icon";
 import { useSettings } from "@/models/settingStore";
 import { themeVars } from "@/theme/theme.css";
 import { rgbAlpha } from "@/utils/theme";
 import { Toaster } from "sonner";
 import styled from "styled-components";
 
-import { Iconify } from "../icon";
 
 /**
  * https://sonner.emilkowal.ski/getting-started

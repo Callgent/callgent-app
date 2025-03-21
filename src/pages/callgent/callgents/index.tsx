@@ -27,7 +27,7 @@ export default function Callgents() {
     setCallgentModalProps((prev) => ({
       ...prev,
       show: true,
-      title: "Create New"
+      title: "Create New Callgent"
     }));
   };
 
@@ -35,7 +35,7 @@ export default function Callgents() {
     setCallgentModalProps((prev) => ({
       ...prev,
       show: true,
-      title: "Edit",
+      title: "Edit Callgent",
       formValue,
     }));
   };

@@ -7,6 +7,7 @@ import { enhanceNode } from '@/utils/callgent-tree';
 const initState = {
   callgentTree: [],
   realms: [],
+  realmKey: '',
   adaptors: [],
   modelTitle: "",
   action: null,
@@ -23,6 +24,7 @@ export const useTreeActionStore = create<TreeActionState>((set) => ({
     openModal: (node: ModalNode) => set({ isModalOpen: true, currentNode: node }),
     closeModal: () => set({ isModalOpen: false, action: null, currentNode: null }),
     setCurrentNode: (node: CallgentInfo) => set({ currentNode: node }),
+    setRealmKey: (realmKey: string) => set({ realmKey }),
   }
 }));
 

@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { Col, Row, Tag } from "antd";
 
-import Card from "@/components/card";
+import Card from "@/components/layouts/card";
 import { IconButton, Iconify } from "@/components/icon";
 
 export default function TeamsTab() {
