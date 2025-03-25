@@ -37,7 +37,7 @@ export default function Callgents() {
             <Col span={24} lg={6}>
               <Form.Item label="Adaptor" name="adaptor" className="!mb-0">
                 <Select placeholder="Select adaptor">
-                  <Select.Option value="restAPI">restAPI</Select.Option>
+                  <Select.Option value="RestAPI">RestAPI</Select.Option>
                   <Select.Option value="Webpage">Webpage</Select.Option>
                   <Select.Option value="Email">Email</Select.Option>
                 </Select>
