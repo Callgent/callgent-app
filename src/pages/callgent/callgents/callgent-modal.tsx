@@ -49,7 +49,7 @@ export function CallgentModal({ title, show, formValue, onOk, onCancel }: Callge
         <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please describe the purpose of this Callgent' }]}>
           <Input.TextArea placeholder="Describe the purpose of this Callgent (e.g., its function or goal)" />
         </Form.Item>
-        <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please explain how to use this Callgent' }]}>
+        <Form.Item label="how2Use" name="how2Ops" rules={[{ required: false, message: 'Please explain how to use this Callgent' }]}>
           <Input.TextArea placeholder="Provide usage instructions for this Callgent (e.g., steps to operate it)" />
         </Form.Item>
       </Form>

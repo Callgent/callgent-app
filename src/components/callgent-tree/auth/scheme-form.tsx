@@ -35,21 +35,23 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
         rules={[{ required: true, message: 'Please enter scheme name' }]}
       >
         <Input
-          style={{ color: "black" }}
-          placeholder="Enter scheme realm, e.g. 'x-api-key'" />
+          placeholder={formValues && "Enter scheme realm, e.g. 'x-api-key'"} />
       </Form.Item>
 
       <Form.Item
         label="Realm Name"
         name='realm'
-
-        rules={[{ required: true, message: 'Please enter scheme name' }]}
+        rules={[{ required: false, message: 'Please enter scheme name' }]}
       >
-        <Input className='bg-white' placeholder="Enter scheme realm, e.g. 'x-api-key'" />
+        <Input className='bg-white' placeholder={formValues ? "" : "Enter scheme realm, e.g. 'x-api-key'"} />
       </Form.Item>
 
       <Form.Item label="ValidationUrl" name={['scheme', 'validationUrl']}>
-        <Input placeholder="Enter validationUr, leave empty for user to fill in" />
+        <Input placeholder={formValues ? "" : "Enter validationUr"} />
+      </Form.Item>
+
+      <Form.Item label="secret" name='secret'>
+        <Input.Password placeholder={formValues ? "" : "Enter secret"} />
       </Form.Item>
 
       <Form.Item
@@ -82,7 +84,7 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
                     name={['pricing', 'perRequest']}
                   >
                     <Input
-                      placeholder="Enter price in cents"
+                      placeholder={formValues ? "" : "Enter price in cents"}
                       type="number"
                       step="0.01"
                       min={0}
@@ -97,7 +99,7 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
                     name={['pricing', 'perResponse']}
                   >
                     <Input.TextArea
-                      placeholder="Enter JS function calcPrice(req): [(resp) => int] / Per Response, 1billion=$0.01"
+                      placeholder={formValues ? "" : "Enter JS function calcPrice(req): [(resp) => int] / Per Response, 1billion=$0.01"}
                       rows={4}
                       className="w-[300px]"
                     />

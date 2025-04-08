@@ -3,13 +3,13 @@ import { Adaptor, CallgentInfo } from '#/entity';
 export const enhanceNode = (node: CallgentInfo, level: number): CallgentInfo => {
   let enhancedNode = { ...node };
   if (level === 2) {
-    enhancedNode = { ...enhancedNode, add: true };
+    enhancedNode = { ...enhancedNode, parentType: node?.id, add: true };
   } else if (level === 3 && node?.type === "SERVER") {
-    enhancedNode = { ...enhancedNode, edit: true, delete: true, import: true, lock: true, virtualApi: true };
+    enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, import: true, lock: true, virtualApi: true };
   } else if (level === 3 || level === 1) {
-    enhancedNode = { ...enhancedNode, edit: true, delete: true, lock: true };
+    enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, lock: true };
   } else if (level === 4) {
-    enhancedNode = { ...enhancedNode, lock: true, delete: true };
+    enhancedNode = { ...enhancedNode, parentType: node?.type, lock: true, delete: true };
   }
   if (node.children) {
     enhancedNode.children = node.children.map(child => enhanceNode(child, level + 1));
@@ -49,7 +49,7 @@ export const callgentApi = (data: any) => {
           whatFor: data?.whatFor,
           description: data?.description,
           parameters: data?.params?.parameters || [],
-          requestBody: data?.params?.requestObject || {},
+          requestBody: data?.params?.requestObject || data?.params?.requestBody || {},
           responses: data?.responses,
         },
       },

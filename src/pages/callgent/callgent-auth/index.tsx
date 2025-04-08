@@ -43,7 +43,7 @@ export default function CallgentAuth() {
   const tabItems = [
     ...(realms.map((item: Realm) => ({
       key: item.id!,
-      label: item.authType,
+      label: item?.provider,
       children: <NewAuth callgentId={id!} />,
       closable: false,
     }))),

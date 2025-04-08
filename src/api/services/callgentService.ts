@@ -100,7 +100,8 @@ export const putRealms = async (data: Realm) =>
 		data: {
 			realm: data?.realm,
 			scheme: data?.scheme,
-			pricing: data?.pricing
+			pricing: data?.pricing,
+			secret: data?.secret
 		},
 	});
 

@@ -45,6 +45,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
           id: node.id!,
           modelTitle: node?.name,
           type: node.id,
+          parentType: node?.parentType,
           data: node,
         });
         break;
@@ -53,6 +54,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
           id: node.id!,
           modelTitle: node.adaptorKey || "Callgent",
           type: node.id,
+          parentType: node?.parentType,
           data: node,
         });
         break;

@@ -46,4 +46,5 @@ export interface ModalNode {
   type?: string;
   modelTitle?: string;
   data?: any;
+  parentType?: string;
 }

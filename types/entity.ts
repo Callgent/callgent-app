@@ -29,7 +29,7 @@ export interface CallgentInfo {
 	name?: string;
 	avatar?: string;
 	whatFor?: string;
-	how2Use?: string;
+	how2Ops?: string;
 	summary?: string;
 	description?: string;
 	selectedOptions?: Array<string>;
@@ -68,6 +68,7 @@ export interface CallgentInfo {
 	import?: boolean;
 	lock?: boolean;
 	virtualApi?: boolean;
+	parentType?: string;
 }
 
 export interface HostType {
@@ -78,7 +79,6 @@ export interface Scheme {
 	type: string;
 	in: string;
 	name: string;
-	provider: string;
 	secret: string;
 }
 
@@ -92,7 +92,9 @@ export interface Realm {
 	perUser: boolean;
 	enabled: boolean;
 	type?: string;
+	provider?: string;
 	pricingEnabled?: boolean;
+	secret?: string;
 	pricing?: {
 		perRequest?: number;
 		perResponse?: string;
