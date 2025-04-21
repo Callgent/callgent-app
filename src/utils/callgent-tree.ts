@@ -6,7 +6,9 @@ export const enhanceNode = (node: CallgentInfo, level: number): CallgentInfo => 
     enhancedNode = { ...enhancedNode, parentType: node?.id, add: true };
   } else if (level === 3 && node?.type === "SERVER") {
     enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, import: true, lock: true, virtualApi: true };
-  } else if (level === 3 || level === 1) {
+  } else if (level === 3) {
+    enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, lock: true, virtualApi: true };
+  } else if (level === 1) {
     enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, lock: true };
   } else if (level === 4) {
     enhancedNode = { ...enhancedNode, parentType: node?.type, lock: true, delete: true };
