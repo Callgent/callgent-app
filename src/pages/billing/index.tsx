@@ -1,9 +1,9 @@
-import Card from "@/components/layouts/card";
+import BillingTable from "./table";
 
 export default function Billing() {
   return (
-    <Card>
-
-    </Card>
+    <>
+      <BillingTable />
+    </>
   );
 }

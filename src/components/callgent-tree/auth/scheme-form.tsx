@@ -35,7 +35,7 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
         rules={[{ required: true, message: 'Please enter scheme name' }]}
       >
         <Input
-          placeholder={formValues && "Enter scheme realm, e.g. 'x-api-key'"} />
+          placeholder={formValues?.id && "Enter scheme realm, e.g. 'x-api-key'"} />
       </Form.Item>
 
       <Form.Item
@@ -43,15 +43,15 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
         name='realm'
         rules={[{ required: false, message: 'Please enter scheme name' }]}
       >
-        <Input className='bg-white' placeholder={formValues ? "" : "Enter scheme realm, e.g. 'x-api-key'"} />
+        <Input className='bg-white' placeholder={formValues?.id ? "" : "Enter scheme realm, e.g. 'x-api-key'"} />
       </Form.Item>
 
       <Form.Item label="ValidationUrl" name={['scheme', 'validationUrl']}>
-        <Input placeholder={formValues ? "" : "Enter validationUr"} />
+        <Input placeholder={formValues?.id ? "" : "Enter validationUr"} />
       </Form.Item>
 
       <Form.Item label="secret" name='secret'>
-        <Input.Password placeholder={formValues ? "" : "Enter secret"} />
+        <Input.Password placeholder={formValues?.id ? "" : "Enter secret"} />
       </Form.Item>
 
       <Form.Item
@@ -80,11 +80,11 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
               <>
                 {showPriceInput && (
                   <Form.Item
-                    label="Fixed Price Per Request"
+                    label="Fixed Price Per Request (in Cents)"
                     name={['pricing', 'perRequest']}
                   >
                     <Input
-                      placeholder={formValues ? "" : "Enter price in cents"}
+                      placeholder={formValues?.id ? "" : "Enter price in cents"}
                       type="number"
                       step="0.01"
                       min={0}
@@ -95,11 +95,11 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
 
                 {showFunctionInput && (
                   <Form.Item
-                    label="Calculate Price Per Request"
+                    label="Calculate Price Per Request (in Cents)"
                     name={['pricing', 'perResponse']}
                   >
                     <Input.TextArea
-                      placeholder={formValues ? "" : "Enter JS function calcPrice(req): [(resp) => int] / Per Response, 1billion=$0.01"}
+                      placeholder={formValues?.id ? "" : "Enter JS function calcPrice(req): [(resp) => int] / Per Response, 1billion=$0.01"}
                       rows={4}
                       className="w-[300px]"
                     />
