@@ -63,6 +63,8 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
   const path = Object.keys(openApiSpec.paths)[0];
   const method = Object.keys(openApiSpec.paths[path])[0];
   const operation = openApiSpec.paths[path][method];
+  console.log(openApiSpec);
+
   return {
     operationId: operation?.operationId || method + path,
     path: path,
@@ -75,5 +77,7 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
     },
     responses: operation?.responses || {},
     rawJson: openApiSpec,
+    how2exe: operation?.how2exe || null,
+    how2Ops: operation?.how2Ops || null
   };
 };

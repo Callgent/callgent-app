@@ -6,6 +6,7 @@ import { TreeActionModal } from './model';
 import useTreeActionStore, { useFetchAdaptor, useFetchCallgentTree, useTreeActions } from '@/models/callgentTreeStore';
 import { enhanceNode, setAdaptor } from '@/utils/callgent-tree';
 import { CircleLoading } from '../layouts/loading';
+import Endpoint from './endpoint';
 
 export default function CallgentInfo() {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -13,7 +14,7 @@ export default function CallgentInfo() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { callgentTree } = useTreeActionStore();
+  const { callgentTree, action } = useTreeActionStore();
   const fetchCallgentTree = useFetchCallgentTree();
   const fetchAdaptor = useFetchAdaptor();
 
@@ -69,8 +70,10 @@ export default function CallgentInfo() {
   }
 
   return (
-    <div className="w-full rounded-md py-2 bg-[#F6F7F8] dark:bg-[#323234]">
+    <div className="w-full flex flex-col-reverse justify-between lg:flex-row">
+      {action === 'virtualApi' && <Endpoint />}
       <TreeNode
+        className='flex-1 rounded-md py-2 bg-[#F6F7F8] dark:bg-[#323234] mb-4 lg:mb-0'
         nodes={callgentTree}
         level={1}
         expandedNodes={expandedNodes}

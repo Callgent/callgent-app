@@ -16,9 +16,10 @@ interface TreeNodeProps {
   expandedNodes: Set<string>;
   onToggle: (id: string) => void;
   callgentId?: string;
+  className?: string;
 }
 
-const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: TreeNodeProps) => {
+const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, className }: TreeNodeProps) => {
   if (nodes.length === 0) {
     return null
   }
@@ -76,7 +77,8 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
         break;
       case 'virtualApi':
         setCurrentNode(node);
-        navigate(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
+        sessionStorage.removeItem('endpoint-form-storage')
+      // navigate(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
     }
     useTreeActionStore.setState({ action: actionType });
   }
@@ -110,7 +112,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId }: Tre
     setOpenConfirm(true);
   };
   return (
-    <div>
+    <div className={className}>
       {nodes.map(node => (
         <div className="w-full" data-testid="tree-node" key={node?.id}>
           <div className="flex justify-between items-center p-2 rounded mb-1 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700">

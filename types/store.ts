@@ -48,3 +48,40 @@ export interface ModalNode {
   data?: any;
   parentType?: string;
 }
+
+export interface EndpointState {
+  endpointName: string
+  whatFor: string
+  how2Ops: string
+  parameters: any[]
+  responses: any[]
+  formData: Record<string, any>
+  isParameterOpen: boolean
+  isResponseOpen: boolean
+  isEndpointOpen: boolean
+  editIndex: number
+  editType: string
+
+  setEndpointName: (name: string) => void
+  setWhatFor: (text: string) => void
+  setHow2Ops: (text: string) => void
+
+  setParameters: (params: any[]) => void
+  addParameter: (param: any) => void
+  updateParameter: (index: number, param: any) => void
+
+  setResponses: (resps: any[]) => void
+  addResponse: (resp: any) => void
+  updateResponse: (index: number, resp: any) => void
+  removeParameter: (index: number) => void
+  removeResponse: (index: number) => void
+
+  setFormData: (data: Record<string, any>) => void
+
+  setIsParameterOpen: (open: boolean) => void
+  setIsResponseOpen: (open: boolean) => void
+  setIsEndpointOpen: (open: boolean) => void
+
+  setEditIndex: (index: number) => void
+  setEditType: (type: string) => void
+}
