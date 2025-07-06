@@ -84,4 +84,7 @@ export interface EndpointState {
 
   setEditIndex: (index: number) => void
   setEditType: (type: string) => void
+  apiDefaultValues: Record<string, Record<string, string>>
+  setDefaultValue: (apiName: string, paramName: string, value: string) => void
+  getDefaultValue: (apiName: string, paramName: string) => string
 }

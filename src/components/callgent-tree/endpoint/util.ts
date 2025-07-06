@@ -21,66 +21,30 @@ export const fieldTypes = [
   { label: 'array', value: 'array' },
 ];
 
-// Convert config object to OpenAPI 3.0 specification format
-export function convertToOpenAPI(config: any) {
-  const { path, operationId, whatFor, requestBody, how2Ops } = config;
-  const method = config.endpointConfig?.method?.toLowerCase() || 'get';
-
-  // Map parameters to OpenAPI parameter objects
-  const parameters = (config.parameters || []).map((p: any) => {
-    return {
-      name: p.name,
-      // Note: 'params' here maps to 'query', 'path' to 'path' in OpenAPI
-      in: p.method === 'params' ? 'query' : 'path',
-      required: p.method === 'path',
-      description: p.describe,
-      schema: {
-        type: p.type || 'string',
-        default: p.default,
-      },
-    };
-  });
-
-  // Map responses to properties object for schema
-  const properties: Record<string, any> = {};
-
-  (config.responses || []).forEach((r: any) => {
-    properties[r.name] = {
-      type: r.type || 'string',
-      description: r.describe,
-      default: r.default,
-    };
-  });
-
-  // Construct standard 200 response schema
-  const responses = {
-    "200": {
-      description: "Successful response",
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties,
-          },
-        },
-      },
+// api列表
+export const apiList = {
+  "endpoints": [
+    {
+      "id": "esW3GgQl8-0qDJ_vvtphv",
+      "name": "GET /OAuthClientController_oauthStart",
+      "callgentId": "euXexUmhK0ruEc-qQQwl1"
     },
-  };
-  // Return OpenAPI 3.0 specification object
-  return {
-    openapi: "3.0.0",
-    paths: {
-      [path]: {
-        [method]: {
-          operationId,
-          how2exe: config?.endpointConfig?.how2exe || null,
-          whatFor,
-          parameters,
-          requestBody,
-          responses,
-          how2Ops,
-        },
-      },
-    },
-  };
+    {
+      "id": "esW361MTmZlwwQxk0yBGu",
+      "name": "GET /OAuthClientController_oauthCallback",
+      "callgentId": "euXexUmhK0ruEc-qQQwl1"
+    }
+  ],
+  "sentries": [
+    {
+      "id": "root",
+      "name": "root",
+      "host": "callgent-interface",
+      "adaptor": "Callgent",
+      "interfaceUri": null,
+      "callgentIds": [
+        "euXexUmhK0ruEc-qQQwl1"
+      ]
+    }
+  ]
 }

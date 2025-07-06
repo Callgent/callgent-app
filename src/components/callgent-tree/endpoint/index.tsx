@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
-import { Input, Tag, Button, InputRef } from 'antd'
+import { Input, Button, InputRef, Tabs } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import EndpointModal from './modal'
-import { convertToOpenAPI } from './util'
 import useTreeActionStore from '@/models/callgentTreeStore'
 import { postEndpointsApi } from '@/api/services/callgentService'
-import { restoreDataFromOpenApi } from '@/utils/callgent-tree'
+import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
+import EndpointSelectApi from './select-api'
+import PayloadCom from './payload'
 
 export default function EndpointPage() {
   const {
@@ -16,19 +17,12 @@ export default function EndpointPage() {
     whatFor,
     how2Ops,
     formData,
-    setIsParameterOpen,
-    setIsResponseOpen,
     setIsEndpointOpen,
     setParameters,
     setResponses,
     setWhatFor,
     setEndpointName,
     setHow2Ops,
-    setEditIndex,
-    setEditType,
-    setFormData,
-    addParameter,
-    addResponse,
   } = useEndpointStore()
 
   const { currentNode, callgentTree } = useTreeActionStore()
@@ -49,7 +43,7 @@ export default function EndpointPage() {
       responses,
       how2Ops,
     })
-    await postEndpointsApi({ ...restoreDataFromOpenApi(data), entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
+    await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping: formData.apiMap, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
   }
 
   // Reset all states on cancel
@@ -73,27 +67,15 @@ export default function EndpointPage() {
     }
   }
 
-  // Input for new parameter and response
-  const [paramName, setParamName] = useState('')
-  const subParamName = () => {
-    if (!paramName.trim()) return
-    addParameter({ name: paramName.trim(), method: 'body', type: 'string' })
-    setParamName('')
-  }
-
-  const [response, setResponse] = useState('')
-  const subResponse = () => {
-    if (!response.trim()) return
-    addResponse({ name: response.trim(), type: 'object' })
-    setResponse('')
-  }
   const inputRef = useRef<InputRef>(null)
 
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
+
   return (
     <div className="w-full mr-4">
+
       <div className="mx-auto rounded-lg p-6 space-y-6 border-2">
         <div className="flex justify-between">
           <h2 className="text-3xl font-semibold font-sans">Functional Endpoint</h2>
@@ -129,122 +111,46 @@ export default function EndpointPage() {
 
             {/* Parameters */}
             <div className="border border-gray-200 rounded">
-              <div className="flex justify-between items-center bg-gray-50 px-4 py-2">
-                <span className="font-medium">Payload</span>
-                <button
-                  onClick={() => setIsParameterOpen(true)}
-                  className="flex items-center gap-1 text-blue-600 hover:bg-gray-200 px -2 rounded"
-                >
-                  <Icon icon="solar:add-circle-bold" className="w-4 h-4" />
-                  <span>Add</span>
-                </button>
+              <div className="font-medium bg-gray-50 px-4 py-2">
+                Payload
               </div>
               <div className="divide-y divide-gray-100 border-t">
-                {parameters.map((param, index) => (
-                  <div key={index} className="flex justify-between px-4 py-3 items-center">
-                    <div>{param.name}</div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {param.default && <Tag color="green">{param.default}</Tag>}
-                      <Tag color="blue">{param.type}</Tag>
-                      <button
-                        onClick={() => {
-                          setEditIndex(index)
-                          setEditType('parameter')
-                          setFormData({ ...formData, parameter: param })
-                          setIsParameterOpen(true)
-                        }}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Icon icon="solar:pen-bold" className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex justify-between px-4 py-3 items-center hover:bg-gray-100">
-                  <div className="border hover:border-gray-300 rounded-md cursor-pointer transition-colors duration-300">
-                    <Input
-                      placeholder="Parameter name"
-                      bordered={false}
-                      value={paramName}
-                      onChange={(e) => setParamName(e.target.value)}
-                      onPressEnter={subParamName}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Tag color="blue">string</Tag>
-                    <button
-                      className="text-blue-500 hover:text-blue-700"
-                      onClick={subParamName}
-                    >
-                      <Icon icon="mdi:content-save" className="w-4 h-4 text-green-600" />
-                    </button>
-                  </div>
-                </div>
+                <PayloadCom data={parameters} onSubmit={(data: any) => setParameters(data)} />
               </div>
             </div>
 
             {/* Responses */}
             <div className="border border-gray-200 rounded">
-              <div className="flex justify-between items-center bg-gray-50 px-4 py-2">
-                <span className="font-medium">Responses</span>
-                <button
-                  onClick={() => setIsResponseOpen(true)}
-                  className="flex items-center gap-1 text-blue-600"
-                >
-                  <Icon icon="solar:add-circle-bold" className="w-4 h-4" />
-                  <span>Add</span>
-                </button>
+              <div className="font-medium bg-gray-50 px-4 py-2">
+                Responses
               </div>
               <div className="divide-y divide-gray-100">
-                {responses.map((res, index) => (
-                  <div key={index} className="flex justify-between px-4 py-3 items-center">
-                    <div>{res.name}</div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {res.default && <Tag color="green">{res.default}</Tag>}
-                      <Tag color="blue">{res.type}</Tag>
-                      <button
-                        onClick={() => {
-                          setEditIndex(index)
-                          setEditType('response')
-                          setFormData({ ...formData, response: res })
-                          setIsResponseOpen(true)
-                        }}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <Icon icon="solar:pen-bold" className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex justify-between px-4 py-3 items-center hover:bg-gray-100">
-                  <div className="border hover:border-gray-300 rounded-md cursor-pointer transition-colors duration-300">
-                    <Input
-                      placeholder="Response name"
-                      bordered={false}
-                      value={response}
-                      onChange={(e) => setResponse(e.target.value)}
-                      onPressEnter={subResponse}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Tag color="blue">string</Tag>
-                    <button className="text-blue-500 hover:text-blue-700" onClick={subResponse}>
-                      <Icon icon="mdi:content-save" className="w-4 h-4 text-green-600" />
-                    </button>
-                  </div>
-                </div>
+                <PayloadCom data={responses} onSubmit={(data: any) => setResponses(data)} mode='response' />
               </div>
             </div>
 
             {/* how2Ops textarea */}
             <div>
-              <label className="block text-sm font-medium mb-1">how2Ops</label>
-              <Input.TextArea
-                rows={3}
-                value={how2Ops}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                onChange={(e) => setHow2Ops(e.target.value)}
-              />
+              <Tabs defaultActiveKey="1" items={[
+                {
+                  key: '1',
+                  label: 'how2Ops',
+                  children: (<div>
+                    <Input.TextArea
+                      rows={3}
+                      value={how2Ops}
+                      className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      onChange={(e) => setHow2Ops(e.target.value)}
+                    />
+                  </div>),
+                },
+                {
+                  key: '2',
+                  label: 'Api Map',
+                  children: <EndpointSelectApi />,
+                },
+              ]} />
+
             </div>
 
             {/* Action buttons */}

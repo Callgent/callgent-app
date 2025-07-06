@@ -1,4 +1,4 @@
-import { Modal, Input, Select, Form, Button } from 'antd'
+import { Modal, Input, Select, Form, Button, Checkbox } from 'antd'
 import { fieldTypes, requestLocations, requestMethods } from './util'
 import { useEndpointStore } from '@/models/endpoint'
 
@@ -47,11 +47,11 @@ export default function EndpointModal() {
           </Button>
         ]}
       >
-        <Form form={formEndpoint} layout="vertical" initialValues={formData.endpoint}>
+        <Form form={formEndpoint} layout="vertical" initialValues={{ ...formData.endpoint, method: 'GET' }}>
           <Form.Item name="method" label="HTTP Method" rules={[{ required: true }]}>
             <Select className="w-full" options={requestMethods} />
           </Form.Item>
-          <Form.Item name="how2exe" label="Execution Description">
+          <Form.Item name="how2exe" label="how2exe">
             <Input.TextArea rows={4} />
           </Form.Item>
         </Form>
@@ -113,11 +113,11 @@ export default function EndpointModal() {
           </Button>
         ]}
       >
-        <Form form={formParameter} layout="vertical" initialValues={formData.parameter}>
+        <Form form={formParameter} layout="vertical" initialValues={{ ...formData.parameter, location: 'body', type: 'string' }}>
           <Form.Item name="name" label="Name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="method" label="Location" rules={[{ required: true }]}>
+          <Form.Item name="location" label="location" rules={[{ required: true }]}>
             <Select options={requestLocations} />
           </Form.Item>
           <Form.Item name="type" label="Type" rules={[{ required: true }]}>
@@ -129,7 +129,11 @@ export default function EndpointModal() {
           <Form.Item name="default" label="Default Value">
             <Input />
           </Form.Item>
+          <Form.Item name="required" valuePropName="checked">
+            <Checkbox>Required</Checkbox>
+          </Form.Item>
         </Form>
+
       </Modal>
 
       {/* Response Modal */}
@@ -188,7 +192,7 @@ export default function EndpointModal() {
           </Button>
         ]}
       >
-        <Form form={formResponse} layout="vertical" initialValues={formData.response}>
+        <Form form={formResponse} layout="vertical" initialValues={{ ...formData.response, type: 'string' }}>
           <Form.Item name="name" label="Name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -200,6 +204,9 @@ export default function EndpointModal() {
           </Form.Item>
           <Form.Item name="default" label="Default Value">
             <Input />
+          </Form.Item>
+          <Form.Item name="required" valuePropName="checked">
+            <Checkbox>Required</Checkbox>
           </Form.Item>
         </Form>
       </Modal>

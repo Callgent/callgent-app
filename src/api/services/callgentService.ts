@@ -150,3 +150,8 @@ export const postRequestApi = async (callgentId: string, data: any, taskId: stri
 		}
 	});
 
+/** get /api/callgent-api */
+export const getCallgentApiList = async (id: string) =>
+	apiClient.get<any>({
+		url: `/api/endpoints/from/${id}`
+	});

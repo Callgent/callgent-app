@@ -4,7 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 
 export const useEndpointStore = create<EndpointState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       endpointName: '',
       whatFor: '',
       how2Ops: '',
@@ -62,6 +62,22 @@ export const useEndpointStore = create<EndpointState>()(
 
       setEditIndex: (i) => set({ editIndex: i }),
       setEditType: (t) => set({ editType: t }),
+
+      apiDefaultValues: {},
+      setDefaultValue: (apiName, paramName, value) => {
+        const prev = get().apiDefaultValues
+        const updated = {
+          ...prev,
+          [apiName]: {
+            ...prev[apiName],
+            [paramName]: value,
+          },
+        }
+        set({ apiDefaultValues: updated })
+      },
+      getDefaultValue: (apiName, paramName) => {
+        return get().apiDefaultValues?.[apiName]?.[paramName] || ''
+      },
     }),
     {
       name: 'endpoint-form-storage',
