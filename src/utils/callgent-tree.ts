@@ -255,7 +255,10 @@ export function treeToOpenAPI(tree: any[]) {
 
   tree.forEach(node => {
     if (node.in === 'body') {
-      bodyProperties[node.name] = nodeToSchema(node)
+      bodyProperties[node.name] = {
+        ...nodeToSchema(node),
+        ...(node.prompt ? { mapping: node.prompt } : {})
+      }
       if (node.required) bodyRequired.push(node.name)
     } else {
       parameters.push({
@@ -263,7 +266,8 @@ export function treeToOpenAPI(tree: any[]) {
         in: node.in,
         required: node.required || false,
         description: node.description || undefined,
-        schema: nodeToSchema(node)
+        schema: nodeToSchema(node),
+        ...(node?.prompt ? { mapping: node.prompt } : {})
       })
     }
   })
@@ -276,7 +280,8 @@ export function treeToOpenAPI(tree: any[]) {
           schema: {
             type: 'object',
             properties: bodyProperties,
-            required: bodyRequired.length > 0 ? bodyRequired : undefined
+            required: bodyRequired.length > 0 ? bodyRequired : undefined,
+
           }
         }
       }

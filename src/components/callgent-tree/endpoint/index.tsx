@@ -5,7 +5,7 @@ import { useEndpointStore } from '@/models/endpoint'
 import EndpointModal from './modal'
 import useTreeActionStore from '@/models/callgentTreeStore'
 import { postEndpointsApi } from '@/api/services/callgentService'
-import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
+import { convertToOpenAPI, restoreDataFromOpenApi, treeToOpenAPI } from '@/utils/callgent-tree'
 import EndpointSelectApi from './select-api'
 import PayloadCom from './payload'
 
@@ -43,7 +43,7 @@ export default function EndpointPage() {
       responses,
       how2Ops,
     })
-    await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping: formData.apiMap, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
+    await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping: { api_id: formData.apiMap.api_id, params: treeToOpenAPI(formData.apiMap?.parameter) }, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
   }
 
   // Reset all states on cancel

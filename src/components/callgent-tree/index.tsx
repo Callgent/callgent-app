@@ -14,7 +14,7 @@ export default function CallgentInfo() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { callgentTree } = useTreeActionStore();
+  const { callgentTree, action } = useTreeActionStore();
   const fetchCallgentTree = useFetchCallgentTree();
   const fetchAdaptor = useFetchAdaptor();
 
@@ -71,8 +71,7 @@ export default function CallgentInfo() {
 
   return (
     <div className="w-full flex flex-col-reverse justify-between lg:flex-row">
-      {/* {action === 'virtualApi' && <Endpoint />} */}
-      <Endpoint />
+      {action === 'virtualApi' && <Endpoint />}
       <TreeNode
         className='flex-1 rounded-md py-2 bg-[#F6F7F8] dark:bg-[#323234] mb-4 lg:mb-0'
         nodes={callgentTree}
