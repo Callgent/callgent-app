@@ -7,6 +7,7 @@ import { useEndpointStore } from '@/models/endpoint'
 import {
   convertEndpointsToTreeNodes,
   convertSentriesToTreeNodes,
+  parseOpenApiParams,
   updateTreeNode
 } from '@/utils/callgent-tree'
 import ApiMap from './api-map'
@@ -73,44 +74,10 @@ export default function EndpointSelectApi() {
 
     try {
       const { data } = await getCallgentApi(value)
-      const generateKey = () => `${Date.now()}-${Math.floor(Math.random() * 10000)}`
-
-      const result: any[] = []
-
-      const params = data.params || {}
-
-      // Handle parameters
-      if (Array.isArray(params.parameters)) {
-        for (const param of params.parameters) {
-          result.push({
-            key: generateKey(),
-            name: param.name || '',
-            type: param.schema?.type || 'string',
-            description: param.description || '',
-            in: param.in || 'query',
-            default: param.schema?.default || '',
-            required: !!param.required,
-            children: []
-          })
-        }
-      }
-
-      // Handle requestBody.text/plain
-      const bodySchema = params.requestBody?.content?.['text/plain']?.schema
-      if (bodySchema) {
-        result.push({
-          key: generateKey(),
-          name: 'body',
-          type: bodySchema.type || 'string',
-          description: params.requestBody?.description || '',
-          in: 'body',
-          default: '',
-          required: !!params.requestBody?.required,
-          children: []
-        })
-      }
-
       const api = node.fullData
+
+      const result = parseOpenApiParams(data.params || {})
+
       setSelectedApiId(value)
       setCurrentApi({
         ...api,

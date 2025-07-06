@@ -342,3 +342,63 @@ export function updateTreeNode(list: any[], key: string, children: any[]): any[]
     return node
   })
 }
+
+export function parseOpenApiParams(params: any): any[] {
+  const generateKey = () => `${Date.now()}-${Math.floor(Math.random() * 10000)}`
+  const result: any[] = []
+
+  // Handle parameters (query, header, etc.)
+  if (Array.isArray(params.parameters)) {
+    for (const param of params.parameters) {
+      result.push({
+        key: generateKey(),
+        name: param.name || '',
+        type: param.schema?.type || 'string',
+        description: param.description || '',
+        in: param.in || 'query',
+        default: param.schema?.default || '',
+        required: !!param.required,
+        children: [],
+      })
+    }
+  }
+
+  // Handle requestBody.text/plain
+  const bodySchema = params.requestBody?.content?.['text/plain']?.schema
+  if (bodySchema) {
+    result.push({
+      key: generateKey(),
+      name: 'body',
+      type: bodySchema.type || 'string',
+      description: params.requestBody?.description || '',
+      in: 'body',
+      default: '',
+      required: !!params.requestBody?.required,
+      children: [],
+    })
+  }
+
+  // Handle requestObject.content['application/json']
+  const requestSchema = params.requestObject?.content?.['application/json']?.schema
+  if (requestSchema?.properties) {
+    const properties = requestSchema.properties
+    const required = requestSchema.required || []
+
+    for (const [name, prop] of Object.entries(properties)) {
+      const propSchema = prop as any
+
+      result.push({
+        key: generateKey(),
+        name,
+        type: propSchema.type || 'string',
+        description: propSchema.description || '',
+        in: 'body',
+        default: propSchema.default ?? '',
+        required: required.includes(name),
+        children: [],
+      })
+    }
+  }
+
+  return result
+}

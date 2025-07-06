@@ -30,10 +30,9 @@ export default function ApiMap({
         className="flex items-center pl-4 py-1 hover:bg-gray-100 rounded text-sm"
         style={{ paddingLeft: `${level * 16}px` }}
       >
-        {/* 字段名 */}
-        <div className="font-semibold w-32">{node.name}</div>
 
-        {/* 提示词 */}
+        <div className="font-semibold w-36">{node.name}</div>
+
         <div className="">
           {isEditing ? (
             <Input
@@ -44,7 +43,7 @@ export default function ApiMap({
               onBlur={() => submitEdit(node.key)}
               autoFocus
               className="w-full"
-              placeholder="请输入提示词"
+              placeholder="Click to add prompt word"
             />
           ) : (
             <div
@@ -54,7 +53,7 @@ export default function ApiMap({
                 setEditingPrompt(node.prompt || '')
               }}
             >
-              {node.prompt || <span className="text-gray-400">点击添加提示词</span>}
+              {node.prompt || <span className="text-gray-400">Click to add prompt word</span>}
             </div>
           )}
         </div>
@@ -63,7 +62,7 @@ export default function ApiMap({
   }
 
   return (
-    <div className="w-full text-sm font-mono px-2 pb-2 space-y-1">
+    <div className="w-full text-sm font-mono px-2 pb-2 space-y-1 max-h-56 overflow-auto">
       {treeData.map((node: any) => renderNode(node))}
     </div>
   )
