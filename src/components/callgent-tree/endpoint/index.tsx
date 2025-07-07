@@ -5,9 +5,10 @@ import { useEndpointStore } from '@/models/endpoint'
 import EndpointModal from './modal'
 import useTreeActionStore from '@/models/callgentTreeStore'
 import { postEndpointsApi } from '@/api/services/callgentService'
-import { convertToOpenAPI, restoreDataFromOpenApi, treeToOpenAPI } from '@/utils/callgent-tree'
+import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
 import EndpointSelectApi from './select-api'
 import PayloadCom from './payload'
+import { extractFirst2xxJsonSchema, injectDefaults } from './util'
 
 export default function EndpointPage() {
   const {
@@ -43,7 +44,15 @@ export default function EndpointPage() {
       responses,
       how2Ops,
     })
-    await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping: { api_id: formData.apiMap.api_id, params: treeToOpenAPI(formData.apiMap?.parameter) }, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
+    const apiMapping = {
+      api_id: formData.apiMap.api_id,
+      params: {
+        parameters: injectDefaults(formData.apiMap.api_data.params.parameters, formData.apiMap.parameters) || {},
+        requestBody: injectDefaults(formData.apiMap.api_data.params.requestBody, formData.apiMap.requestBody) || {}
+      },
+      responses: injectDefaults(extractFirst2xxJsonSchema(formData.apiMap.api_data.responses), formData.apiMap.responses) || {}
+    }
+    await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
   }
 
   // Reset all states on cancel
@@ -66,16 +75,13 @@ export default function EndpointPage() {
       setIsLoading(false)
     }
   }
-
   const inputRef = useRef<InputRef>(null)
-
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
 
   return (
     <div className="w-full mr-4">
-
       <div className="mx-auto rounded-lg p-6 space-y-6 border-2">
         <div className="flex justify-between">
           <h2 className="text-3xl font-semibold font-sans">Functional Endpoint</h2>

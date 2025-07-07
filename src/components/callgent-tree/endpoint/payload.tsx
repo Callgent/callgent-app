@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Input, Select, Button, Modal, Form, Checkbox, message, Tag } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { commitEdit, deleteNodes, recursiveAdd, updateNode } from '@/utils/callgent-tree'
+import { commitEdit, deleteNodes, updateNode, findNode } from '@/utils/callgent-tree'
 
 const typeOptions = [
   { label: 'string', value: 'string' },
@@ -49,7 +49,9 @@ export default function PayloadCom({
       message.warning('Please complete the current field editing first.')
       return
     }
+
     const newKey = Date.now().toString()
+
     const newNode = {
       key: newKey,
       name: '',
@@ -58,15 +60,34 @@ export default function PayloadCom({
       ...(mode === 'request' ? { in: 'body' } : {}),
       default: '',
       required: false,
-      children: []
+      children: [],
+      parentType: ''
     }
 
     if (!parentKey) {
       setTreeData(prev => [...prev, newNode])
+      setEditingKey(newKey)
     } else {
-      setTreeData(prev => recursiveAdd(prev, parentKey, newNode))
+      const parent = findNode(treeData, parentKey)
+      if (!parent) return
+      const updatedTree = [...treeData]
+      if (parent.type === 'array') {
+        const itemNode = {
+          ...newNode,
+          name: 'item',
+          parentType: 'array'
+        }
+        parent.children = [itemNode]
+      } else if (parent.type === 'object') {
+        const childNode = {
+          ...newNode,
+          parentType: 'object'
+        }
+        parent.children = [...(parent.children || []), childNode]
+        setEditingKey(newKey)
+      }
+      setTreeData(updatedTree)
     }
-    setEditingKey(newKey)
     setEditingValue('')
   }
 
@@ -85,13 +106,15 @@ export default function PayloadCom({
     })
   }
 
+  const isArrayItem = (node: any) => node?.parentType === 'array'
+
   const renderNode = (node: any, level = 0) => {
     const isEditing = editingKey === node.key
     return (
       <div key={node.key} className="group pl-2 mt-1">
         <div className="p-1 flex items-center justify-between hover:bg-gray-200 rounded">
           <div>
-            {isEditing ? (
+            {(isEditing && !isArrayItem(currentEditNode)) ? (
               <div className="space-x-3 flex">
                 <Input
                   value={editingValue}
@@ -107,7 +130,7 @@ export default function PayloadCom({
               </div>
             ) : (
               <div className="w-36 px-2 cursor-pointer" onClick={() => {
-                if (editingKey === null) {
+                if (editingKey === null && node.parentType !== 'array') {
                   setEditingKey(node.key)
                   setEditingValue(node.name)
                 }
@@ -118,7 +141,7 @@ export default function PayloadCom({
           </div>
 
           <div className="space-x-2 flex items-center">
-            {node.type === 'object' && (
+            {['object', 'array'].includes(node.type) && (
               <div
                 className="w-4 h-4 border border-gray-400 rounded-sm text-center leading-[0.8rem] cursor-pointer hover:border-blue-500 hover:text-blue-600"
                 onClick={() => addNode(node.key)}
@@ -166,9 +189,11 @@ export default function PayloadCom({
         onOk={handleModalOk}
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="Field Name" name="name" rules={[{ required: true, message: 'Please enter a field name' }]}>
-            <Input />
-          </Form.Item>
+          {!isArrayItem(currentEditNode) && (
+            <Form.Item label="Field Name" name="name" rules={[{ required: true, message: 'Please enter a field name' }]}>
+              <Input />
+            </Form.Item>
+          )}
 
           <Form.Item label="Type" name="type" rules={[{ required: true }]}>
             <Select options={typeOptions} />
@@ -187,6 +212,7 @@ export default function PayloadCom({
           <Form.Item label="Default Value" name="default">
             <Input />
           </Form.Item>
+
           {mode === 'request' && (
             <Form.Item name="required" valuePropName="checked">
               <Checkbox>Required</Checkbox>

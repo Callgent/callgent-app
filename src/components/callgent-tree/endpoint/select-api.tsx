@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { TreeSelect, Form, Spin, message } from 'antd'
+import { TreeSelect, Spin, message } from 'antd'
 import { getCallgentApi, getCallgentApiList } from '@/api/services/callgentService'
 import { useLocation } from 'react-router'
 import { useEndpointStore } from '@/models/endpoint'
@@ -7,22 +7,19 @@ import { useEndpointStore } from '@/models/endpoint'
 import {
   convertEndpointsToTreeNodes,
   convertSentriesToTreeNodes,
-  parseOpenApiParams,
   updateTreeNode
 } from '@/utils/callgent-tree'
 import ApiMap from './api-map'
+import { extractFirst2xxJsonSchema } from './util'
 
 export default function EndpointSelectApi() {
   const location = useLocation()
   const query = new URLSearchParams(location.search)
   const callgentId = query.get('callgentId') || ''
-
-  const [formApi] = Form.useForm()
-  const { getDefaultValue, setDefaultValue, setFormData, formData } = useEndpointStore()
+  const { setFormData, formData } = useEndpointStore()
 
   const [treeData, setTreeData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [selectedApiId, setSelectedApiId] = useState<string | undefined>(undefined)
   const [currentApi, setCurrentApi] = useState<any | null>(null)
 
   // Initialize top-level nodes
@@ -73,60 +70,29 @@ export default function EndpointSelectApi() {
     if (!node?.fullData) return
 
     try {
-      const { data } = await getCallgentApi(value)
-      const api = node.fullData
-
-      const result = parseOpenApiParams(data.params || {})
-
-      setSelectedApiId(value)
-      setCurrentApi({
-        ...api,
-        parameter: result
-      })
-
-      result.forEach((param: any) => {
-        const existing = getDefaultValue(api.name, param.name)
-        const defaultVal = existing !== '' ? existing : param.default ?? ''
-        setDefaultValue(api.name, param.name, defaultVal)
-      })
+      const { data } = await getCallgentApi(value);
+      setCurrentApi(data)
+      setFormData({ ...formData, apiMap: { api_id: data.id, api_data: data, } })
     } catch (err) {
       message.error('Failed to load API parameters')
     }
   }
 
-  // Sync form change to store
-  const handleFormChange = () => {
-    const values = formApi.getFieldsValue()
-    if (!selectedApiId) return
-    setFormData({ ...formData, apiMap: values })
-  }
-
   return (
-    <div className="py-4 space-y-4">
+    <div className="py-4">
       <Spin spinning={loading}>
-        <Form
-          form={formApi}
-          onChange={handleFormChange}
-          initialValues={formData.apiMap}
-        >
-          <Form.Item name="api_id" rules={[{ required: true, message: 'Please select an API' }]}>
-            <TreeSelect
-              className="w-full"
-              treeData={treeData}
-              loadData={onLoadData}
-              onSelect={handleApiSelect}
-              placeholder="Select an API"
-              treeDefaultExpandAll={false}
-              allowClear
-              showSearch
-            />
-          </Form.Item>
-          {currentApi?.parameter?.length > 0 && (
-            <div className="divide-y divide-gray-100 border rounded">
-              <ApiMap data={currentApi.parameter} onSubmit={(data: any) => { setCurrentApi({ ...currentApi, parameter: data }); setFormData({ ...formData, apiMap: { ...formData?.apiMap, parameter: data } }) }} />
-            </div>
-          )}
-        </Form>
+        <TreeSelect
+          className="w-full"
+          treeData={treeData}
+          loadData={onLoadData}
+          onSelect={handleApiSelect}
+          placeholder="Select an API"
+          treeDefaultExpandAll={false}
+          defaultValue={formData?.apiMap?.api_data?.name || null}
+          allowClear
+          showSearch
+        />
+        <ApiMap data={currentApi?.params || formData?.apiMap?.api_data.params || {}} responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.apiMap?.api_data.responses)} />
       </Spin>
     </div>
   )

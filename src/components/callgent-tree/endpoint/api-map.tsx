@@ -1,69 +1,81 @@
-import { useState } from 'react'
-import { Input } from 'antd'
-import { updateNode } from '@/utils/callgent-tree'
+import Form from '@rjsf/antd'
+import validator from '@rjsf/validator-ajv8'
+import { getSchema } from './util'
+import { useEndpointStore } from '@/models/endpoint'
+import { useEffect, useState } from 'react'
+import { Select } from 'antd'
 
-export default function ApiMap({
-  data = [],
-  onSubmit
-}: {
-  data?: any[]
-  onSubmit?: (tree: any[]) => void
-}) {
-  const [treeData, setTreeData] = useState<any[]>(data)
-  const [editingKey, setEditingKey] = useState<string | null>(null)
-  const [editingPrompt, setEditingPrompt] = useState<string>('')
+export default function SchemaEditorForm({ data, responses }: any) {
+  const { setFormData, formData } = useEndpointStore()
+  const [mediaTypeOptions, setMediaTypeOptions] = useState<string[]>([])
+  const [selectedMediaType, setSelectedMediaType] = useState<string | undefined>()
+  useEffect(() => {
+    const content = data?.requestBody?.content
+    if (content && typeof content === 'object') {
+      const types = Object.keys(content)
+      setMediaTypeOptions(types)
+      setSelectedMediaType(types[0]) // 默认选第一个
+    }
+  }, [data])
 
-  const submitEdit = (key: string) => {
-    const newData = updateNode(treeData, key, {
-      prompt: editingPrompt
+  const handleSubmit = (form: any, type: string) => {
+    setFormData({
+      ...formData,
+      apiMap: {
+        ...formData?.apiMap,
+        [type]: form.formData
+      }
     })
-    setTreeData(newData)
-    onSubmit?.(newData)
-    setEditingKey(null)
   }
 
-  const renderNode = (node: any, level = 0) => {
-    const isEditing = editingKey === node.key
-    return (
-      <div
-        key={node.key}
-        className="flex items-center pl-4 py-1 hover:bg-gray-100 rounded text-sm"
-        style={{ paddingLeft: `${level * 16}px` }}
-      >
-
-        <div className="font-semibold w-36">{node.name}</div>
-
-        <div className="">
-          {isEditing ? (
-            <Input
-              size="small"
-              value={editingPrompt}
-              onChange={(e) => setEditingPrompt(e.target.value)}
-              onPressEnter={() => submitEdit(node.key)}
-              onBlur={() => submitEdit(node.key)}
-              autoFocus
-              className="w-full"
-              placeholder="Click to add prompt word"
-            />
-          ) : (
-            <div
-              className="text-gray-600 cursor-pointer truncate"
-              onClick={() => {
-                setEditingKey(node.key)
-                setEditingPrompt(node.prompt || '')
-              }}
-            >
-              {node.prompt || <span className="text-gray-400">Click to add prompt word</span>}
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
+  const schema = selectedMediaType && data?.requestBody?.content?.[selectedMediaType]?.schema
 
   return (
-    <div className="w-full text-sm font-mono px-2 pb-2 space-y-1 max-h-56 overflow-auto">
-      {treeData.map((node: any) => renderNode(node))}
+    <div className="space-y-4 mt-2 max-h-80 overflow-x-hidden border p-2 rounded">
+      {data?.parameters && (
+        <Form
+          schema={getSchema(data)}
+          validator={validator}
+          onChange={(data) => handleSubmit(data, 'parameters')}
+          uiSchema={{
+            'ui:submitButtonOptions': { norender: true },
+          }}
+        />
+      )}
+
+      {mediaTypeOptions.length > 1 && (
+        <div className="space-y-2">
+          <label className="block font-medium text-gray-700">Select Media Type</label>
+          <Select
+            className="w-full"
+            options={mediaTypeOptions.map(type => ({ label: type, value: type }))}
+            value={selectedMediaType}
+            onChange={setSelectedMediaType}
+          />
+        </div>
+      )}
+
+      {selectedMediaType && schema && (
+        <Form
+          schema={schema}
+          validator={validator}
+          onChange={(data) => handleSubmit(data, 'requestBody')}
+          uiSchema={{
+            'ui:submitButtonOptions': { norender: true },
+          }}
+        />
+      )}
+
+      {responses && (
+        <Form
+          schema={responses}
+          validator={validator}
+          onChange={(data) => handleSubmit(data, 'responses')}
+          uiSchema={{
+            'ui:submitButtonOptions': { norender: true },
+          }}
+        />
+      )}
     </div>
   )
 }
