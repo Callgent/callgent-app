@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react'
 import { Input, Button, InputRef, Tabs } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import EndpointModal from './modal'
-import useTreeActionStore from '@/models/callgentTreeStore'
+import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import { postEndpointsApi } from '@/api/services/callgentService'
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
 import EndpointSelectApi from './select-api'
@@ -26,7 +26,8 @@ export default function EndpointPage() {
     setHow2Ops,
   } = useEndpointStore()
 
-  const { currentNode, callgentTree } = useTreeActionStore()
+  const { currentNode, callgentTree, } = useTreeActionStore()
+  const { closeModal } = useTreeActions()
 
   // AI generation states
   const [aiInputVisible, setAiInputVisible] = useState(false)
@@ -62,6 +63,7 @@ export default function EndpointPage() {
     setHow2Ops('')
     setParameters([])
     setResponses([])
+    closeModal()
   }
 
   // AI request logic
