@@ -55,13 +55,15 @@ export default function PayloadCom({
     const newNode = {
       key: newKey,
       name: '',
-      type: 'string',
       description: '',
       ...(mode === 'request' ? { in: 'body' } : {}),
-      default: '',
       required: false,
       children: [],
-      parentType: ''
+      parentType: '',
+      schema: {
+        type: 'string',
+        default: '',
+      }
     }
 
     if (!parentKey) {
@@ -71,14 +73,14 @@ export default function PayloadCom({
       const parent = findNode(treeData, parentKey)
       if (!parent) return
       const updatedTree = [...treeData]
-      if (parent.type === 'array') {
+      if (parent.schema.type === 'array') {
         const itemNode = {
           ...newNode,
           name: 'item',
           parentType: 'array'
         }
         parent.children = [itemNode]
-      } else if (parent.type === 'object') {
+      } else if (parent.schema.type === 'object') {
         const childNode = {
           ...newNode,
           parentType: 'object'
@@ -112,7 +114,7 @@ export default function PayloadCom({
     const isEditing = editingKey === node.key
     return (
       <div key={node.key} className="group pl-2 mt-1">
-        <div className="p-1 flex items-center justify-between hover:bg-gray-200 rounded">
+        <div className="p-1 flex items-center justify-between border border-gray-300  dark:border-gray-600 rounded">
           <div>
             {(isEditing && !isArrayItem(currentEditNode)) ? (
               <div className="space-x-3 flex">
@@ -141,7 +143,7 @@ export default function PayloadCom({
           </div>
 
           <div className="space-x-2 flex items-center">
-            {['object', 'array'].includes(node.type) && (
+            {['object', 'array'].includes(node.schema.type) && (
               <div
                 className="w-4 h-4 border border-gray-400 rounded-sm text-center leading-[0.8rem] cursor-pointer hover:border-blue-500 hover:text-blue-600"
                 onClick={() => addNode(node.key)}
@@ -150,7 +152,7 @@ export default function PayloadCom({
               </div>
             )}
 
-            <Tag color="green">{node.type}</Tag>
+            <Tag color="green">{node.schema.type}</Tag>
 
             <Button size="small" danger
               onClick={() => {
@@ -195,7 +197,7 @@ export default function PayloadCom({
             </Form.Item>
           )}
 
-          <Form.Item label="Type" name="type" rules={[{ required: true }]}>
+          <Form.Item label="Type" name={["schema", "type"]} rules={[{ required: true }]}>
             <Select options={typeOptions} />
           </Form.Item>
 
@@ -209,7 +211,7 @@ export default function PayloadCom({
             </Form.Item>
           )}
 
-          <Form.Item label="Default Value" name="default">
+          <Form.Item label="Default Value" name={["schema", "default"]}>
             <Input />
           </Form.Item>
 

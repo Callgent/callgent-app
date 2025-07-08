@@ -1,5 +1,6 @@
 import { CallgentInfo } from "#/entity";
 import { Link } from "react-router";
+import { useTreeActionStore } from '@/models/callgentTreeStore';
 
 export default function NodeComponent({ node, callgentId, level }: { node: CallgentInfo, callgentId: string, level: number }) {
   let content = (
@@ -37,13 +38,9 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
   }
   if (level === 4) {
     content = (
-      <Link
-        to={`/callgentapi?endpointsId=${node?.id}`}
-        className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1 hover:text-blue-600"
-        data-testid="webpage-link"
-      >
+      <div className="whitespace-nowrap overflow-hidden text-ellipsis max-w-full flex-1 hover:text-blue-600 text-info" onClick={() => useTreeActionStore.setState({ action: 'virtualApi' })}>
         {node?.name}
-      </Link>
+      </div >
     );
   }
   return content;

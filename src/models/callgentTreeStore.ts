@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { fetchAdaptors, getCallgentTree } from '@/api/services/callgentService';
 import { ModalNode, TreeActionState } from '#/store';
-import { CallgentInfo, Realm } from '#/entity';
+import { CallgentInfo, Realm, TreeAction } from '#/entity';
 import { enhanceNode } from '@/utils/callgent-tree';
 
 const initState = {
@@ -25,6 +25,7 @@ export const useTreeActionStore = create<TreeActionState>((set) => ({
     closeModal: () => set({ isModalOpen: false, action: null, currentNode: null }),
     setCurrentNode: (node: CallgentInfo) => set({ currentNode: node }),
     setRealmKey: (realmKey: string) => set({ realmKey }),
+    setAction: (action: TreeAction) => set({ action })
   }
 }));
 

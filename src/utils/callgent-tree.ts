@@ -11,7 +11,7 @@ export const enhanceNode = (node: CallgentInfo, level: number): CallgentInfo => 
   } else if (level === 1) {
     enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, lock: true };
   } else if (level === 4) {
-    enhancedNode = { ...enhancedNode, parentType: node?.type, lock: true, delete: true };
+    enhancedNode = { ...enhancedNode, parentType: node?.type || 'CLIENT', delete: true, lock: true };
   }
   if (node.children) {
     enhancedNode.children = node.children.map(child => enhanceNode(child, level + 1));

@@ -68,7 +68,6 @@ export default function EndpointSelectApi() {
   // Handle API selection and load parameters
   const handleApiSelect = async (value: string, node: any) => {
     if (!node?.fullData) return
-
     try {
       const { data } = await getCallgentApi(value);
       setCurrentApi(data)

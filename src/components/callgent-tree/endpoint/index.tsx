@@ -84,7 +84,7 @@ export default function EndpointPage() {
 
   return (
     <div className="w-full mr-4">
-      <div className="mx-auto rounded-lg p-6 space-y-6 border-2">
+      <div className="mx-auto rounded-lg p-6 space-y-6 border-2 border-gray-300 dark:border-gray-600">
         <div className="flex justify-between">
           <h2 className="text-3xl font-semibold font-sans">Functional Endpoint</h2>
           <button
@@ -106,8 +106,8 @@ export default function EndpointPage() {
                 placeholder="Please enter endpoint name starting with /"
 
               />
-              <button className="p-2 rounded bg-gray-200 hover:bg-gray-300 transition-colors duration-300" onClick={() => setIsEndpointOpen(true)}>
-                <Icon icon="solar:settings-bold" className="w-5 h-5 text-gray-600" />
+              <button className="p-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-300" onClick={() => setIsEndpointOpen(true)}>
+                <Icon icon="solar:settings-bold" className="w-5 h-5 " />
               </button>
             </div>
 
@@ -120,17 +120,17 @@ export default function EndpointPage() {
             )}
 
             {/* Parameters */}
-            <div className="border border-gray-200 rounded">
-              <div className="font-medium bg-gray-50 px-4 py-2">
+            <div className="border border-gray-200 dark:border-gray-600 rounded">
+              <div className="font-medium bg-gray-50  px-4 py-2">
                 Payload
               </div>
-              <div className="divide-y divide-gray-100 border-t">
+              <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
                 <PayloadCom data={parameters} onSubmit={(data: any) => setParameters(data)} />
               </div>
             </div>
 
             {/* Responses */}
-            <div className="border border-gray-200 rounded">
+            <div className="border border-gray-200  dark:border-gray-600 rounded">
               <div className="font-medium bg-gray-50 px-4 py-2">
                 Responses
               </div>
@@ -150,7 +150,7 @@ export default function EndpointPage() {
                       <Input.TextArea
                         rows={3}
                         value={how2Ops}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full border border-gray-300  dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         onChange={(e) => setHow2Ops(e.target.value)}
                       />
                     </div>),

@@ -14,7 +14,7 @@ export default function SchemaEditorForm({ data, responses }: any) {
     if (content && typeof content === 'object') {
       const types = Object.keys(content)
       setMediaTypeOptions(types)
-      setSelectedMediaType(types[0]) // 默认选第一个
+      setSelectedMediaType(types[0])
     }
   }, [data])
 
