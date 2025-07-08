@@ -84,8 +84,8 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
 export function convertToOpenAPI(config: any) {
   const { path, operationId, whatFor, how2Ops } = config;
   const method = config.endpointConfig?.method?.toLowerCase() || 'get';
-  const { parameters, requestBody } = treeToOpenAPI(config.parameters)
-  const responseSchema = treeToResponseSchema(config.responses)
+  const { parameters, requestBody } = config.params
+  const responseSchema = config.responses
   // Construct standard 200 response schema
   const responses = {
     '200': {

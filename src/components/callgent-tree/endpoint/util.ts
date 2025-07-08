@@ -31,8 +31,9 @@ export const fieldTypes = [
 ];
 
 import { openapiSchemaToJsonSchema } from '@openapi-contrib/openapi-schema-to-json-schema';
+import type { SchemaNode } from './type';
 export const getSchema = (data: any) => {
-  const parameters = data?.parameters || []
+  const parameters = data || []
   const parameters_schema: any = {
     type: 'object',
     properties: {},
@@ -103,4 +104,161 @@ export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
   } catch (error) {
     return null
   }
+}
+
+export function generateId() {
+  return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+}
+
+export const addSchemaChild = (tree: SchemaNode, parentId: string) => {
+  const walk = (n: SchemaNode): SchemaNode => {
+    if (parentId === 'root') {
+      return {
+        ...n,
+        children: [
+          ...(n.children || []),
+          {
+            id: generateId(),
+            name: '',
+            editingName: true,
+            type: 'string',
+            required: false,
+            in: 'body',
+          },
+        ],
+      }
+    }
+    if (n.id === parentId) {
+      if (n.type === 'object') {
+        return {
+          ...n,
+          children: [
+            ...(n.children || []),
+            {
+              id: generateId(),
+              name: '',
+              editingName: true,
+              type: 'string',
+              required: false,
+              in: 'body',
+            },
+          ],
+        }
+      }
+      if (n.type === 'array') {
+        if (!n.item || n.item.type !== 'object') {
+          return {
+            ...n,
+            item: {
+              id: generateId(),
+              name: 'item',
+              editingName: true,
+              type: 'object',
+              required: false,
+              in: 'body',
+              children: [],
+            },
+          }
+        } else {
+          return {
+            ...n,
+            item: {
+              ...n.item,
+              children: [
+                ...(n.item.children || []),
+                {
+                  id: generateId(),
+                  name: '',
+                  editingName: true,
+                  type: 'string',
+                  required: false,
+                  in: 'body',
+                },
+              ],
+            },
+          }
+        }
+      }
+    }
+    if (n.children) return { ...n, children: n.children.map(walk) }
+    if (n.item) return { ...n, item: walk(n.item) }
+    return n
+  }
+  return walk(tree)
+}
+
+export function treeNodeToSchema(node: SchemaNode): any {
+  const s: any = { type: node.type }
+  if (node.description) s.description = node.description
+  if (node.default !== undefined) s.default = node.default
+  // s.in = node.in
+  if (node.type === 'object') {
+    s.properties = {}
+    const reqs: string[] = []
+    node.children?.forEach(c => {
+      s.properties[c.name] = treeNodeToSchema(c)
+      if (c.required) reqs.push(c.name)
+    })
+    if (reqs.length) s.required = reqs
+  }
+  if (node.type === 'array' && node.item) {
+    s.items = treeNodeToSchema(node.item)
+  }
+  return s
+}
+export function categorizeNodes(nodes: any): {
+  body?: any
+  data: any[]
+} {
+  const result: { body?: any; data: any[] } = {
+    data: [],
+    body: []
+  }
+  nodes.children.forEach((node: SchemaNode) => {
+    if (node.in === 'body') {
+      result.body.push(node)
+    } else {
+      result.data.push({ ...node, schema: { type: node.type, default: node.default } })
+    }
+  })
+  console.log(result.data);
+
+  const body = treeNodeToSchema({ "id": "root", "name": "", "editingName": false, "type": "object", "required": false, "in": "body", "children": result.body })
+  const data = result.data
+  return { body, data };
+}
+// 将 JSON Schema 转成内部树节点
+export function jsonSchemaToTreeNode(
+  schema: any,
+  name = '',
+  inLocation = 'body'
+): SchemaNode {
+  const node: SchemaNode = {
+    id: generateId(),
+    name,
+    editingName: false,
+    type: schema.type,
+    required: false,
+    in: inLocation as any,
+  }
+  if (schema.type === 'object') {
+    node.children = []
+    const props = schema.properties || {}
+    for (const key of Object.keys(props)) {
+      const childSchema = props[key]
+      const childNode = jsonSchemaToTreeNode(childSchema, key, inLocation)
+      childNode.required = Array.isArray(schema.required) && schema.required.includes(key)
+      node.children.push(childNode)
+    }
+  }
+  if (schema.type === 'array') {
+    // 数组只映射 items
+    if (schema.items) {
+      node.item = jsonSchemaToTreeNode(schema.items, 'item', inLocation)
+    }
+  }
+  // 如果有 default/description
+  if (schema.default !== undefined) (node as any).default = schema.default
+  if (schema.description) (node as any).description = schema.description
+  return node
 }

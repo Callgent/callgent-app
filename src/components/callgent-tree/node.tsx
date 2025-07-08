@@ -77,7 +77,6 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
         break;
       case 'virtualApi':
         setCurrentNode(node);
-        sessionStorage.removeItem('endpoint-form-storage')
       // navigate(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
     }
     useTreeActionStore.setState({ action: actionType });

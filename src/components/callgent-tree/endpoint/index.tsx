@@ -7,14 +7,13 @@ import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import { postEndpointsApi } from '@/api/services/callgentService'
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
 import EndpointSelectApi from './select-api'
-import PayloadCom from './payload'
-import { extractFirst2xxJsonSchema, injectDefaults } from './util'
+import JSONSchemaEditor from './OpenApiSchemaEditor'
+import { getSchema } from './util'
 
 export default function EndpointPage() {
   const {
     endpointName,
     parameters,
-    responses,
     whatFor,
     how2Ops,
     formData,
@@ -41,17 +40,20 @@ export default function EndpointPage() {
       operationId: endpointName,
       endpointConfig: formData.endpoint || {},
       whatFor,
-      parameters,
-      responses,
+      params: {
+        parameters: formData.parameters || {},
+        requestBody: formData.requestBody || {}
+      },
+      responses: formData.responses,
       how2Ops,
     })
     const apiMapping = currentNode?.type === 'CLIENT' ? {
       api_id: formData.apiMap.api_id,
       params: {
-        parameters: injectDefaults(formData.apiMap.api_data.params.parameters, formData.apiMap.parameters) || {},
-        requestBody: injectDefaults(formData.apiMap.api_data.params.requestBody, formData.apiMap.requestBody) || {}
+        parameters: formData.apiMap.parameters || {},
+        requestBody: formData.apiMap.requestBody || {}
       },
-      responses: injectDefaults(extractFirst2xxJsonSchema(formData.apiMap.api_data.responses), formData.apiMap.responses) || {}
+      responses: formData.apiMap.responses || {}
     } : {}
     await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
   }
@@ -125,7 +127,13 @@ export default function EndpointPage() {
                 Payload
               </div>
               <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-                <PayloadCom data={parameters} onSubmit={(data: any) => setParameters(data)} />
+                <JSONSchemaEditor
+                  schema={getSchema(formData.parameters)}
+                  // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
+                  mode={2}
+                  // parameters/requestBody/responses
+                  schemaType="parameters"
+                />
               </div>
             </div>
 
@@ -135,7 +143,14 @@ export default function EndpointPage() {
                 Responses
               </div>
               <div className="divide-y divide-gray-100">
-                <PayloadCom data={responses} onSubmit={(data: any) => setResponses(data)} mode='response' />
+                {/* <PayloadCom data={responses} onSubmit={(data: any) => setResponses(data)} mode='response' /> */}
+                <JSONSchemaEditor
+                  schema={formData.responses}
+                  // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
+                  mode={2}
+                  // parameters/requestBody/responses
+                  schemaType="responses"
+                />
               </div>
             </div>
 
