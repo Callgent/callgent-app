@@ -82,14 +82,18 @@ export function injectDefaults(schema: any, data: any): any {
 }
 
 export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
-  const statusCodes = Object.keys(openapiResponses).filter(code => /^2\d\d$/.test(code))
-  for (const status of statusCodes) {
-    const response = openapiResponses[status]
-    const content = response?.content
-    const json = content?.["application/json"]
-    if (json?.schema) {
-      return json.schema
+  try {
+    const statusCodes = Object.keys(openapiResponses).filter(code => /^2\d\d$/.test(code))
+    for (const status of statusCodes) {
+      const response = openapiResponses[status]
+      const content = response?.content
+      const json = content?.["application/json"]
+      if (json?.schema) {
+        return json.schema
+      }
     }
+    return null
+  } catch (error) {
+    return null
   }
-  return null
 }

@@ -92,7 +92,9 @@ export default function EndpointSelectApi() {
           allowClear
           showSearch
         />
-        <ApiMap data={currentApi?.params || formData?.apiMap?.api_data.params || {}} responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.apiMap?.api_data.responses)} />
+        <ApiMap data={currentApi?.params || formData?.apiMap?.api_data.params || {}}
+          responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.apiMap?.api_data?.responses)}
+        />
       </Spin>
     </div>
   )

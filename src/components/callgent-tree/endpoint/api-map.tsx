@@ -66,7 +66,7 @@ export default function SchemaEditorForm({ data, responses }: any) {
         />
       )}
 
-      {responses && (
+      {/* {responses && (
         <Form
           schema={responses}
           validator={validator}
@@ -75,7 +75,7 @@ export default function SchemaEditorForm({ data, responses }: any) {
             'ui:submitButtonOptions': { norender: true },
           }}
         />
-      )}
+      )} */}
     </div>
   )
 }
