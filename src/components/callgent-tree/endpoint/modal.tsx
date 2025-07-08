@@ -49,10 +49,15 @@ export default function EndpointModal() {
       >
         <Form form={formEndpoint} layout="vertical" initialValues={{ ...formData.endpoint, method: 'GET' }}>
           <Form.Item name="method" label="HTTP Method" rules={[{ required: true }]}>
-            <Select className="w-full" options={requestMethods} />
-          </Form.Item>
-          <Form.Item name="how2exe" label="how2exe">
-            <Input.TextArea rows={4} />
+            <Select className="w-full" options={requestMethods.map((item) => ({
+              value: item.value,
+              label: (
+                <div className="flex justify-between items-center mr-4" >
+                  <span>{item.value} </span>
+                  <span className="text-gray-400 text-sm" > {item.description} </span>
+                </div>
+              ),
+            }))} />
           </Form.Item>
         </Form>
       </Modal>

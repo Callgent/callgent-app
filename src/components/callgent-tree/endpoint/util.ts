@@ -1,8 +1,15 @@
 // Request methods
-export const requestMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'CONNECT', 'TRACE'].map(m => ({
-  value: m,
-  label: m,
-}));
+export const requestMethods = [
+  { value: 'GET', description: 'Retrieve data' },
+  { value: 'POST', description: 'Create new data' },
+  { value: 'PUT', description: 'Update/replace data' },
+  { value: 'PATCH', description: 'Partially update data' },
+  { value: 'DELETE', description: 'Remove data' },
+  { value: 'HEAD', description: 'Get metadata (no body)' },
+  { value: 'OPTIONS', description: 'List allowed methods' },
+  { value: 'CONNECT', description: 'Establish tunnel connection' },
+  { value: 'TRACE', description: 'Echoes request (debugging)' },
+]
 
 export const requestLocations = [
   { label: 'Query (URL query parameters)', value: 'query' },

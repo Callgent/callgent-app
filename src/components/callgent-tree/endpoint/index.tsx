@@ -45,14 +45,14 @@ export default function EndpointPage() {
       responses,
       how2Ops,
     })
-    const apiMapping = {
+    const apiMapping = currentNode?.type === 'CLIENT' ? {
       api_id: formData.apiMap.api_id,
       params: {
         parameters: injectDefaults(formData.apiMap.api_data.params.parameters, formData.apiMap.parameters) || {},
         requestBody: injectDefaults(formData.apiMap.api_data.params.requestBody, formData.apiMap.requestBody) || {}
       },
       responses: injectDefaults(extractFirst2xxJsonSchema(formData.apiMap.api_data.responses), formData.apiMap.responses) || {}
-    }
+    } : {}
     await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
   }
 
@@ -112,10 +112,12 @@ export default function EndpointPage() {
             </div>
 
             {/* Description */}
-            <div>
-              <label className="block text-sm font-medium mb-1">whatFor</label>
-              <Input.TextArea rows={2} value={whatFor} onChange={(e) => setWhatFor(e.target.value)} />
-            </div>
+            {currentNode?.type === 'CLIENT' && (
+              <div>
+                <label className="block text-sm font-medium mb-1">whatFor</label>
+                <Input.TextArea rows={2} value={whatFor} onChange={(e) => setWhatFor(e.target.value)} placeholder='Explain to caller, when and how to use this endpoint' />
+              </div>
+            )}
 
             {/* Parameters */}
             <div className="border border-gray-200 rounded">
@@ -138,29 +140,29 @@ export default function EndpointPage() {
             </div>
 
             {/* how2Ops textarea */}
-            <div>
-              <Tabs defaultActiveKey="1" items={[
-                {
-                  key: '1',
-                  label: 'how2Ops',
-                  children: (<div>
-                    <Input.TextArea
-                      rows={3}
-                      value={how2Ops}
-                      className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      onChange={(e) => setHow2Ops(e.target.value)}
-                    />
-                  </div>),
-                },
-                {
-                  key: '2',
-                  label: 'Api Map',
-                  children: <EndpointSelectApi />,
-                },
-              ]} />
-
-            </div>
-
+            {currentNode?.type === 'CLIENT' && (
+              <div>
+                <Tabs defaultActiveKey="1" items={[
+                  {
+                    key: '1',
+                    label: 'how2Ops',
+                    children: (<div>
+                      <Input.TextArea
+                        rows={3}
+                        value={how2Ops}
+                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        onChange={(e) => setHow2Ops(e.target.value)}
+                      />
+                    </div>),
+                  },
+                  {
+                    key: '2',
+                    label: 'Api Map',
+                    children: <EndpointSelectApi />,
+                  },
+                ]} />
+              </div>
+            )}
             {/* Action buttons */}
             <div className="mt-4 flex justify-end space-x-3">
               <Button onClick={handleCancel}>Cancel</Button>
