@@ -54,7 +54,7 @@ export default function EndpointModal() {
               label: (
                 <div className="flex justify-between items-center mr-4" >
                   <span>{item.value} </span>
-                  <span className="text-gray-400 text-sm" > {item.description} </span>
+                  <span className="text-gray-600 text-sm" > {item.description} </span>
                 </div>
               ),
             }))} />
