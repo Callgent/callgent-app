@@ -73,7 +73,7 @@ export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
         return json.schema
       }
     }
-    message.error("Unsupported response type")
+    // message.error("Unsupported response type")
     return null
   } catch (error) {
     return null
