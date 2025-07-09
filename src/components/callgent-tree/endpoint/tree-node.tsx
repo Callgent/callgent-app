@@ -61,9 +61,8 @@ export default function TreeNode({
           />
         ) : (
           <div
-            className={`w-32 mr-2 ${
-              mode === 2 ? 'cursor-pointer' : 'text-gray-500'
-            }`}
+            className={`w-32 mr-2 ${mode === 2 ? 'cursor-pointer' : 'text-gray-500'
+              }`}
             onClick={() =>
               mode === 2 && updateNode(node.id, { editingName: true })
             }
@@ -112,13 +111,13 @@ export default function TreeNode({
                         item:
                           t === 'array'
                             ? {
-                                id: generateId(),
-                                name: 'item',
-                                editingName: true,
-                                type: 'string',
-                                required: false,
-                                in: 'body',
-                              }
+                              id: generateId(),
+                              name: 'item',
+                              editingName: true,
+                              type: 'string',
+                              required: false,
+                              in: 'body',
+                            }
                             : undefined,
                       })
                       setPopVisible(false)

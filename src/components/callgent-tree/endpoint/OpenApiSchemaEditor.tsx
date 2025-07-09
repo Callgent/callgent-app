@@ -2,18 +2,11 @@
 import React, { useEffect, useState } from 'react'
 import TreeNode from './tree-node'
 import SchemaDetailModal from './SchemaDetailModal'
-import type { SchemaNode } from './type'
-import { addSchemaChild, categorizeNodes, jsonSchemaToTreeNode } from './util'
+import type { JSONSchemaEditorProps, SchemaNode } from './type'
+import { addSchemaChild, categorizeNodes } from './util'
 import { useEndpointStore } from '@/models/endpoint'
 
-interface JSONSchemaEditorProps {
-  schema: any
-  mode: 1 | 2 | 3
-  schemaType: 'parameters' | 'requestBody' | 'responses'
-}
-
 export default function JSONSchemaEditor({
-  schema,
   mode,
   schemaType,
 }: JSONSchemaEditorProps) {
@@ -27,14 +20,14 @@ export default function JSONSchemaEditor({
     in: 'body',
     children: [],
   })
-  console.log(schema);
-
+  const { formData, parameters, setFormData, responses } = useEndpointStore()
   useEffect(() => {
-    if (schema && schema.type === 'object') {
-      const root = jsonSchemaToTreeNode(schema, 'root')
-      setTree({ ...root, id: 'root' })
+    if (schemaType === 'params') {
+      setTree(prev => ({ ...prev, children: parameters }))
+    } else if (schemaType === 'responses') {
+      setTree(prev => ({ ...prev, children: responses }))
     }
-  }, [])
+  }, [parameters])
   const [detailId, setDetailId] = useState<string | null>(null)
   const [detailData, setDetailData] = useState<SchemaNode | null>(null)
 
@@ -91,11 +84,9 @@ export default function JSONSchemaEditor({
     if (detailId) updateNode(detailId, values)
     setDetailId(null)
   }
-  const { formData, setFormData } = useEndpointStore()
   const submitSchema = (nodes: SchemaNode) => {
     const { data, body } = categorizeNodes(nodes)
-    console.log(data, body);
-    if (schemaType !== 'responses') {
+    if (schemaType === 'params') {
       setFormData({
         ...formData, parameters: data, requestBody: body
       })

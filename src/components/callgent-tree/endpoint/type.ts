@@ -14,3 +14,8 @@ export interface SchemaNode {
     children?: SchemaNode[]
     item?: SchemaNode
 }
+
+export interface JSONSchemaEditorProps {
+    mode: 1 | 2 | 3
+    schemaType: 'responses' | 'params'
+}

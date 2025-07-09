@@ -32,6 +32,8 @@ export const fieldTypes = [
 
 import { openapiSchemaToJsonSchema } from '@openapi-contrib/openapi-schema-to-json-schema';
 import type { SchemaNode } from './type';
+import { message } from 'antd';
+// parameters转schema
 export const getSchema = (data: any) => {
   const parameters = data || []
   const parameters_schema: any = {
@@ -42,6 +44,9 @@ export const getSchema = (data: any) => {
   for (const param of parameters) {
     const originalSchema = param.schema
     let jsonSchema = openapiSchemaToJsonSchema(originalSchema)
+    jsonSchema.in = param.in || null
+    jsonSchema.required = param.in || true
+    jsonSchema.schema = param.schema || {}
     if (param.description) {
       jsonSchema.description = param.description || null
     }
@@ -56,39 +61,7 @@ export const getSchema = (data: any) => {
   return parameters_schema
 }
 
-/**
- * Recursively injects actual data into the `default` fields of a JSON Schema.
- */
-export function injectDefaults(schema: any, data: any): any {
-  if (!schema) return schema
-  // object
-  if (schema.type === 'object' && schema.properties && typeof data === 'object' && data !== null) {
-    const newProperties: any = {}
-    for (const key in schema.properties) {
-      const propSchema = schema.properties[key]
-      const propValue = data?.[key]
-      newProperties[key] = injectDefaults(propSchema, propValue)
-    }
-    return {
-      ...schema,
-      properties: newProperties
-    }
-  }
-  // array
-  if (schema.type === 'array' && Array.isArray(data)) {
-    const itemsSchema = schema.items
-    if (itemsSchema && typeof itemsSchema === 'object') {
-      return {
-        ...schema,
-        default: data,
-        items: itemsSchema
-      }
-    }
-    return { ...schema, default: data }
-  }
-  return { ...schema, default: data }
-}
-
+// 查找2XX的响应
 export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
   try {
     const statusCodes = Object.keys(openapiResponses).filter(code => /^2\d\d$/.test(code))
@@ -96,10 +69,11 @@ export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
       const response = openapiResponses[status]
       const content = response?.content
       const json = content?.["application/json"]
-      if (json?.schema) {
+      if (json?.schema?.properties) {
         return json.schema
       }
     }
+    message.error("Unsupported response type")
     return null
   } catch (error) {
     return null
@@ -186,12 +160,11 @@ export const addSchemaChild = (tree: SchemaNode, parentId: string) => {
   }
   return walk(tree)
 }
-
+// tree转schema
 export function treeNodeToSchema(node: SchemaNode): any {
   const s: any = { type: node.type }
   if (node.description) s.description = node.description
   if (node.default !== undefined) s.default = node.default
-  // s.in = node.in
   if (node.type === 'object') {
     s.properties = {}
     const reqs: string[] = []
@@ -206,14 +179,9 @@ export function treeNodeToSchema(node: SchemaNode): any {
   }
   return s
 }
-export function categorizeNodes(nodes: any): {
-  body?: any
-  data: any[]
-} {
-  const result: { body?: any; data: any[] } = {
-    data: [],
-    body: []
-  }
+// 区分in body
+export function categorizeNodes(nodes: any): { body?: any, data: any[] } {
+  const result: { body?: any; data: any[] } = { data: [], body: [] }
   nodes.children.forEach((node: SchemaNode) => {
     if (node.in === 'body') {
       result.body.push(node)
@@ -221,18 +189,13 @@ export function categorizeNodes(nodes: any): {
       result.data.push({ ...node, schema: { type: node.type, default: node.default } })
     }
   })
-  console.log(result.data);
-
+  console.log(result.body);
   const body = treeNodeToSchema({ "id": "root", "name": "", "editingName": false, "type": "object", "required": false, "in": "body", "children": result.body })
   const data = result.data
   return { body, data };
 }
 // 将 JSON Schema 转成内部树节点
-export function jsonSchemaToTreeNode(
-  schema: any,
-  name = '',
-  inLocation = 'body'
-): SchemaNode {
+export function jsonSchemaToTreeNode(schema: any, name = '', inLocation = 'body'): SchemaNode {
   const node: SchemaNode = {
     id: generateId(),
     name,
@@ -260,5 +223,6 @@ export function jsonSchemaToTreeNode(
   // 如果有 default/description
   if (schema.default !== undefined) (node as any).default = schema.default
   if (schema.description) (node as any).description = schema.description
+  if (schema.in) (node as any).in = schema.in
   return node
 }

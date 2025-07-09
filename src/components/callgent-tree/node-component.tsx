@@ -1,8 +1,9 @@
 import { CallgentInfo } from "#/entity";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useTreeActionStore } from '@/models/callgentTreeStore';
 import { getCallgentApi } from "@/api/services/callgentService";
 import { useEndpointStore } from "@/models/endpoint";
+import { extractFirst2xxJsonSchema, generateId, jsonSchemaToTreeNode } from "./endpoint/util";
 
 export default function NodeComponent({ node, callgentId, level }: { node: CallgentInfo, callgentId: string, level: number }) {
   let content = (
@@ -38,20 +39,26 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
     case 'SERVER':
     case 'EVENT':
   }
-  const { setFormData, formData } = useEndpointStore()
+  const { setFormData, formData, setParameters, setResponses } = useEndpointStore()
+
+
   const toEditApi = async (node: any) => {
     const { data } = await getCallgentApi(node.id);
+    const requestBody = data?.params?.requestBody?.content["application/json"]?.schema
+    const parameters = data?.params.parameters.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() }))
+    if (requestBody) {
+      setParameters([...parameters, ...(jsonSchemaToTreeNode(requestBody).children as [])])
+    } else (
+      setParameters(parameters)
+    )
+    const responsesSchema = extractFirst2xxJsonSchema(data?.responses)
+    const responses = responsesSchema?.properties ? (jsonSchemaToTreeNode(responsesSchema).children || []) : []
+    setResponses(responses)
     setFormData({
       ...formData,
-      parameters: data?.params?.parameters,
+      parameters: parameters,
       requestBody: data?.params?.requestBody,
-      responses: data?.responses[200].content["application/json"].schema
-    })
-    setFormData({
-      ...formData,
-      parameters: data?.params?.parameters,
-      requestBody: data?.params?.requestBody,
-      responses: data?.responses[200].content["application/json"].schema
+      responses: responses
     })
     setTimeout(() => {
       useTreeActionStore.setState({ action: 'virtualApi' })

@@ -8,15 +8,15 @@ import { postEndpointsApi } from '@/api/services/callgentService'
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
 import EndpointSelectApi from './select-api'
 import JSONSchemaEditor from './OpenApiSchemaEditor'
-import { getSchema } from './util'
+import { categorizeNodes, getSchema } from './util'
 
 export default function EndpointPage() {
   const {
     endpointName,
-    parameters,
     whatFor,
     how2Ops,
     formData,
+    parameters,
     setIsEndpointOpen,
     setParameters,
     setResponses,
@@ -35,26 +35,30 @@ export default function EndpointPage() {
 
   // Output all data on confirm
   const handleConfirm = async () => {
+    const responses = categorizeNodes({ children: formData.responses }).body;
+    const param = categorizeNodes({ children: formData.parameters })
+    console.log(param);
+
     const data = convertToOpenAPI({
       path: endpointName,
       operationId: endpointName,
       endpointConfig: formData.endpoint || {},
       whatFor,
       params: {
-        parameters: formData.parameters || {},
+        parameters: param.data || {},
         requestBody: formData.requestBody || {}
       },
-      responses: formData.responses,
+      responses: responses,
       how2Ops,
     })
     const apiMapping = currentNode?.type === 'CLIENT' ? {
       api_id: formData.apiMap.api_id,
       params: {
         parameters: formData.apiMap.parameters || {},
-        requestBody: formData.apiMap.requestBody || {}
+        requestBody: getSchema(formData.apiMap.requestBody) || {}
       },
-      responses: formData.apiMap.responses || {}
-    } : {}
+      responses: getSchema(formData.apiMap.responses) || {}
+    } : null
     await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
   }
 
@@ -128,11 +132,10 @@ export default function EndpointPage() {
               </div>
               <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
                 <JSONSchemaEditor
-                  schema={getSchema(formData.parameters)}
                   // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
                   mode={2}
-                  // parameters/requestBody/responses
-                  schemaType="parameters"
+                  // params/responses
+                  schemaType="params"
                 />
               </div>
             </div>
@@ -145,7 +148,6 @@ export default function EndpointPage() {
               <div className="divide-y divide-gray-100">
                 {/* <PayloadCom data={responses} onSubmit={(data: any) => setResponses(data)} mode='response' /> */}
                 <JSONSchemaEditor
-                  schema={formData.responses}
                   // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
                   mode={2}
                   // parameters/requestBody/responses

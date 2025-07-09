@@ -5,15 +5,14 @@ import { Modal, Form, Input, Select, Checkbox } from 'antd'
 interface DetailModalProps {
     visible: boolean
     mode: 1 | 2 | 3
-    schemaType: 'parameters' | 'requestBody' | 'responses'
+    schemaType: 'responses' | 'params'
     onCancel: () => void
     onOk: (values: any) => void
     initialValues: any
 }
 
 const fieldsConfig: Record<string, string[]> = {
-    parameters: ['name', 'in', 'required', 'default', 'description'],
-    requestBody: ['name', 'in', 'required', 'default', 'description'],
+    params: ['name', 'in', 'required', 'default', 'description'],
     responses: ['default', 'description'],
 }
 
@@ -93,9 +92,9 @@ export default function SchemaDetailModal({
                                     rules={[
                                         ({ getFieldValue }) => ({
                                             validator() {
-                                                if (getFieldValue('required')) {
+                                                if (!getFieldValue('required') && !getFieldValue('default')) {
                                                     return Promise.reject(
-                                                        new Error('必填项不允许设置默认值')
+                                                        new Error('请设置默认值')
                                                     )
                                                 }
                                                 return Promise.resolve()
