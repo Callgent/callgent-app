@@ -4,6 +4,7 @@ import { getSchema } from './util'
 import { useEndpointStore } from '@/models/endpoint'
 import { useEffect, useState } from 'react'
 import { Select } from 'antd'
+import JSONSchemaEditor from './OpenApiSchemaEditor'
 
 export default function SchemaEditorForm({ data, responses }: any) {
   const { setFormData, formData } = useEndpointStore()
@@ -31,7 +32,7 @@ export default function SchemaEditorForm({ data, responses }: any) {
   const schema = selectedMediaType && data?.requestBody?.content?.[selectedMediaType]?.schema
 
   return (
-    <div className="space-y-4 mt-2 max-h-80 overflow-x-hidden border p-2 rounded">
+    <div className="space-y-4 mt-2 max-h-96 overflow-x-hidden border p-2 rounded">
       {data?.parameters && (
         <Form
           schema={getSchema(data.parameters)}
@@ -65,6 +66,23 @@ export default function SchemaEditorForm({ data, responses }: any) {
           }}
         />
       )}
+
+      <div className="border border-gray-200 dark:border-gray-600 rounded">
+        <div className="font-medium bg-gray-50  px-4 py-2">
+          Payload
+        </div>
+        <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
+          <JSONSchemaEditor mode={1} schemaType="params" />
+        </div>
+      </div>
+      <div className="border border-gray-200  dark:border-gray-600 rounded">
+        <div className="font-medium bg-gray-50 px-4 py-2">
+          Responses
+        </div>
+        <div className="divide-y divide-gray-100">
+          <JSONSchemaEditor mode={1} schemaType="responses" />
+        </div>
+      </div>
 
       {responses?.properties && (
         <Form

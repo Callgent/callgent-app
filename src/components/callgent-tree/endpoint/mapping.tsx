@@ -14,6 +14,9 @@ export default function Mapping() {
   return (
     <div>
       <div>
+        <div className="font-medium bg-gray-50 py-2">
+          How2Ops
+        </div>
         <Input.TextArea
           rows={3}
           value={how2Ops}

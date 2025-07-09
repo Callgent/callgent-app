@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import TreeNode from './tree-node'
 import SchemaDetailModal from './SchemaDetailModal'
 import type { JSONSchemaEditorProps, SchemaNode } from './type'
-import { addSchemaChild, categorizeNodes } from './util'
+import { addSchemaChild, categorizeNodes, jsonSchemaToTreeNode } from './util'
 import { useEndpointStore } from '@/models/endpoint'
 
 // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
@@ -22,11 +22,16 @@ export default function JSONSchemaEditor({
     children: [],
   })
   const { formData, parameters, setFormData, responses } = useEndpointStore()
+
   useEffect(() => {
-    if (schemaType === 'params') {
+    if (schemaType === 'params' && mode === 2) {
       setTree(prev => ({ ...prev, children: parameters }))
-    } else if (schemaType === 'responses') {
+    } else if (schemaType === 'responses' && mode === 2) {
       setTree(prev => ({ ...prev, children: responses }))
+    } else if (schemaType === 'params' && mode === 1 && formData?.parameters) {
+      setTree(prev => ({ ...prev, children: [...formData?.parameters, ...(jsonSchemaToTreeNode(formData?.requestBody)?.children as [])] }))
+    } else if (schemaType === 'responses' && mode === 1 && formData?.responses) {
+      setTree(prev => ({ ...prev, children: jsonSchemaToTreeNode(formData?.responses)?.children }))
     }
   }, [parameters])
   const [detailId, setDetailId] = useState<string | null>(null)

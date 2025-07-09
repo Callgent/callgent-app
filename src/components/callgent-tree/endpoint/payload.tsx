@@ -39,8 +39,8 @@ export default function Payload() {
 
       {/* Description */}
       {currentNode?.type === 'CLIENT' && (
-        <div>
-          <label className="block text-sm font-medium mb-1">whatFor</label>
+        <div className='my-2'>
+          <label className="block font-medium mb-2">whatFor</label>
           <Input.TextArea rows={2} value={whatFor} onChange={(e) => setWhatFor(e.target.value)} placeholder='Explain to caller, when and how to use this endpoint' />
         </div>
       )}

@@ -27,16 +27,22 @@ export default function EndpointPage() {
   const { currentNode, callgentTree, } = useTreeActionStore()
   const { closeModal } = useTreeActions()
 
+  // 受控页签 key，'1' = Define，'2' = Implement
+  const [activeKey, setActiveKey] = useState<'1' | '2'>('1')
+
   // AI generation states
   const [aiInputVisible, setAiInputVisible] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+
+  // 点击 Next，跳到下一页签；如果已是最后一页，可执行提交或禁用按钮
+  const handleNext = () => {
+    if (activeKey === '1') {
+      setActiveKey('2')
+    }
+  }
 
   // Output all data on confirm
   const handleConfirm = async () => {
-    console.log(formData.responses);
-
-    const responses = categorizeNodes({ children: formData?.responses?.length ? formData.responses : [] }).body;
     const param = categorizeNodes({ children: formData.parameters })
     const data = convertToOpenAPI({
       path: endpointName,
@@ -47,7 +53,7 @@ export default function EndpointPage() {
         parameters: param.data || {},
         requestBody: formData.requestBody || {}
       },
-      responses: responses,
+      responses: formData.responses,
       how2Ops,
     })
     const apiMapping = (currentNode?.type === 'CLIENT' && formData?.apiMap?.api_id) ? {
@@ -64,7 +70,7 @@ export default function EndpointPage() {
         setEditId(null)
       })
     } else {
-      await postEndpointsApi(request);
+      await postEndpointsApi(request)
     }
   }
 
@@ -76,19 +82,9 @@ export default function EndpointPage() {
     setParameters([])
     setResponses([])
     closeModal()
+    setActiveKey('1')
   }
 
-  // AI request logic
-  const handleAiGenerate = async () => {
-    setIsLoading(true)
-    try {
-      // TODO: implement AI generation request
-    } catch (err) {
-      console.error('AI request failed:', err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
   const inputRef = useRef<InputRef>(null)
   useEffect(() => {
     inputRef.current?.focus()
@@ -107,27 +103,21 @@ export default function EndpointPage() {
           </button>
         </div>
 
-        {(!aiInputVisible && currentNode?.type === 'CLIENT') ? (
-          <Tabs defaultActiveKey="1" items={[
-            {
-              key: '1',
-              label: 'Define',
-              children: <Payload />,
-            },
-            {
-              key: '2',
-              label: 'Implement',
-              children: <Mapping />,
-            },
-          ]} />
-        ) : <Payload />}
-        <div className="mt-4 flex justify-end space-x-3">
-          <Button onClick={handleCancel}>Cancel</Button>
-          <Button type="primary" onClick={handleConfirm}>
-            Confirm
-          </Button>
-        </div>
-        {/* AI input area */}
+        {/* 如果是 CLIENT 且不显示 AI 输入，则展示两个“页签”，但隐藏标签栏 */}
+        {(!aiInputVisible && currentNode?.type === 'CLIENT') && (
+          <Tabs
+            activeKey={activeKey}
+            items={[
+              { key: '1', label: 'Define', children: <Payload />, disabled: true },
+              { key: '2', label: 'Implement', children: <Mapping />, disabled: true },
+            ]}
+          />
+        )}
+
+        {/* 非 CLIENT 或者 AI 模式下只展示 Payload */}
+        {(!aiInputVisible && currentNode?.type !== 'CLIENT') && (
+          <Payload />
+        )}
         {aiInputVisible && (
           <div className="space-y-2">
             <Input.TextArea
@@ -136,14 +126,31 @@ export default function EndpointPage() {
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
             />
-            <div className="flex justify-end">
-              <Button type="primary" loading={isLoading} onClick={handleAiGenerate}>
-                Submit
-              </Button>
-            </div>
           </div>
         )}
+
+        <div className="mt-4 flex justify-end space-x-3">
+          <Button onClick={handleCancel}>Cancel</Button>
+
+          {/* 如果有下一页签，显示 Next 按钮，否则显示 Confirm */}
+          {currentNode?.type === 'CLIENT' && !aiInputVisible ? (
+            activeKey === '1' ? (
+              <Button type="primary" onClick={handleNext}>
+                Next
+              </Button>
+            ) : (
+              <Button type="primary" onClick={handleConfirm}>
+                Confirm
+              </Button>
+            )
+          ) : (
+            <Button type="primary" onClick={handleConfirm}>
+              Confirm
+            </Button>
+          )}
+        </div>
       </div>
+
       <EndpointModal />
     </div>
   )

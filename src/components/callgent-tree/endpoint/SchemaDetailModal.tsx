@@ -13,7 +13,7 @@ interface DetailModalProps {
 
 const fieldsConfig: Record<string, string[]> = {
     params: ['name', 'in', 'required', 'default', 'description'],
-    responses: ['default', 'description'],
+    responses: ['name', 'default', 'description'],
 }
 
 export default function SchemaDetailModal({
