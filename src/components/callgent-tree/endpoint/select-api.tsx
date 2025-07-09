@@ -54,7 +54,6 @@ export default function EndpointSelectApi() {
       const { data } = await getCallgentApiList(`${callgentId}^${treeNode.host}`)
       const endpoints = data.endpoints || []
       const sentries = data.sentries || []
-
       const endpointNodes = convertEndpointsToTreeNodes(endpoints)
       const sentryNodes = convertSentriesToTreeNodes(sentries)
 

@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { Icon } from '@iconify/react'
-import { Input, Button, InputRef, Tabs, message } from 'antd'
+import { Input, Button, InputRef, Tabs } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import EndpointModal from './modal'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import { postEndpointsApi, putCallgentApi } from '@/api/services/callgentService'
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
-import EndpointSelectApi from './select-api'
-import JSONSchemaEditor from './OpenApiSchemaEditor'
-import { categorizeNodes, getSchema } from './util'
+import { categorizeNodes, injectDefaults } from './util'
+import Payload from './payload'
+import Mapping from './mapping'
 
 export default function EndpointPage() {
   const {
@@ -18,7 +17,6 @@ export default function EndpointPage() {
     formData,
     editId,
     setEditId,
-    setIsEndpointOpen,
     setParameters,
     setResponses,
     setWhatFor,
@@ -36,7 +34,9 @@ export default function EndpointPage() {
 
   // Output all data on confirm
   const handleConfirm = async () => {
-    const responses = categorizeNodes({ children: formData.responses }).body;
+    console.log(formData.responses);
+
+    const responses = categorizeNodes({ children: formData?.responses?.length ? formData.responses : [] }).body;
     const param = categorizeNodes({ children: formData.parameters })
     const data = convertToOpenAPI({
       path: endpointName,
@@ -50,13 +50,13 @@ export default function EndpointPage() {
       responses: responses,
       how2Ops,
     })
-    const apiMapping = currentNode?.type === 'CLIENT' ? {
+    const apiMapping = (currentNode?.type === 'CLIENT' && formData?.apiMap?.api_id) ? {
       api_id: formData.apiMap.api_id,
       params: {
         parameters: formData.apiMap.parameters || {},
-        requestBody: getSchema(formData.apiMap.requestBody) || {}
+        requestBody: injectDefaults(formData.apiMap.api_data.params.requestBody, formData.apiMap.requestBody) || {}
       },
-      responses: getSchema(formData.apiMap.responses) || {}
+      responses: injectDefaults(formData.apiMap.api_data.responses, formData.apiMap.responses) || {}
     } : null
     const request = { ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: callgentTree[0]?.id }
     if (editId) {
@@ -106,96 +106,27 @@ export default function EndpointPage() {
             AI Generate
           </button>
         </div>
-        {!aiInputVisible && (
-          <>
-            {/* Endpoint name and setting */}
-            <div className="flex items-center space-x-2">
-              <Input
-                ref={inputRef}
-                defaultValue="mysite"
-                value={endpointName}
-                onChange={(e) => setEndpointName(e.target.value)}
-                placeholder="Please enter endpoint name starting with /"
 
-              />
-              <button className="p-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-300" onClick={() => setIsEndpointOpen(true)}>
-                <Icon icon="solar:settings-bold" className="w-5 h-5 " />
-              </button>
-            </div>
-
-            {/* Description */}
-            {currentNode?.type === 'CLIENT' && (
-              <div>
-                <label className="block text-sm font-medium mb-1">whatFor</label>
-                <Input.TextArea rows={2} value={whatFor} onChange={(e) => setWhatFor(e.target.value)} placeholder='Explain to caller, when and how to use this endpoint' />
-              </div>
-            )}
-
-            {/* Parameters */}
-            <div className="border border-gray-200 dark:border-gray-600 rounded">
-              <div className="font-medium bg-gray-50  px-4 py-2">
-                Payload
-              </div>
-              <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-                <JSONSchemaEditor
-                  // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
-                  mode={2}
-                  // params/responses
-                  schemaType="params"
-                />
-              </div>
-            </div>
-
-            {/* Responses */}
-            <div className="border border-gray-200  dark:border-gray-600 rounded">
-              <div className="font-medium bg-gray-50 px-4 py-2">
-                Responses
-              </div>
-              <div className="divide-y divide-gray-100">
-                {/* <PayloadCom data={responses} onSubmit={(data: any) => setResponses(data)} mode='response' /> */}
-                <JSONSchemaEditor
-                  // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
-                  mode={2}
-                  // parameters/requestBody/responses
-                  schemaType="responses"
-                />
-              </div>
-            </div>
-
-            {/* how2Ops textarea */}
-            {currentNode?.type === 'CLIENT' && (
-              <div>
-                <Tabs defaultActiveKey="1" items={[
-                  {
-                    key: '1',
-                    label: 'how2Ops',
-                    children: (<div>
-                      <Input.TextArea
-                        rows={3}
-                        value={how2Ops}
-                        className="w-full border border-gray-300  dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        onChange={(e) => setHow2Ops(e.target.value)}
-                      />
-                    </div>),
-                  },
-                  {
-                    key: '2',
-                    label: 'Api Map',
-                    children: <EndpointSelectApi />,
-                  },
-                ]} />
-              </div>
-            )}
-            {/* Action buttons */}
-            <div className="mt-4 flex justify-end space-x-3">
-              <Button onClick={handleCancel}>Cancel</Button>
-              <Button type="primary" onClick={handleConfirm}>
-                Confirm
-              </Button>
-            </div>
-          </>
-        )}
-
+        {(!aiInputVisible && currentNode?.type === 'CLIENT') ? (
+          <Tabs defaultActiveKey="1" items={[
+            {
+              key: '1',
+              label: 'Define',
+              children: <Payload />,
+            },
+            {
+              key: '2',
+              label: 'Implement',
+              children: <Mapping />,
+            },
+          ]} />
+        ) : <Payload />}
+        <div className="mt-4 flex justify-end space-x-3">
+          <Button onClick={handleCancel}>Cancel</Button>
+          <Button type="primary" onClick={handleConfirm}>
+            Confirm
+          </Button>
+        </div>
         {/* AI input area */}
         {aiInputVisible && (
           <div className="space-y-2">

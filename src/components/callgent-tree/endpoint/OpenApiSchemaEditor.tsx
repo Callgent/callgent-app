@@ -1,4 +1,3 @@
-// OpenApiSchemaEditor.tsx
 import React, { useEffect, useState } from 'react'
 import TreeNode from './tree-node'
 import SchemaDetailModal from './SchemaDetailModal'
@@ -6,6 +5,8 @@ import type { JSONSchemaEditorProps, SchemaNode } from './type'
 import { addSchemaChild, categorizeNodes } from './util'
 import { useEndpointStore } from '@/models/endpoint'
 
+// 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
+// params/responses
 export default function JSONSchemaEditor({
   mode,
   schemaType,

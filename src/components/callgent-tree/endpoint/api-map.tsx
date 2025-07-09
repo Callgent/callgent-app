@@ -34,7 +34,7 @@ export default function SchemaEditorForm({ data, responses }: any) {
     <div className="space-y-4 mt-2 max-h-80 overflow-x-hidden border p-2 rounded">
       {data?.parameters && (
         <Form
-          schema={getSchema(data)}
+          schema={getSchema(data.parameters)}
           validator={validator}
           onChange={(data) => handleSubmit(data, 'parameters')}
           uiSchema={{
@@ -66,7 +66,7 @@ export default function SchemaEditorForm({ data, responses }: any) {
         />
       )}
 
-      {responses && (
+      {responses?.properties && (
         <Form
           schema={responses}
           validator={validator}

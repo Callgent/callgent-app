@@ -226,3 +226,33 @@ export function jsonSchemaToTreeNode(schema: any, name = '', inLocation = 'body'
   if (schema.in) (node as any).in = schema.in
   return node
 }
+
+export function injectDefaults(schema: any, data: any): any {
+  if (!schema) return schema
+  // object
+  if (schema.type === 'object' && schema.properties && typeof data === 'object' && data !== null) {
+    const newProperties: any = {}
+    for (const key in schema.properties) {
+      const propSchema = schema.properties[key]
+      const propValue = data?.[key]
+      newProperties[key] = injectDefaults(propSchema, propValue)
+    }
+    return {
+      ...schema,
+      properties: newProperties
+    }
+  }
+  // array
+  if (schema.type === 'array' && Array.isArray(data)) {
+    const itemsSchema = schema.items
+    if (itemsSchema && typeof itemsSchema === 'object') {
+      return {
+        ...schema,
+        default: data,
+        items: itemsSchema
+      }
+    }
+    return { ...schema, default: data }
+  }
+  return { ...schema, default: data }
+}
