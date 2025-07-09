@@ -47,7 +47,7 @@ export default function EndpointModal() {
           </Button>
         ]}
       >
-        <Form form={formEndpoint} layout="vertical" initialValues={{ ...formData.endpoint, method: 'GET' }}>
+        <Form form={formEndpoint} layout="vertical" initialValues={{ method: 'POST', ...formData.endpoint }}>
           <Form.Item name="method" label="HTTP Method" rules={[{ required: true }]}>
             <Select className="w-full" options={requestMethods.map((item) => ({
               value: item.value,

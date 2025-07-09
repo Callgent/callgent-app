@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
-import { Input, Button, InputRef, Tabs } from 'antd'
+import { Input, Button, InputRef, Tabs, message } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import EndpointModal from './modal'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
-import { postEndpointsApi } from '@/api/services/callgentService'
+import { postEndpointsApi, putCallgentApi } from '@/api/services/callgentService'
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
 import EndpointSelectApi from './select-api'
 import JSONSchemaEditor from './OpenApiSchemaEditor'
@@ -16,7 +16,8 @@ export default function EndpointPage() {
     whatFor,
     how2Ops,
     formData,
-    parameters,
+    editId,
+    setEditId,
     setIsEndpointOpen,
     setParameters,
     setResponses,
@@ -37,8 +38,6 @@ export default function EndpointPage() {
   const handleConfirm = async () => {
     const responses = categorizeNodes({ children: formData.responses }).body;
     const param = categorizeNodes({ children: formData.parameters })
-    console.log(param);
-
     const data = convertToOpenAPI({
       path: endpointName,
       operationId: endpointName,
@@ -59,7 +58,14 @@ export default function EndpointPage() {
       },
       responses: getSchema(formData.apiMap.responses) || {}
     } : null
-    await postEndpointsApi({ ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: callgentTree[0]?.id });
+    const request = { ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: callgentTree[0]?.id }
+    if (editId) {
+      putCallgentApi(editId, request).then(() => {
+        setEditId(null)
+      })
+    } else {
+      await postEndpointsApi(request);
+    }
   }
 
   // Reset all states on cancel

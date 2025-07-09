@@ -182,14 +182,14 @@ export function treeNodeToSchema(node: SchemaNode): any {
 // 区分in body
 export function categorizeNodes(nodes: any): { body?: any, data: any[] } {
   const result: { body?: any; data: any[] } = { data: [], body: [] }
-  nodes.children.forEach((node: SchemaNode) => {
+  if (!nodes?.children) { return result }
+  nodes?.children.forEach((node: SchemaNode) => {
     if (node.in === 'body') {
       result.body.push(node)
     } else {
       result.data.push({ ...node, schema: { type: node.type, default: node.default } })
     }
   })
-  console.log(result.body);
   const body = treeNodeToSchema({ "id": "root", "name": "", "editingName": false, "type": "object", "required": false, "in": "body", "children": result.body })
   const data = result.data
   return { body, data };

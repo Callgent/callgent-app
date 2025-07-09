@@ -39,11 +39,11 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
     case 'SERVER':
     case 'EVENT':
   }
-  const { setFormData, formData, setParameters, setResponses } = useEndpointStore()
-
+  const { setFormData, formData, setParameters, setResponses, setEndpointName, setEditId } = useEndpointStore()
 
   const toEditApi = async (node: any) => {
     const { data } = await getCallgentApi(node.id);
+    setEditId(node.id)
     const requestBody = data?.params?.requestBody?.content["application/json"]?.schema
     const parameters = data?.params.parameters.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() }))
     if (requestBody) {
@@ -58,8 +58,12 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
       ...formData,
       parameters: parameters,
       requestBody: data?.params?.requestBody,
-      responses: responses
+      responses: responses,
+      endpoint: {
+        method: data?.method || 'POST'
+      }
     })
+    setEndpointName(data?.path || null)
     setTimeout(() => {
       useTreeActionStore.setState({ action: 'virtualApi' })
       useTreeActionStore.setState({ currentNode: node })

@@ -16,7 +16,9 @@ export const useEndpointStore = create<EndpointState>()(
       isEndpointOpen: false,
       editIndex: -1,
       editType: '',
+      editId: null,
 
+      setEditId: (text) => set({ editId: text }),
       setEndpointName: (name) => set({ endpointName: name }),
       setWhatFor: (text) => set({ whatFor: text }),
       setHow2Ops: (text) => set({ how2Ops: text }),

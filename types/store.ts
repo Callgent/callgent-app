@@ -61,7 +61,9 @@ export interface EndpointState {
   isEndpointOpen: boolean
   editIndex: number
   editType: string
+  editId: string | null
 
+  setEditId: (name: string | null) => void
   setEndpointName: (name: string) => void
   setWhatFor: (text: string) => void
   setHow2Ops: (text: string) => void

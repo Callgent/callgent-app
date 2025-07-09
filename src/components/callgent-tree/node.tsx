@@ -25,7 +25,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
     return null
   }
   const { openModal, setCallgentTree, setCurrentNode } = useTreeActions();
-  const { setFormData, setParameters, setResponses } = useEndpointStore()
+  const { setFormData, setParameters, setResponses, setEditId } = useEndpointStore()
   const node = nodes[0]
   const navigate = useNavigate();
   const iconSrc = useMemo(() => {
@@ -82,6 +82,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
         setFormData({})
         setParameters([])
         setResponses([])
+        setEditId(null)
       // navigate(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
     }
     useTreeActionStore.setState({ action: actionType });
