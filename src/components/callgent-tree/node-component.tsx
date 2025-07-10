@@ -45,7 +45,7 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
     const { data } = await getCallgentApi(node.id);
     setEditId(node.id)
     const requestBody = data?.params?.requestBody?.content["application/json"]?.schema
-    const parameters = data?.params.parameters.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() }))
+    const parameters = data?.params?.parameters.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() }))
     if (requestBody) {
       setParameters([...parameters, ...(jsonSchemaToTreeNode(requestBody).children as [])])
     } else (
@@ -66,7 +66,7 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
     setEndpointName(data?.path || null)
     setTimeout(() => {
       useTreeActionStore.setState({ action: 'virtualApi' })
-      useTreeActionStore.setState({ currentNode: node })
+      useTreeActionStore.setState({ currentNode: { ...node, type: node?.parentType || '' } })
     }, 0);
   }
   if (level === 4) {
