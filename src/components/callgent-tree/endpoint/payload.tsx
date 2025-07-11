@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
-import { Input, InputRef } from 'antd'
+import { Button, Form, Input, InputRef, Modal, Select } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore from '@/models/callgentTreeStore'
 import JSONSchemaEditor from './schema-editor'
+import { requestMethods } from './util'
 
 export default function Payload() {
   const {
@@ -13,8 +14,12 @@ export default function Payload() {
     setIsEndpointOpen,
     setWhatFor,
     setEndpointName,
+    isEndpointOpen,
+    formData,
+    setFormData
   } = useEndpointStore()
 
+  const [formEndpoint] = Form.useForm()
   const { currentNode } = useTreeActionStore()
 
   const inputRef = useRef<InputRef>(null)
@@ -52,7 +57,7 @@ export default function Payload() {
           Payload
         </div>
         <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-          <JSONSchemaEditor mode={2} schemaType="params" />
+          <JSONSchemaEditor mode={status === 'read_only' ? 1 : 2} schemaType="params" />
         </div>
       </div>
       <div className="border border-gray-200  dark:border-gray-600 rounded">
@@ -60,9 +65,50 @@ export default function Payload() {
           Responses
         </div>
         <div className="divide-y divide-gray-100">
-          <JSONSchemaEditor mode={2} schemaType="responses" />
+          <JSONSchemaEditor mode={status === 'read_only' ? 1 : 2} schemaType="responses" />
         </div>
       </div>
+      <Modal
+        title="Endpoint Settings"
+        open={isEndpointOpen}
+        onCancel={() => setIsEndpointOpen(false)}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => setIsEndpointOpen(false)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="ok"
+            type="primary"
+            onClick={() => {
+              formEndpoint.validateFields().then(values => {
+                setFormData({ ...formData, endpoint: values })
+                setIsEndpointOpen(false)
+              })
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Confirm
+          </Button>
+        ]}
+      >
+        <Form form={formEndpoint} layout="vertical" initialValues={formData.endpoint}>
+          <Form.Item name="method" label="HTTP Method" rules={[{ required: true }]}>
+            <Select className="w-full" options={requestMethods.map((item) => ({
+              value: item.value,
+              label: (
+                <div className="flex justify-between items-center mr-4" >
+                  <span>{item.value} </span>
+                  <span className="text-gray-600 text-sm" > {item.description} </span>
+                </div>
+              ),
+            }))} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   )
 }

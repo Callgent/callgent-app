@@ -38,19 +38,17 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
     case 'SERVER':
     case 'EVENT':
   }
-  const { toggletheEP, editId } = useEndpointStore()
+  const { toggletheEP, status } = useEndpointStore()
   // 编辑切换 ep
   const toEditApi = async (node: any) => {
-    if (editId) {
+    if (status === 'define' || status === 'implement') {
       Modal.confirm({
         title: '确认取消修改？',
         content: '所有未保存的更改将会丢失，是否确定取消？',
         okText: '确认',
         cancelText: '返回',
         centered: true,
-        okButtonProps: {
-          className: 'bg-primary text-white border-none'
-        },
+        okButtonProps: { className: 'bg-primary text-white border-none' },
         async onOk() {
           await toggletheEP(node.id)
           useTreeActionStore.setState({ action: 'virtualApi' })

@@ -15,15 +15,17 @@ export default function EndpointPage() {
     how2Ops,
     formData,
     editId,
+    status,
     setEditId,
-    clear
+    clear,
+    setStatus
   } = useEndpointStore()
 
   const { currentNode, callgentTree, } = useTreeActionStore()
   const { closeModal } = useTreeActions()
 
   // 受控页签 key，'1' = Define，'2' = Implement
-  const [activeKey, setActiveKey] = useState<'1' | '2'>('1')
+  const [activeKey, setActiveKey] = useState('1')
 
   // AI generation states
   const [aiInputVisible, setAiInputVisible] = useState(false)
@@ -72,10 +74,13 @@ export default function EndpointPage() {
   // Reset all states on cancel
   const handleCancel = () => {
     Modal.confirm({
-      title: '确认切换EP？',
+      title: '确认关闭？',
       content: '所有未保存的更改将会丢失，是否确定取消？',
       okText: '确认',
       cancelText: '返回',
+      okButtonProps: {
+        className: 'bg-primary text-white border-none'
+      },
       centered: true,
       onOk() {
         clear()
@@ -107,9 +112,10 @@ export default function EndpointPage() {
         {(!aiInputVisible && currentNode?.type === 'CLIENT') ? (
           <Tabs
             activeKey={activeKey}
+            onChange={(e: string) => setActiveKey(e)}
             items={[
-              { key: '1', label: 'Define', children: <Payload />, disabled: true },
-              { key: '2', label: 'Implement', children: <Mapping />, disabled: true },
+              { key: '1', label: 'Define', children: <Payload />, disabled: status === 'read_only' ? false : true },
+              { key: '2', label: 'Implement', children: <Mapping />, disabled: status === 'read_only' ? false : true },
             ]}
           />
         ) : (<Payload />)}
@@ -127,22 +133,29 @@ export default function EndpointPage() {
 
         <div className="mt-4 flex justify-end space-x-3">
           <Button onClick={handleCancel}>Cancel</Button>
-          {/* 如果有下一页签，显示 Next 按钮，否则显示 Confirm */}
-          {currentNode?.type === 'CLIENT' && !aiInputVisible ? (
-            activeKey === '1' ? (
-              <Button type="primary" onClick={handleNext}>
-                Save
-              </Button>
+          {status === 'read_only' && (
+            <Button type="primary" onClick={() => setStatus("define")}>
+              Edit
+            </Button>
+          )}
+          {status === 'define' && (
+            currentNode?.type === 'CLIENT' && !aiInputVisible ? (
+              activeKey === '1' ? (
+                <Button type="primary" onClick={handleNext}>
+                  Save
+                </Button>
+              ) : (
+                <Button type="primary" onClick={handleConfirm}>
+                  Confirm
+                </Button>
+              )
             ) : (
               <Button type="primary" onClick={handleConfirm}>
                 Confirm
               </Button>
             )
-          ) : (
-            <Button type="primary" onClick={handleConfirm}>
-              Confirm
-            </Button>
           )}
+
         </div>
       </div>
     </div>
