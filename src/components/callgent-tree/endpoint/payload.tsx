@@ -35,6 +35,7 @@ export default function Payload() {
           defaultValue="mysite"
           value={endpointName}
           onChange={(e) => setEndpointName(e.target.value)}
+          disabled={status === 'read_only'}
           placeholder="Please enter endpoint name starting with /"
 
         />
@@ -47,7 +48,12 @@ export default function Payload() {
       {currentNode?.type === 'CLIENT' && (
         <div className='my-2'>
           <label className="block font-medium mb-2">whatFor</label>
-          <Input.TextArea rows={2} value={whatFor} onChange={(e) => setWhatFor(e.target.value)} placeholder='Explain to caller, when and how to use this endpoint' />
+          <Input.TextArea
+            rows={2}
+            value={whatFor}
+            onChange={(e) => setWhatFor(e.target.value)}
+            disabled={status === 'read_only'}
+            placeholder='Explain to caller, when and how to use this endpoint' />
         </div>
       )}
 
@@ -97,15 +103,17 @@ export default function Payload() {
       >
         <Form form={formEndpoint} layout="vertical" initialValues={formData.endpoint}>
           <Form.Item name="method" label="HTTP Method" rules={[{ required: true }]}>
-            <Select className="w-full" options={requestMethods.map((item) => ({
-              value: item.value,
-              label: (
-                <div className="flex justify-between items-center mr-4" >
-                  <span>{item.value} </span>
-                  <span className="text-gray-600 text-sm" > {item.description} </span>
-                </div>
-              ),
-            }))} />
+            <Select className="w-full"
+              disabled={status === 'read_only'}
+              options={requestMethods.map((item) => ({
+                value: item.value,
+                label: (
+                  <div className="flex justify-between items-center mr-4" >
+                    <span>{item.value} </span>
+                    <span className="text-gray-600 text-sm" > {item.description} </span>
+                  </div>
+                ),
+              }))} />
           </Form.Item>
         </Form>
       </Modal>

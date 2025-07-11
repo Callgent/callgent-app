@@ -4,7 +4,7 @@ import { useEndpointStore } from '@/models/endpoint'
 import EndpointSelectApi from './select-api'
 
 export default function Mapping() {
-  const { how2Ops, setHow2Ops } = useEndpointStore()
+  const { how2Ops, setHow2Ops, status } = useEndpointStore()
 
   const inputRef = useRef<InputRef>(null)
   useEffect(() => {
@@ -19,6 +19,7 @@ export default function Mapping() {
         </div>
         <Input.TextArea
           rows={3}
+          disabled={status === 'read_only'}
           value={how2Ops}
           className="w-full border border-gray-300  dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           onChange={(e) => setHow2Ops(e.target.value)}

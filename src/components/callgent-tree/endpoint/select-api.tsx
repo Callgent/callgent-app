@@ -16,7 +16,7 @@ export default function EndpointSelectApi() {
   const location = useLocation()
   const query = new URLSearchParams(location.search)
   const callgentId = query.get('callgentId') || ''
-  const { setFormData, formData } = useEndpointStore()
+  const { setFormData, formData, status } = useEndpointStore()
 
   const [treeData, setTreeData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -88,6 +88,7 @@ export default function EndpointSelectApi() {
           defaultValue={formData?.apiMap?.api_data?.name || null}
           allowClear
           showSearch
+          disabled={status === 'read_only'}
         />
         <ApiMap data={currentApi?.params || formData?.apiMap?.api_data.params || {}}
           responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.apiMap?.api_data?.responses)}
