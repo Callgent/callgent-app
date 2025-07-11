@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Input, Button, InputRef, Tabs } from 'antd'
+import { Input, Button, InputRef, Tabs, Modal } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
-import EndpointModal from './modal'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import { postEndpointsApi, putCallgentApi } from '@/api/services/callgentService'
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
@@ -17,11 +16,7 @@ export default function EndpointPage() {
     formData,
     editId,
     setEditId,
-    setParameters,
-    setResponses,
-    setWhatFor,
-    setEndpointName,
-    setHow2Ops,
+    clear
   } = useEndpointStore()
 
   const { currentNode, callgentTree, } = useTreeActionStore()
@@ -76,13 +71,18 @@ export default function EndpointPage() {
 
   // Reset all states on cancel
   const handleCancel = () => {
-    setEndpointName('')
-    setWhatFor('')
-    setHow2Ops('')
-    setParameters([])
-    setResponses([])
-    closeModal()
-    setActiveKey('1')
+    Modal.confirm({
+      title: '确认切换EP？',
+      content: '所有未保存的更改将会丢失，是否确定取消？',
+      okText: '确认',
+      cancelText: '返回',
+      centered: true,
+      onOk() {
+        clear()
+        closeModal()
+        setActiveKey('1')
+      }
+    });
   }
 
   const inputRef = useRef<InputRef>(null)
@@ -104,7 +104,7 @@ export default function EndpointPage() {
         </div>
 
         {/* 如果是 CLIENT 且不显示 AI 输入，则展示两个“页签”，但隐藏标签栏 */}
-        {(!aiInputVisible && currentNode?.type === 'CLIENT') && (
+        {(!aiInputVisible && currentNode?.type === 'CLIENT') ? (
           <Tabs
             activeKey={activeKey}
             items={[
@@ -112,12 +112,8 @@ export default function EndpointPage() {
               { key: '2', label: 'Implement', children: <Mapping />, disabled: true },
             ]}
           />
-        )}
+        ) : (<Payload />)}
 
-        {/* 非 CLIENT 或者 AI 模式下只展示 Payload */}
-        {(!aiInputVisible && currentNode?.type !== 'CLIENT') && (
-          <Payload />
-        )}
         {aiInputVisible && (
           <div className="space-y-2">
             <Input.TextArea
@@ -131,12 +127,11 @@ export default function EndpointPage() {
 
         <div className="mt-4 flex justify-end space-x-3">
           <Button onClick={handleCancel}>Cancel</Button>
-
           {/* 如果有下一页签，显示 Next 按钮，否则显示 Confirm */}
           {currentNode?.type === 'CLIENT' && !aiInputVisible ? (
             activeKey === '1' ? (
               <Button type="primary" onClick={handleNext}>
-                Next
+                Save
               </Button>
             ) : (
               <Button type="primary" onClick={handleConfirm}>
@@ -150,8 +145,6 @@ export default function EndpointPage() {
           )}
         </div>
       </div>
-
-      <EndpointModal />
     </div>
   )
 }

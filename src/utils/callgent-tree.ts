@@ -1,20 +1,20 @@
 import { Adaptor, CallgentInfo } from '#/entity';
 
-export const enhanceNode = (node: CallgentInfo, level: number): CallgentInfo => {
+// 控制节点状态
+export const enhanceNode = (node: CallgentInfo, level: number, parentType: string | undefined): CallgentInfo => {
   let enhancedNode = { ...node };
-  if (level === 2) {
-    enhancedNode = { ...enhancedNode, parentType: node?.id, add: true };
-  } else if (level === 3 && node?.type === "SERVER") {
-    enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, import: true, lock: true, virtualApi: true };
+  if (level === 1) {
+    enhancedNode = { ...enhancedNode, parentType: parentType, edit: true, delete: true, lock: true };
+  } else if (level === 2) {
+    enhancedNode = { ...enhancedNode, parentType: parentType, add: true };
   } else if (level === 3) {
-    enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, lock: true, virtualApi: true };
-  } else if (level === 1) {
-    enhancedNode = { ...enhancedNode, parentType: node?.type, edit: true, delete: true, lock: true };
+    enhancedNode = { ...enhancedNode, parentType: parentType, edit: true, delete: true, lock: true, virtualApi: true, import: true, };
   } else if (level === 4) {
-    enhancedNode = { ...enhancedNode, parentType: node?.type || 'CLIENT', delete: true, lock: true };
+    enhancedNode = { ...enhancedNode, parentType: parentType, delete: true, lock: true };
   }
   if (node.children) {
-    enhancedNode.children = node.children.map(child => enhanceNode(child, level + 1));
+    if (level === 2) { node.type = node.id }
+    enhancedNode.children = node.children.map(child => enhanceNode(child, level + 1, node.type));
   }
   enhancedNode.selectedOptions = node?.securities?.map((obj: string) => Object.keys(obj)[0]) || [];
   return enhancedNode;

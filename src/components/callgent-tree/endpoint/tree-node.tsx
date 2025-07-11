@@ -16,13 +16,7 @@ interface TreeNodeProps {
   deleteNode: (id: string) => void
 }
 
-const typeOptions: NodeType[] = [
-  'string',
-  'number',
-  'boolean',
-  'object',
-  'array',
-]
+const typeOptions: NodeType[] = ['string', 'number', 'boolean', 'object', 'array',]
 
 export default function TreeNode({
   node,

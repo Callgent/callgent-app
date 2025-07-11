@@ -31,7 +31,7 @@ export default function EndpointSelectApi() {
       const endpoints = data.endpoints || []
       const sentries = data.sentries || []
       const endpointNodes = convertEndpointsToTreeNodes(endpoints)
-      const sentryNodes = convertSentriesToTreeNodes(sentries)
+      const sentryNodes = convertSentriesToTreeNodes(sentries).map((item: any) => ({ ...item, selectable: false }))
       setTreeData([...endpointNodes, ...sentryNodes])
     } catch (err) {
       message.error('Failed to initialize')
@@ -55,8 +55,7 @@ export default function EndpointSelectApi() {
       const endpoints = data.endpoints || []
       const sentries = data.sentries || []
       const endpointNodes = convertEndpointsToTreeNodes(endpoints)
-      const sentryNodes = convertSentriesToTreeNodes(sentries)
-
+      const sentryNodes = convertSentriesToTreeNodes(sentries).map((item: any) => ({ ...item, selectable: false }))
       const newTreeData = updateTreeNode(treeData, treeNode.key, [...sentryNodes, ...endpointNodes])
       setTreeData(newTreeData)
     } catch (err) {

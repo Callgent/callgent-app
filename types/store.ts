@@ -50,6 +50,8 @@ export interface ModalNode {
 }
 
 export interface EndpointState {
+  status: 'define' | 'implement' | 'read_only' | null
+  editId: string | null
   endpointName: string
   whatFor: string
   how2Ops: string
@@ -61,32 +63,17 @@ export interface EndpointState {
   isEndpointOpen: boolean
   editIndex: number
   editType: string
-  editId: string | null
 
+  toggletheEP: (id: string) => Promise<void>
+  setStatus: (status: 'define' | 'implement' | null) => void
   setEditId: (name: string | null) => void
   setEndpointName: (name: string) => void
   setWhatFor: (text: string) => void
   setHow2Ops: (text: string) => void
-
   setParameters: (params: any[]) => void
-  addParameter: (param: any) => void
-  updateParameter: (index: number, param: any) => void
-
   setResponses: (resps: any[]) => void
-  addResponse: (resp: any) => void
-  updateResponse: (index: number, resp: any) => void
-  removeParameter: (index: number) => void
-  removeResponse: (index: number) => void
-
   setFormData: (data: Record<string, any>) => void
-
-  setIsParameterOpen: (open: boolean) => void
-  setIsResponseOpen: (open: boolean) => void
   setIsEndpointOpen: (open: boolean) => void
-
-  setEditIndex: (index: number) => void
-  setEditType: (type: string) => void
-  apiDefaultValues: Record<string, Record<string, string>>
-  setDefaultValue: (apiName: string, paramName: string, value: string) => void
-  getDefaultValue: (apiName: string, paramName: string) => string
+  clear: () => void
 }
+

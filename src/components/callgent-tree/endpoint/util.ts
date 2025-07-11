@@ -32,7 +32,6 @@ export const fieldTypes = [
 
 import { openapiSchemaToJsonSchema } from '@openapi-contrib/openapi-schema-to-json-schema';
 import type { SchemaNode } from './type';
-import { message } from 'antd';
 // parameters转schema
 export const getSchema = (data: any) => {
   const parameters = data || []
@@ -65,6 +64,8 @@ export const getSchema = (data: any) => {
 export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
   try {
     const statusCodes = Object.keys(openapiResponses).filter(code => /^2\d\d$/.test(code))
+
+
     for (const status of statusCodes) {
       const response = openapiResponses[status]
       const content = response?.content
@@ -200,10 +201,11 @@ export function jsonSchemaToTreeNode(schema: any, name = '', inLocation = 'body'
     id: generateId(),
     name,
     editingName: false,
-    type: schema.type,
+    type: schema?.type,
     required: false,
     in: inLocation as any,
   }
+  if (!schema) { return { ...node, children: [] } }
   if (schema.type === 'object') {
     node.children = []
     const props = schema.properties || {}

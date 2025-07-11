@@ -3,10 +3,11 @@ import { Icon } from '@iconify/react'
 import { Input, InputRef } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore from '@/models/callgentTreeStore'
-import JSONSchemaEditor from './OpenApiSchemaEditor'
+import JSONSchemaEditor from './schema-editor'
 
 export default function Payload() {
   const {
+    status,
     endpointName,
     whatFor,
     setIsEndpointOpen,

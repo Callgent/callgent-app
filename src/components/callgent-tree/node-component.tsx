@@ -1,9 +1,8 @@
 import { CallgentInfo } from "#/entity";
 import { Link } from "react-router";
 import { useTreeActionStore } from '@/models/callgentTreeStore';
-import { getCallgentApi } from "@/api/services/callgentService";
 import { useEndpointStore } from "@/models/endpoint";
-import { extractFirst2xxJsonSchema, generateId, jsonSchemaToTreeNode } from "./endpoint/util";
+import { Modal } from "antd";
 
 export default function NodeComponent({ node, callgentId, level }: { node: CallgentInfo, callgentId: string, level: number }) {
   let content = (
@@ -39,35 +38,30 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
     case 'SERVER':
     case 'EVENT':
   }
-  const { setFormData, formData, setParameters, setResponses, setEndpointName, setEditId } = useEndpointStore()
-
+  const { toggletheEP, editId } = useEndpointStore()
+  // 编辑切换 ep
   const toEditApi = async (node: any) => {
-    const { data } = await getCallgentApi(node.id);
-    setEditId(node.id)
-    const requestBody = data?.params?.requestBody?.content["application/json"]?.schema
-    const parameters = data?.params?.parameters.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() }))
-    if (requestBody) {
-      setParameters([...parameters, ...(jsonSchemaToTreeNode(requestBody).children as [])])
-    } else (
-      setParameters(parameters)
-    )
-    const responsesSchema = extractFirst2xxJsonSchema(data?.responses)
-    const responses = responsesSchema?.properties ? (jsonSchemaToTreeNode(responsesSchema).children || []) : []
-    setResponses(responses)
-    setFormData({
-      ...formData,
-      parameters: parameters,
-      requestBody: data?.params?.requestBody,
-      responses: responses,
-      endpoint: {
-        method: data?.method || 'POST'
-      }
-    })
-    setEndpointName(data?.path || null)
-    setTimeout(() => {
+    if (editId) {
+      Modal.confirm({
+        title: '确认取消修改？',
+        content: '所有未保存的更改将会丢失，是否确定取消？',
+        okText: '确认',
+        cancelText: '返回',
+        centered: true,
+        okButtonProps: {
+          className: 'bg-primary text-white border-none'
+        },
+        async onOk() {
+          await toggletheEP(node.id)
+          useTreeActionStore.setState({ action: 'virtualApi' })
+          useTreeActionStore.setState({ currentNode: { ...node, type: node?.parentType } })
+        }
+      });
+    } else {
+      await toggletheEP(node.id)
       useTreeActionStore.setState({ action: 'virtualApi' })
-      useTreeActionStore.setState({ currentNode: { ...node, type: node?.parentType || '' } })
-    }, 0);
+      useTreeActionStore.setState({ currentNode: { ...node, type: node?.parentType } })
+    }
   }
   if (level === 4) {
     content = (

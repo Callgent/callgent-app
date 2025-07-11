@@ -35,7 +35,7 @@ export const useFetchCallgentTree = () => {
   const fetchCallgentServerList = async (id: string) => {
     try {
       const { data } = await getCallgentTree(id);
-      const enhancedData = enhanceNode(data, 1);
+      const enhancedData = enhanceNode(data, 1, 'root');
       setCallgentTree([enhancedData]);
       setCallgentRealms(data?.realms || []);
       return data;

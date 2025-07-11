@@ -4,7 +4,7 @@ import { getSchema } from './util'
 import { useEndpointStore } from '@/models/endpoint'
 import { useEffect, useState } from 'react'
 import { Select } from 'antd'
-import JSONSchemaEditor from './OpenApiSchemaEditor'
+import JSONSchemaEditor from './schema-editor'
 
 export default function SchemaEditorForm({ data, responses }: any) {
   const { setFormData, formData } = useEndpointStore()

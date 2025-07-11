@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import TreeNode from './tree-node'
-import SchemaDetailModal from './SchemaDetailModal'
+import SchemaDetailModal from './edit-modal'
 import type { JSONSchemaEditorProps, SchemaNode } from './type'
 import { addSchemaChild, categorizeNodes, jsonSchemaToTreeNode } from './util'
 import { useEndpointStore } from '@/models/endpoint'
 
 // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
 // params/responses
-export default function JSONSchemaEditor({
-  mode,
-  schemaType,
-}: JSONSchemaEditorProps) {
+export default function JSONSchemaEditor({ mode, schemaType, }: JSONSchemaEditorProps) {
   // 初始根节点
   const [tree, setTree] = useState<SchemaNode>({
     id: 'root',
@@ -38,7 +35,7 @@ export default function JSONSchemaEditor({
   const [detailData, setDetailData] = useState<SchemaNode | null>(null)
 
   const addChild = (parentId: string) => {
-    if (mode !== 2) return       // 仅定义模式可新增
+    if (mode !== 2) return
     setTree(addSchemaChild(tree, parentId))
   }
   const updateNode = (id: string, partial: Partial<SchemaNode>) => {
@@ -53,7 +50,7 @@ export default function JSONSchemaEditor({
     submitSchema(newTree)
   }
   const deleteNode = (id: string) => {
-    if (mode !== 2) return       // 仅定义模式可删除
+    if (mode !== 2) return
     const walk = (n: SchemaNode): SchemaNode => {
       if (n.children) {
         n.children = n.children.filter(c => c.id !== id).map(walk)
@@ -70,7 +67,7 @@ export default function JSONSchemaEditor({
     submitSchema(newTree)
   }
   const openDetail = (id: string) => {
-    if (mode === 1) return       // 只读模式不弹窗
+    if (mode === 1) return
     const find = (n: SchemaNode): SchemaNode | null => {
       if (n.id === id) return n
       if (n.children) {
@@ -93,13 +90,9 @@ export default function JSONSchemaEditor({
   const submitSchema = (nodes: SchemaNode) => {
     const { data, body } = categorizeNodes(nodes)
     if (schemaType === 'params') {
-      setFormData({
-        ...formData, parameters: data, requestBody: body
-      })
+      setFormData({ ...formData, parameters: data, requestBody: body })
     } else {
-      setFormData({
-        ...formData, responses: body
-      })
+      setFormData({ ...formData, responses: body })
     }
   }
 

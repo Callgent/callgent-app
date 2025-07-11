@@ -1,97 +1,64 @@
 import { EndpointState } from '#/store'
+import { getCallgentApi } from '@/api/services/callgentService';
+import { extractFirst2xxJsonSchema, generateId, jsonSchemaToTreeNode } from '@/components/callgent-tree/endpoint/util';
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+
+const initData = {
+  status: null,
+  editId: null,
+  endpointName: '',
+  whatFor: '',
+  how2Ops: '',
+  parameters: [],
+  responses: [],
+  formData: {},
+  isParameterOpen: false,
+  isResponseOpen: false,
+  isEndpointOpen: false,
+  editIndex: -1,
+  editType: '',
+}
 
 export const useEndpointStore = create<EndpointState>()(
-  persist(
-    (set, get) => ({
-      endpointName: '',
-      whatFor: '',
-      how2Ops: '',
-      parameters: [],
-      responses: [],
-      formData: {},
-      isParameterOpen: false,
-      isResponseOpen: false,
-      isEndpointOpen: false,
-      editIndex: -1,
-      editType: '',
-      editId: null,
-
-      setEditId: (text) => set({ editId: text }),
-      setEndpointName: (name) => set({ endpointName: name }),
-      setWhatFor: (text) => set({ whatFor: text }),
-      setHow2Ops: (text) => set({ how2Ops: text }),
-
-      setParameters: (params) => set({ parameters: params }),
-      addParameter: (param) =>
-        set((state) => ({ parameters: [...state.parameters, param] })),
-      updateParameter: (index, param) =>
-        set((state) => {
-          const newParams = [...state.parameters]
-          newParams[index] = param
-          return { parameters: newParams }
-        }),
-      removeParameter: (index) =>
-        set((state) => {
-          const newParams = [...state.parameters]
-          newParams.splice(index, 1)
-          return { parameters: newParams }
-        }),
-
-      setResponses: (resps) => set({ responses: resps }),
-      addResponse: (resp) =>
-        set((state) => ({ responses: [...state.responses, resp] })),
-      removeResponse: (index) =>
-        set((state) => {
-          const newResponses = [...state.responses]
-          newResponses.splice(index, 1)
-          return { responses: newResponses }
-        }),
-
-      updateResponse: (index, resp) =>
-        set((state) => {
-          const newResponses = [...state.responses]
-          newResponses[index] = resp
-          return { responses: newResponses }
-        }),
-
-      setFormData: (data) => set({ formData: data }),
-
-      setIsParameterOpen: (open) => set({ isParameterOpen: open }),
-      setIsResponseOpen: (open) => set({ isResponseOpen: open }),
-      setIsEndpointOpen: (open) => set({ isEndpointOpen: open }),
-
-      setEditIndex: (i) => set({ editIndex: i }),
-      setEditType: (t) => set({ editType: t }),
-
-      apiDefaultValues: {},
-      setDefaultValue: (apiName, paramName, value) => {
-        const prev = get().apiDefaultValues
-        const updated = {
-          ...prev,
-          [apiName]: {
-            ...prev[apiName],
-            [paramName]: value,
-          },
+  (set, get) => ({
+    ...initData,
+    // 切换ep
+    toggletheEP: async (id: string) => {
+      const { data } = await getCallgentApi(id);
+      let parameters = data?.params?.parameters?.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() })) || []
+      const requestBody = data?.params?.requestBody?.content["application/json"]?.schema
+      const responsesSchema = extractFirst2xxJsonSchema(data?.responses)
+      const responses = jsonSchemaToTreeNode(responsesSchema).children
+      set({
+        status: 'read_only',
+        endpointName: data?.path || null,
+        editId: id,
+        parameters: requestBody ? [...parameters, ...(jsonSchemaToTreeNode(requestBody).children as [])] : parameters,
+        whatFor: data?.whatFor || null,
+        how2Ops: data?.how2Ops || null,
+        responses,
+        formData: {
+          ...get().formData,
+          parameters: parameters,
+          requestBody: requestBody,
+          responses: responses,
+          endpoint: {
+            method: data?.method || 'POST'
+          }
         }
-        set({ apiDefaultValues: updated })
-      },
-      getDefaultValue: (apiName, paramName) => {
-        return get().apiDefaultValues?.[apiName]?.[paramName] || ''
-      },
-    }),
-    {
-      name: 'endpoint-form-storage',
-      storage: createJSONStorage(() => sessionStorage),
-      partialize: (state) => ({
-        endpointName: state.endpointName,
-        whatFor: state.whatFor,
-        how2Ops: state.how2Ops,
-        parameters: state.parameters,
-        responses: state.responses,
-        formData: state.formData,
-      }),
+      })
+    },
+    setStatus: (type) => set({ status: type }),
+    setEditId: (text) => set({ editId: text }),
+    setEndpointName: (name) => set({ endpointName: name }),
+    setWhatFor: (text) => set({ whatFor: text }),
+    setHow2Ops: (text) => set({ how2Ops: text }),
+    setParameters: (params) => set({ parameters: params }),
+    setResponses: (resps) => set({ responses: resps }),
+    setFormData: (data) => set({ formData: data }),
+    setIsEndpointOpen: (open) => set({ isEndpointOpen: open }),
+    clear: () => {
+      set(initData)
     }
-  )
+  })
 )
