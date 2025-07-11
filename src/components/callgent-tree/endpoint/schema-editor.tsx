@@ -4,6 +4,7 @@ import SchemaDetailModal from './edit-modal'
 import type { JSONSchemaEditorProps, SchemaNode } from './type'
 import { addSchemaChild, categorizeNodes, jsonSchemaToTreeNode } from './util'
 import { useEndpointStore } from '@/models/endpoint'
+import { Button } from 'antd'
 
 // 1 = 只读模式，只能查看；2 = 定义模式，可新增/删除/修改所有信息；3 = 实现模式，仅可编辑 default
 // params/responses
@@ -18,7 +19,7 @@ export default function JSONSchemaEditor({ mode, schemaType, }: JSONSchemaEditor
     in: 'body',
     children: [],
   })
-  const { formData, parameters, setFormData, responses } = useEndpointStore()
+  const { formData, parameters, setFormData, responses, status } = useEndpointStore()
 
   useEffect(() => {
     if (schemaType === 'params' && mode === 2) {
@@ -139,14 +140,13 @@ export default function JSONSchemaEditor({ mode, schemaType, }: JSONSchemaEditor
         {tree.children ? renderTree(tree.children) : null}
       </div>
       {/* 顶层新增 */}
-      {mode === 2 && (
-        <div
-          className="mb-2 w-full text-center py-2 border border-dashed border-gray-400 rounded-md text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600 cursor-pointer transition"
-          onClick={() => addChild('root')}
-        >
-          + Add
-        </div>
-      )}
+      <Button
+        className="mb-2 w-full text-center py-2 border border-dashed border-gray-400 rounded-md text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
+        onClick={() => addChild('root')}
+        disabled={status === 'read_only' || mode === 1}
+      >
+        + Add
+      </Button>
       {/* 详情弹窗 */}
       {detailData && detailId && (
         <SchemaDetailModal

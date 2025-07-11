@@ -55,7 +55,14 @@ export default function SchemaEditorForm({ data, responses }: any) {
           />
         </div>
       )}
-
+      <div className="border border-gray-200 dark:border-gray-600 rounded">
+        <div className="font-medium bg-gray-50  px-4 py-2">
+          Payload comes from api1
+        </div>
+        <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
+          <JSONSchemaEditor mode={1} schemaType="params" />
+        </div>
+      </div>
       {selectedMediaType && schema && (
         <Form
           schema={schema}
@@ -66,24 +73,6 @@ export default function SchemaEditorForm({ data, responses }: any) {
           }}
         />
       )}
-
-      <div className="border border-gray-200 dark:border-gray-600 rounded">
-        <div className="font-medium bg-gray-50  px-4 py-2">
-          Payload comes from api1
-        </div>
-        <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-          <JSONSchemaEditor mode={1} schemaType="params" />
-        </div>
-      </div>
-      <div className="border border-gray-200  dark:border-gray-600 rounded">
-        <div className="font-medium bg-gray-50 px-4 py-2">
-          Responses comes from api1
-        </div>
-        <div className="divide-y divide-gray-100">
-          <JSONSchemaEditor mode={1} schemaType="responses" />
-        </div>
-      </div>
-
       {responses?.properties && (
         <Form
           schema={responses}
@@ -94,6 +83,14 @@ export default function SchemaEditorForm({ data, responses }: any) {
           }}
         />
       )}
+      <div className="border border-gray-200  dark:border-gray-600 rounded">
+        <div className="font-medium bg-gray-50 px-4 py-2">
+          Responses comes from api1
+        </div>
+        <div className="divide-y divide-gray-100">
+          <JSONSchemaEditor mode={1} schemaType="responses" />
+        </div>
+      </div>
     </div>
   )
 }

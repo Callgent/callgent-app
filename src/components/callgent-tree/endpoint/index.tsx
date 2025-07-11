@@ -2,21 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { Input, Button, InputRef, Tabs, Modal } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
-import { postEndpointsApi, putCallgentApi } from '@/api/services/callgentService'
-import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree'
-import { categorizeNodes, injectDefaults } from './util'
 import Payload from './payload'
 import Mapping from './mapping'
 
 export default function EndpointPage() {
   const {
-    endpointName,
-    whatFor,
-    how2Ops,
-    formData,
-    editId,
     status,
-    setEditId,
+    endpointName,
+    handleConfirm,
     clear,
     setStatus
   } = useEndpointStore()
@@ -38,41 +31,9 @@ export default function EndpointPage() {
     }
   }
 
-  // Output all data on confirm
-  const handleConfirm = async () => {
-    const param = categorizeNodes({ children: formData.parameters })
-    const data = convertToOpenAPI({
-      path: endpointName,
-      operationId: endpointName,
-      endpointConfig: formData.endpoint || {},
-      whatFor,
-      params: {
-        parameters: param.data || {},
-        requestBody: formData.requestBody || {}
-      },
-      responses: formData.responses,
-      how2Ops,
-    })
-    const apiMapping = (currentNode?.type === 'CLIENT' && formData?.apiMap?.api_id) ? {
-      api_id: formData.apiMap.api_id,
-      params: {
-        parameters: formData.apiMap.parameters || {},
-        requestBody: injectDefaults(formData.apiMap.api_data.params.requestBody, formData.apiMap.requestBody) || {}
-      },
-      responses: injectDefaults(formData.apiMap.api_data.responses, formData.apiMap.responses) || {}
-    } : null
-    const request = { ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: callgentTree[0]?.id }
-    if (editId) {
-      putCallgentApi(editId, request).then(() => {
-        setEditId(null)
-      })
-    } else {
-      await postEndpointsApi(request)
-    }
-  }
-
   // Reset all states on cancel
   const handleCancel = () => {
+    if (status === 'read_only') { return close() }
     Modal.confirm({
       title: '确认关闭？',
       content: '所有未保存的更改将会丢失，是否确定取消？',
@@ -82,12 +43,13 @@ export default function EndpointPage() {
         className: 'bg-primary text-white border-none'
       },
       centered: true,
-      onOk() {
-        clear()
-        closeModal()
-        setActiveKey('1')
-      }
+      onOk() { close() }
     });
+  }
+  const close = () => {
+    clear()
+    closeModal()
+    setActiveKey('1')
   }
 
   const inputRef = useRef<InputRef>(null)
@@ -107,50 +69,58 @@ export default function EndpointPage() {
             AI Generate
           </button>
         </div>
-
-        {/* 如果是 CLIENT 且不显示 AI 输入，则展示两个“页签”，但隐藏标签栏 */}
-        {(!aiInputVisible && currentNode?.type === 'CLIENT') ? (
-          <Tabs
-            activeKey={activeKey}
-            onChange={(e: string) => setActiveKey(e)}
-            items={[
-              { key: '1', label: 'Define', children: <Payload />, disabled: status === 'read_only' ? false : true },
-              { key: '2', label: 'Implement', children: <Mapping />, disabled: status === 'read_only' ? false : true },
-            ]}
-          />
-        ) : (<Payload />)}
-
-        {aiInputVisible && (
-          <div className="space-y-2">
-            <Input.TextArea
-              rows={6}
-              placeholder="Example: Generate an OpenAPI 3.0 JSON document for listing users, with pagination and filtering support"
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-            />
-          </div>
-        )}
+        {!aiInputVisible ?
+          (
+            <>
+              {(currentNode?.type === 'CLIENT') ? (
+                <Tabs
+                  activeKey={activeKey}
+                  onChange={(e: string) => setActiveKey(e)}
+                  items={[
+                    { key: '1', label: 'Define', children: <Payload />, disabled: status === 'read_only' ? false : true },
+                    { key: '2', label: 'Implement', children: <Mapping />, disabled: status === 'read_only' ? false : true },
+                  ]}
+                />
+              ) : (<Payload />)}
+            </>
+          )
+          :
+          (
+            <div className="space-y-2">
+              <Input.TextArea
+                rows={6}
+                placeholder="Example: Generate an OpenAPI 3.0 JSON document for listing users, with pagination and filtering support"
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+              />
+            </div>
+          )
+        }
 
         <div className="mt-4 flex justify-end space-x-3">
           <Button onClick={handleCancel}>Cancel</Button>
-          {status === 'read_only' && (
+          {status === 'read_only' ? (
             <Button type="primary" onClick={() => setStatus("define")}>
               Edit
+            </Button>
+          ) : (
+            <Button type="primary" onClick={handleNext} disabled={endpointName ? false : true}>
+              Save
             </Button>
           )}
           {status === 'define' && (
             currentNode?.type === 'CLIENT' && !aiInputVisible ? (
               activeKey === '1' ? (
-                <Button type="primary" onClick={handleNext}>
+                <Button type="primary" onClick={handleNext} disabled={endpointName ? false : true}>
                   Save
                 </Button>
               ) : (
-                <Button type="primary" onClick={handleConfirm}>
+                <Button type="primary" onClick={() => handleConfirm(currentNode, callgentTree[0].id!)}>
                   Confirm
                 </Button>
               )
             ) : (
-              <Button type="primary" onClick={handleConfirm}>
+              <Button type="primary" onClick={() => handleConfirm(currentNode, callgentTree[0].id!)}>
                 Confirm
               </Button>
             )
@@ -158,6 +128,6 @@ export default function EndpointPage() {
 
         </div>
       </div>
-    </div>
+    </div >
   )
 }

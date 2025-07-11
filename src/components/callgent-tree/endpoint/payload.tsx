@@ -37,9 +37,8 @@ export default function Payload() {
           onChange={(e) => setEndpointName(e.target.value)}
           disabled={status === 'read_only'}
           placeholder="Please enter endpoint name starting with /"
-
         />
-        <button className="p-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-300" onClick={() => setIsEndpointOpen(true)}>
+        <button onClick={() => setIsEndpointOpen(true)} className="p-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-300">
           <Icon icon="solar:settings-bold" className="w-5 h-5 " />
         </button>
       </div>
@@ -66,7 +65,7 @@ export default function Payload() {
           <JSONSchemaEditor mode={status === 'read_only' ? 1 : 2} schemaType="params" />
         </div>
       </div>
-      <div className="border border-gray-200  dark:border-gray-600 rounded">
+      <div className="border border-gray-200  dark:border-gray-600 rounded mt-2">
         <div className="font-medium bg-gray-50 px-4 py-2">
           Responses
         </div>
@@ -78,6 +77,7 @@ export default function Payload() {
         title="Endpoint Settings"
         open={isEndpointOpen}
         onCancel={() => setIsEndpointOpen(false)}
+        centered={true}
         footer={[
           <Button
             key="cancel"

@@ -1,6 +1,7 @@
 import { EndpointState } from '#/store'
-import { getCallgentApi } from '@/api/services/callgentService';
-import { extractFirst2xxJsonSchema, generateId, jsonSchemaToTreeNode } from '@/components/callgent-tree/endpoint/util';
+import { getCallgentApi, postEndpointsApi, putCallgentApi } from '@/api/services/callgentService';
+import { categorizeNodes, extractFirst2xxJsonSchema, generateId, injectDefaults, jsonSchemaToTreeNode } from '@/components/callgent-tree/endpoint/util';
+import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { create } from 'zustand'
 
 const initData = {
@@ -47,6 +48,39 @@ export const useEndpointStore = create<EndpointState>()(
           }
         }
       })
+    },
+    // 提交ep
+    handleConfirm: async (currentNode, id) => {
+      const { formData, endpointName, whatFor, how2Ops, editId } = get()
+      const param = categorizeNodes({ children: formData.parameters })
+      const data = convertToOpenAPI({
+        path: endpointName,
+        operationId: endpointName,
+        endpointConfig: formData.endpoint || {},
+        whatFor,
+        params: {
+          parameters: param.data || {},
+          requestBody: formData.requestBody || {}
+        },
+        responses: formData.responses,
+        how2Ops,
+      })
+      const apiMapping = (currentNode?.type === 'CLIENT' && formData?.apiMap?.api_id) ? {
+        api_id: formData.apiMap.api_id,
+        params: {
+          parameters: formData.apiMap.parameters || {},
+          requestBody: injectDefaults(formData.apiMap.api_data.params.requestBody, formData.apiMap.requestBody) || {}
+        },
+        responses: injectDefaults(formData.apiMap.api_data.responses, formData.apiMap.responses) || {}
+      } : null
+      const request = { ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: id }
+      if (editId) {
+        putCallgentApi(editId, request).then(() => {
+          set({ editId: null })
+        })
+      } else {
+        await postEndpointsApi(request)
+      }
     },
     setStatus: (type) => set({ status: type }),
     setEditId: (text) => set({ editId: text }),
