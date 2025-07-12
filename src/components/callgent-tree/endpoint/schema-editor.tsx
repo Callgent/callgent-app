@@ -29,7 +29,7 @@ export default function JSONSchemaEditor({ mode, schemaType, }: JSONSchemaEditor
     } else if (schemaType === 'params' && mode === 1 && formData?.parameters) {
       setTree(prev => ({ ...prev, children: [...formData?.parameters, ...(jsonSchemaToTreeNode(formData?.requestBody)?.children as [])] }))
     } else if (schemaType === 'responses' && mode === 1 && formData?.responses) {
-      setTree(prev => ({ ...prev, children: jsonSchemaToTreeNode(formData?.responses)?.children }))
+      setTree(prev => ({ ...prev, children: responses }))
     }
   }, [parameters])
   const [detailId, setDetailId] = useState<string | null>(null)
