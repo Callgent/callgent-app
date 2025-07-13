@@ -33,17 +33,6 @@ export default function SchemaEditorForm({ data, responses }: any) {
 
   return (
     <div className="space-y-4 mt-2 max-h-[500px] overflow-x-hidden border p-2 rounded">
-      {data?.parameters && (
-        <Form
-          schema={getSchema(data.parameters)}
-          validator={validator}
-          onChange={(data) => handleSubmit(data, 'parameters')}
-          uiSchema={{
-            'ui:submitButtonOptions': { norender: true },
-          }}
-        />
-      )}
-
       {mediaTypeOptions.length > 1 && (
         <div className="space-y-2">
           <label className="block font-medium text-gray-700">Select Media Type</label>
@@ -63,6 +52,16 @@ export default function SchemaEditorForm({ data, responses }: any) {
           <JSONSchemaEditor mode={1} schemaType="params" />
         </div>
       </div>
+      {data?.parameters && (
+        <Form
+          schema={getSchema(data.parameters)}
+          validator={validator}
+          onChange={(data) => handleSubmit(data, 'parameters')}
+          uiSchema={{
+            'ui:submitButtonOptions': { norender: true },
+          }}
+        />
+      )}
       {selectedMediaType && schema && (
         <Form
           schema={schema}
