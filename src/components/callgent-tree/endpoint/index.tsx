@@ -99,13 +99,9 @@ export default function EndpointPage() {
 
         <div className="mt-4 flex justify-end space-x-3">
           <Button onClick={handleCancel}>Cancel</Button>
-          {status === 'read_only' ? (
+          {status === 'read_only' && (
             <Button type="primary" onClick={() => setStatus("define")}>
               Edit
-            </Button>
-          ) : (
-            <Button type="primary" onClick={handleNext} disabled={endpointName ? false : true}>
-              Save
             </Button>
           )}
           {status === 'define' && (

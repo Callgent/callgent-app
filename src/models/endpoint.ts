@@ -92,7 +92,7 @@ export const useEndpointStore = create<EndpointState>()(
     setFormData: (data) => set({ formData: data }),
     setIsEndpointOpen: (open) => set({ isEndpointOpen: open }),
     clear: () => {
-      set(initData)
+      set({ ...initData, status: 'define' })
     }
   })
 )
