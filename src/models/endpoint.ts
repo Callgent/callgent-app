@@ -65,7 +65,7 @@ export const useEndpointStore = create<EndpointState>()(
         responses: formData.responses,
         how2Ops,
       })
-      const metaExe = (currentNode?.type === 'CLIENT' && formData?.metaExe?.epId) ? {
+      const apiMap = (currentNode?.type === 'CLIENT' && formData?.metaExe?.epId) ? {
         epId: formData.metaExe.epId,
         params: {
           parameters: formData.metaExe.parameters || {},
@@ -73,7 +73,7 @@ export const useEndpointStore = create<EndpointState>()(
         },
         responses: injectDefaults(formData.metaExe.api_data.responses, formData.metaExe.responses) || {}
       } : null
-      const request = { ...restoreDataFromOpenApi(data), metaExe }
+      const request = { ...restoreDataFromOpenApi(data), metaExe: { apiMap } }
       if (editId) {
         putEndpointApi(editId, request).then(() => {
           set({ editId: null })
