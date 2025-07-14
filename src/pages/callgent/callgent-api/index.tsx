@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Space } from "antd";
-import { getCallgentApi } from "@/api/services/callgentService";
+import { getEndpointApi } from "@/api/services/callgentService";
 import SwaggerApi from "@/components/callgent-tree/sep-api/callgent-api";
 import { callgentApi } from "@/utils/callgent-tree";
 import { CircleLoading } from "@/components/layouts/loading";
@@ -22,7 +22,7 @@ export default function CallgentApi() {
         }
         setOpenApi(data);
       } else {
-        const { data } = await getCallgentApi(endpointsId);
+        const { data } = await getEndpointApi(endpointsId);
         const normalizedOpenApi = callgentApi(data);
         setOpenApi(normalizedOpenApi);
       }

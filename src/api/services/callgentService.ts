@@ -119,13 +119,13 @@ export const selectRealms = async (data: CallgentInfo, realmKey: { realmKey: str
 	});
 
 /** get /api/callgent-api */
-export const getCallgentApi = async (id: string) =>
+export const getEndpointApi = async (id: string) =>
 	apiClient.get<any>({
 		url: `/api/endpoints/${id}`
 	});
 
 /** put /api/callgent-api */
-export const putCallgentApi = async (id: string, data: any) =>
+export const putEndpointApi = async (id: string, data: any) =>
 	apiClient.put<any>({
 		url: `/api/endpoints/${id}`,
 		data

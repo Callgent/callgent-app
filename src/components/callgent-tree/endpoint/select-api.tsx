@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { TreeSelect, Spin, message } from 'antd'
-import { getCallgentApi, getCallgentApiList } from '@/api/services/callgentService'
+import { getEndpointApi, getCallgentApiList } from '@/api/services/callgentService'
 import { useLocation } from 'react-router'
 import { useEndpointStore } from '@/models/endpoint'
 
@@ -67,7 +67,7 @@ export default function EndpointSelectApi() {
   const handleApiSelect = async (value: string, node: any) => {
     if (!node?.fullData) return
     try {
-      const { data } = await getCallgentApi(value);
+      const { data } = await getEndpointApi(value);
       setCurrentApi(data)
       setFormData({ ...formData, apiMap: { api_id: data.id, api_data: data, } })
     } catch (err) {

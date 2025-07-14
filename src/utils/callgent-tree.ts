@@ -75,8 +75,7 @@ export const restoreDataFromOpenApi = (openApiSpec: any) => {
     },
     responses: operation?.responses || {},
     rawJson: openApiSpec,
-    how2exe: operation?.how2exe || null,
-    how2Ops: operation?.how2Ops || null
+    how2Ops: operation?.how2Ops || null,
   };
 };
 

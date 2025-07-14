@@ -7,7 +7,7 @@ import "ace-builds/src-noconflict/theme-github_dark";
 import { toast } from "sonner";
 import { Button } from "antd";
 import { restoreDataFromOpenApi } from "@/utils/callgent-tree";
-import { postEndpointsApi, putCallgentApi } from "@/api/services/callgentService";
+import { postEndpointsApi, putEndpointApi } from "@/api/services/callgentService";
 import { useNavigate } from "react-router";
 
 export default function SwaggerEditor({ openApi }: { openApi: any }) {
@@ -52,7 +52,7 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
       const entryId = queryParams.get("entryId");
       if (id) {
         const restoreData = restoreDataFromOpenApi(dataToSave);
-        await putCallgentApi(id!, restoreData);
+        await putEndpointApi(id!, restoreData);
       } else if (callgentId && entryId) {
         const restoreData = restoreDataFromOpenApi(dataToSave);
         await postEndpointsApi({ ...restoreData, callgentId: callgentId, entryId: entryId });

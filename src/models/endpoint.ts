@@ -1,5 +1,5 @@
 import { EndpointState } from '#/store'
-import { getCallgentApi, postEndpointsApi, putCallgentApi } from '@/api/services/callgentService';
+import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
 import { categorizeNodes, extractFirst2xxJsonSchema, generateId, injectDefaults, jsonSchemaToTreeNode } from '@/components/callgent-tree/endpoint/util';
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { create } from 'zustand'
@@ -25,7 +25,7 @@ export const useEndpointStore = create<EndpointState>()(
     ...initData,
     // 切换ep
     toggletheEP: async (id: string) => {
-      const { data } = await getCallgentApi(id);
+      const { data } = await getEndpointApi(id);
       let parameters = data?.params?.parameters?.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() })) || []
       const requestBody = data?.params?.requestBody?.content["application/json"]?.schema
       const responsesSchema = extractFirst2xxJsonSchema(data?.responses)
@@ -65,7 +65,7 @@ export const useEndpointStore = create<EndpointState>()(
         responses: formData.responses,
         how2Ops,
       })
-      const apiMapping = (currentNode?.type === 'CLIENT' && formData?.apiMap?.api_id) ? {
+      const metaExe = (currentNode?.type === 'CLIENT' && formData?.apiMap?.api_id) ? {
         api_id: formData.apiMap.api_id,
         params: {
           parameters: formData.apiMap.parameters || {},
@@ -73,9 +73,9 @@ export const useEndpointStore = create<EndpointState>()(
         },
         responses: injectDefaults(formData.apiMap.api_data.responses, formData.apiMap.responses) || {}
       } : null
-      const request = { ...restoreDataFromOpenApi(data), apiMapping, entryId: currentNode?.id, callgentId: id }
+      const request = { ...restoreDataFromOpenApi(data), metaExe }
       if (editId) {
-        putCallgentApi(editId, request).then(() => {
+        putEndpointApi(editId, request).then(() => {
           set({ editId: null })
         })
       } else {
