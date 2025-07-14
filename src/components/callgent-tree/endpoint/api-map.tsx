@@ -22,8 +22,8 @@ export default function SchemaEditorForm({ data, responses }: any) {
   const handleSubmit = (form: any, type: string) => {
     setFormData({
       ...formData,
-      apiMap: {
-        ...formData?.apiMap,
+      metaExe: {
+        ...formData?.metaExe,
         [type]: form.formData
       }
     })

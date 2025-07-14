@@ -69,7 +69,7 @@ export default function EndpointSelectApi() {
     try {
       const { data } = await getEndpointApi(value);
       setCurrentApi(data)
-      setFormData({ ...formData, apiMap: { api_id: data.id, api_data: data, } })
+      setFormData({ ...formData, metaExe: { epId: data.id, api_data: data } })
     } catch (err) {
       message.error('Failed to load API parameters')
     }
@@ -85,13 +85,13 @@ export default function EndpointSelectApi() {
           onSelect={handleApiSelect}
           placeholder="Select an API"
           treeDefaultExpandAll={false}
-          defaultValue={formData?.apiMap?.api_data?.name || null}
+          defaultValue={formData?.metaExe?.api_data?.name || null}
           allowClear
           showSearch
           disabled={status === 'read_only'}
         />
-        <ApiMap data={currentApi?.params || formData?.apiMap?.api_data.params || {}}
-          responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.apiMap?.api_data?.responses)}
+        <ApiMap data={currentApi?.params || formData?.metaExe?.api_data.params || {}}
+          responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.metaExe?.api_data?.responses)}
         />
       </Spin>
     </div>
