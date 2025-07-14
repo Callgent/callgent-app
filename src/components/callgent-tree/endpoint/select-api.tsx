@@ -57,6 +57,7 @@ export default function EndpointSelectApi() {
       const endpointNodes = convertEndpointsToTreeNodes(endpoints)
       const sentryNodes = convertSentriesToTreeNodes(sentries).map((item: any) => ({ ...item, selectable: false }))
       const newTreeData = updateTreeNode(treeData, treeNode.key, [...sentryNodes, ...endpointNodes])
+      setFormData({ ...formData, entry: data?.endpoints[0]?.entry })
       setTreeData(newTreeData)
     } catch (err) {
       message.error('Failed to load child nodes')
@@ -69,7 +70,7 @@ export default function EndpointSelectApi() {
     try {
       const { data } = await getEndpointApi(value);
       setCurrentApi(data)
-      setFormData({ ...formData, metaExe: { epId: data.id, api_data: data } })
+      setFormData({ ...formData, metaExe: { apiMap: { epId: data.id, api_data: data } } })
     } catch (err) {
       message.error('Failed to load API parameters')
     }
@@ -90,8 +91,8 @@ export default function EndpointSelectApi() {
           showSearch
           disabled={status === 'read_only'}
         />
-        <ApiMap data={currentApi?.params || formData?.metaExe?.api_data.params || {}}
-          responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.metaExe?.api_data?.responses)}
+        <ApiMap data={currentApi?.params || formData?.metaExe?.apiMap?.api_data?.params || {}}
+          responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.metaExe?.apiMap?.api_data?.responses)}
         />
       </Spin>
     </div>

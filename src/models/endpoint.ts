@@ -50,8 +50,9 @@ export const useEndpointStore = create<EndpointState>()(
       })
     },
     // 提交ep
-    handleConfirm: async (currentNode, id) => {
+    handleConfirm: async (currentNode) => {
       const { formData, endpointName, whatFor, how2Ops, editId } = get()
+      console.log(formData?.metaExe?.apiMap?.api_data);
       const param = categorizeNodes({ children: formData.parameters })
       const data = convertToOpenAPI({
         path: endpointName,
@@ -65,13 +66,14 @@ export const useEndpointStore = create<EndpointState>()(
         responses: formData.responses,
         how2Ops,
       })
-      const apiMap = (currentNode?.type === 'CLIENT' && formData?.metaExe?.epId) ? {
-        epId: formData.metaExe.epId,
+      const apiMap = (currentNode?.type === 'CLIENT' && formData?.metaExe?.apiMap?.epId) ? {
+        epId: formData.metaExe?.apiMap?.epId,
+        entry: formData.entry || formData?.metaExe?.apiMap?.entry,
         params: {
           parameters: formData.metaExe.parameters || {},
-          requestBody: injectDefaults(formData.metaExe.api_data.params.requestBody, formData.metaExe.requestBody) || {}
+          requestBody: injectDefaults(formData?.metaExe?.apiMap?.api_data?.params?.requestBody, formData.metaExe.requestBody) || {}
         },
-        responses: injectDefaults(formData.metaExe.api_data.responses, formData.metaExe.responses) || {}
+        responses: injectDefaults(formData?.metaExe?.apiMap?.api_data?.responses, formData.metaExe.responses) || {}
       } : null
       const request = { ...restoreDataFromOpenApi(data), metaExe: { apiMap } }
       if (editId) {

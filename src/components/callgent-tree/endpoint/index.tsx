@@ -14,7 +14,7 @@ export default function EndpointPage() {
     setStatus
   } = useEndpointStore()
 
-  const { currentNode, callgentTree, } = useTreeActionStore()
+  const { currentNode } = useTreeActionStore()
   const { closeModal } = useTreeActions()
 
   // 受控页签 key，'1' = Define，'2' = Implement
@@ -111,12 +111,12 @@ export default function EndpointPage() {
                   Save
                 </Button>
               ) : (
-                <Button type="primary" onClick={() => handleConfirm(currentNode, callgentTree[0].id!)}>
+                <Button type="primary" onClick={() => handleConfirm(currentNode)}>
                   Confirm
                 </Button>
               )
             ) : (
-              <Button type="primary" onClick={() => handleConfirm(currentNode, callgentTree[0].id!)}>
+              <Button type="primary" onClick={() => handleConfirm(currentNode)}>
                 Confirm
               </Button>
             )
