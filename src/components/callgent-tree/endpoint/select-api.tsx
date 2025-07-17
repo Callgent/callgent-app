@@ -70,7 +70,7 @@ export default function EndpointSelectApi() {
     try {
       const { data } = await getEndpointApi(value);
       setCurrentApi(data)
-      setFormData({ ...formData, metaExe: { apiMap: { epId: data.id, api_data: data } } })
+      setFormData({ ...formData, metaExe: { apiMap: { epName: data.name, api_data: data } } })
     } catch (err) {
       message.error('Failed to load API parameters')
     }

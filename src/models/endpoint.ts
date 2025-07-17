@@ -66,8 +66,8 @@ export const useEndpointStore = create<EndpointState>()(
         responses: formData.responses,
         how2Ops,
       })
-      const apiMap = (currentNode?.type === 'CLIENT' && formData?.metaExe?.apiMap?.epId) ? {
-        epId: formData.metaExe?.apiMap?.epId,
+      const apiMap = (currentNode?.type === 'CLIENT' && formData?.metaExe?.apiMap?.epName) ? {
+        epName: formData.metaExe?.apiMap?.epName,
         entry: formData.entry || formData?.metaExe?.apiMap?.entry,
         params: {
           parameters: formData.metaExe.parameters || {},
