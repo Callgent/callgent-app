@@ -61,7 +61,13 @@ export const useEndpointStore = create<EndpointState>()(
         whatFor,
         params: {
           parameters: param.data || {},
-          requestBody: formData.requestBody || {}
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: formData.requestBody || {},
+              }
+            }
+          }
         },
         responses: formData.responses,
         how2Ops,
@@ -72,9 +78,23 @@ export const useEndpointStore = create<EndpointState>()(
         entry: formData.entry || formData?.metaExe?.apiMap?.entry,
         params: {
           parameters: formData.metaExe.parameters || {},
-          requestBody: injectDefaults(api_data?.params?.requestBody?.content['application/json']?.schema, formData.metaExe.requestBody) || {}
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: injectDefaults(api_data?.params?.requestBody?.content['application/json']?.schema, formData.metaExe.requestBody) || {},
+              }
+            }
+          }
         },
-        responses: injectDefaults(extractFirst2xxJsonSchema(api_data?.responses), formData.metaExe.responses) || {}
+        responses: {
+          "200": {
+            content: {
+              "application/json": {
+                schema: injectDefaults(extractFirst2xxJsonSchema(api_data?.responses), formData.metaExe.responses) || {}
+              }
+            }
+          }
+        }
       } : null
       const request = { ...restoreDataFromOpenApi(data), metaExe: { apiMap } }
       if (editId) {
