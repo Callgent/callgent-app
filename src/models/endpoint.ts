@@ -66,14 +66,15 @@ export const useEndpointStore = create<EndpointState>()(
         responses: formData.responses,
         how2Ops,
       })
+      const api_data = formData?.metaExe?.apiMap?.api_data || {}
       const apiMap = (currentNode?.type === 'CLIENT' && formData?.metaExe?.apiMap?.epName) ? {
         epName: formData.metaExe?.apiMap?.epName,
         entry: formData.entry || formData?.metaExe?.apiMap?.entry,
         params: {
           parameters: formData.metaExe.parameters || {},
-          requestBody: injectDefaults(formData?.metaExe?.apiMap?.api_data?.params?.requestBody, formData.metaExe.requestBody) || {}
+          requestBody: injectDefaults(api_data?.params?.requestBody?.content['application/json']?.schema, formData.metaExe.requestBody) || {}
         },
-        responses: injectDefaults(formData?.metaExe?.apiMap?.api_data?.responses, formData.metaExe.responses) || {}
+        responses: injectDefaults(extractFirst2xxJsonSchema(api_data?.responses), formData.metaExe.responses) || {}
       } : null
       const request = { ...restoreDataFromOpenApi(data), metaExe: { apiMap } }
       if (editId) {

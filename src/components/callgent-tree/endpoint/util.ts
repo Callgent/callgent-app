@@ -231,7 +231,6 @@ export function jsonSchemaToTreeNode(schema: any, name = '', inLocation = 'body'
 
 export function injectDefaults(schema: any, data: any): any {
   if (!schema) return schema
-  // object
   if (schema.type === 'object' && schema.properties && typeof data === 'object' && data !== null) {
     const newProperties: any = {}
     for (const key in schema.properties) {
@@ -244,7 +243,6 @@ export function injectDefaults(schema: any, data: any): any {
       properties: newProperties
     }
   }
-  // array
   if (schema.type === 'array' && Array.isArray(data)) {
     const itemsSchema = schema.items
     if (itemsSchema && typeof itemsSchema === 'object') {
