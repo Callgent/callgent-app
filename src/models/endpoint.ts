@@ -42,7 +42,7 @@ export const useEndpointStore = create<EndpointState>()(
           ...get().formData,
           parameters: parameters,
           requestBody: requestBody,
-          responses: responses,
+          responses: responsesSchema || {},
           endpoint: {
             method: data?.method || 'POST'
           }
