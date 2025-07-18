@@ -1,6 +1,6 @@
 import { EndpointState } from '#/store'
 import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
-import { categorizeNodes, extractFirst2xxJsonSchema, generateId, injectDefaults, jsonSchemaToTreeNode } from '@/components/callgent-tree/endpoint/util';
+import { categorizeNodes, extractFirst2xxJsonSchema, generateId, injectDefaults, injectParametersDefaults, jsonSchemaToTreeNode } from '@/components/callgent-tree/endpoint/util';
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { create } from 'zustand'
 
@@ -52,7 +52,6 @@ export const useEndpointStore = create<EndpointState>()(
     // 提交ep
     handleConfirm: async (currentNode) => {
       const { formData, endpointName, whatFor, how2Ops, editId } = get()
-      console.log(formData?.metaExe?.apiMap?.api_data);
       const param = categorizeNodes({ children: formData.parameters })
       const data = convertToOpenAPI({
         path: endpointName,
@@ -77,7 +76,7 @@ export const useEndpointStore = create<EndpointState>()(
         epName: formData.metaExe?.apiMap?.epName,
         entry: formData.entry || formData?.metaExe?.apiMap?.entry,
         params: {
-          parameters: formData.metaExe.parameters || {},
+          parameters: injectParametersDefaults(api_data?.params?.parameters, formData.metaExe.parameters) || {},
           requestBody: {
             content: {
               "application/json": {

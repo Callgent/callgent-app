@@ -10,7 +10,7 @@ const { Countdown } = Statistic;
 function MobileForm() {
 	const { t } = useTranslation();
 	const onFinish = (values: any) => {
-		console.log("Received values of form: ", values);
+
 	};
 
 	const [countdown, setCountdown] = useState(0); // 倒计时的秒数

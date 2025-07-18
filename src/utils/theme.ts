@@ -1,20 +1,5 @@
 import color from "color";
 import { themeTokens } from "../theme/type";
-
-/**
- * @example
- * const rgb = rgbAlpha("#000000", 0.24);
- * console.log(rgb); // "rgba(0, 0, 0, 0.24)"
- *
- * const rgb = rgbAlpha("var(--colors-palette-primary-main)", 0.24);
- * console.log(rgb); // "rgba(var(--colors-palette-primary-main), 0.24)"
- *
- * const rgb = rgbAlpha("rgb(var(--colors-palette-primary-main))", 0.24);
- * console.log(rgb); // "rgba(rgb(var(--colors-palette-primary-main)), 0.24)"
- *
- * const rgb = rgbAlpha([200, 250, 214], 0.24);
- * console.log(rgb); // "rgba(200, 250, 214, 0.24)"
- */
 export function rgbAlpha(color: string | string[] | number[], alpha: number): string {
 	// ensure alpha value is between 0-1
 	const safeAlpha = Math.max(0, Math.min(1, alpha));

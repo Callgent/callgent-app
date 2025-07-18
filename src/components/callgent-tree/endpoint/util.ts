@@ -229,6 +229,7 @@ export function jsonSchemaToTreeNode(schema: any, name = '', inLocation = 'body'
   return node
 }
 
+// schema
 export function injectDefaults(schema: any, data: any): any {
   if (!schema) return schema
   if (schema.type === 'object' && schema.properties && typeof data === 'object' && data !== null) {
@@ -255,4 +256,15 @@ export function injectDefaults(schema: any, data: any): any {
     return { ...schema, default: data }
   }
   return { ...schema, default: data }
+}
+// parameters
+export function injectParametersDefaults(parameters: any[], data: any): any {
+  return parameters.map((item) => ({
+    ...item,
+    default: data[item.name],
+    schema: {
+      ...item.schema,
+      default: data[item.name]
+    }
+  }))
 }

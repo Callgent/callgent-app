@@ -94,7 +94,6 @@ export default function CalendarEventForm({
 						onCancel();
 					})
 					.catch((info) => {
-						console.log("Validate Failed:", info);
 					});
 			}}
 		>

@@ -133,7 +133,6 @@ export default function Kanban() {
 				});
 			}
 			setAddingColumn(false);
-			console.log("click outside");
 		}
 	};
 	useEvent("click", handleClickOutside);
