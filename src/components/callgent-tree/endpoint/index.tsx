@@ -9,13 +9,15 @@ export default function EndpointPage() {
   const {
     status,
     endpointName,
+    formData,
     handleConfirm,
     clear,
-    setStatus
+    setFormData
   } = useEndpointStore()
 
   const { currentNode } = useTreeActionStore()
   const { closeModal } = useTreeActions()
+
 
   // 受控页签 key，'1' = Define，'2' = Implement
   const [activeKey, setActiveKey] = useState('1')
@@ -33,7 +35,7 @@ export default function EndpointPage() {
 
   // Reset all states on cancel
   const handleCancel = () => {
-    if (status === 'read_only') { return close() }
+    if (status === 'edit') { return close() }
     Modal.confirm({
       title: '确认关闭？',
       content: '所有未保存的更改将会丢失，是否确定取消？',
@@ -57,6 +59,23 @@ export default function EndpointPage() {
     inputRef.current?.focus()
   }, [])
 
+  const parametersRef = useRef<any>(null);
+  const requestBodyRef = useRef<any>(null);
+  const responsesRef = useRef<any>(null);
+  const handleSubmit = (currentNode: any) => {
+    setFormData({
+      ...formData,
+      metaExe: {
+        ...formData?.metaExe,
+        'parameters': parametersRef.current?.state?.formData,
+        'requestBody': requestBodyRef.current?.state?.formData,
+        'responsesApiOne': responsesRef.current?.state?.formData,
+      }
+    })
+    setTimeout(() => {
+      handleConfirm(currentNode)
+    }, 50);
+  }
   return (
     <div className="w-full mr-4">
       <div className="mx-auto rounded-lg p-6 space-y-6 border-2 border-gray-300 dark:border-gray-600">
@@ -77,8 +96,8 @@ export default function EndpointPage() {
                   activeKey={activeKey}
                   onChange={(e: string) => setActiveKey(e)}
                   items={[
-                    { key: '1', label: 'Define', children: <Payload />, disabled: status === 'read_only' ? false : true },
-                    { key: '2', label: 'Implement', children: <Mapping />, disabled: status === 'read_only' ? false : true },
+                    { key: '1', label: 'Define', children: <Payload />, disabled: false },
+                    { key: '2', label: 'Implement', children: <Mapping refs={{ parametersRef, requestBodyRef, responsesRef }} />, disabled: false },
                   ]}
                 />
               ) : (<Payload />)}
@@ -99,11 +118,6 @@ export default function EndpointPage() {
 
         <div className="mt-4 flex justify-end space-x-3">
           <Button onClick={handleCancel}>Cancel</Button>
-          {status === 'read_only' && (
-            <Button type="primary" onClick={() => setStatus("define")}>
-              Edit
-            </Button>
-          )}
           {status === 'define' && (
             currentNode?.type === 'CLIENT' && !aiInputVisible ? (
               activeKey === '1' ? (
@@ -111,7 +125,7 @@ export default function EndpointPage() {
                   Save
                 </Button>
               ) : (
-                <Button type="primary" onClick={() => handleConfirm(currentNode)}>
+                <Button type="primary" onClick={() => handleSubmit(currentNode)}>
                   Confirm
                 </Button>
               )

@@ -50,7 +50,7 @@ export interface ModalNode {
 }
 
 export interface EndpointState {
-  status: 'define' | 'implement' | 'read_only' | null
+  status: 'define' | 'implement' | 'read_only' | 'edit' | null
   editId: string | null
   endpointName: string
   whatFor: string
@@ -66,7 +66,7 @@ export interface EndpointState {
 
   toggletheEP: (id: string) => Promise<void>
   handleConfirm: (currentNode: any) => Promise<void>
-  setStatus: (status: 'define' | 'implement' | null) => void
+  setStatus: (status: 'define' | 'implement' | 'edit' | null) => void
   setEditId: (name: string | null) => void
   setEndpointName: (name: string) => void
   setWhatFor: (text: string) => void

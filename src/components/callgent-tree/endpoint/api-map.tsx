@@ -1,15 +1,16 @@
-import Form from '@rjsf/antd'
-import validator from '@rjsf/validator-ajv8'
-import { getSchema } from './util'
+import { getSchema, injectDefaults, jsonSchemaToTreeNode } from './util'
 import { useEndpointStore } from '@/models/endpoint'
 import { useEffect, useState } from 'react'
 import { Select } from 'antd'
-import JSONSchemaEditor from './schema-editor'
+import SchemaEditor from '../SchemaTree/SchemaEditor'
+import RjsfAntd from '../SchemaTree/rjsf-antd'
+import { flattenSchemaToMentions } from '@/utils/callgent-tree'
 
-export default function SchemaEditorForm({ data, responses }: any) {
+export default function ApiMap({ data, apiResponses, refs }: { data: any, apiResponses: any, refs: { parametersRef: any, requestBodyRef: any, responsesRef: any } }) {
   const { setFormData, formData } = useEndpointStore()
   const [mediaTypeOptions, setMediaTypeOptions] = useState<string[]>([])
   const [selectedMediaType, setSelectedMediaType] = useState<string | undefined>()
+
   useEffect(() => {
     const content = data?.requestBody?.content
     if (content && typeof content === 'object') {
@@ -28,9 +29,7 @@ export default function SchemaEditorForm({ data, responses }: any) {
       }
     })
   }
-
   const schema = selectedMediaType && data?.requestBody?.content?.[selectedMediaType]?.schema
-
   return (
     <div className="space-y-4 mt-2 max-h-[500px] overflow-x-hidden border p-2 rounded">
       {mediaTypeOptions.length > 1 && (
@@ -49,47 +48,64 @@ export default function SchemaEditorForm({ data, responses }: any) {
           Payload comes from api1
         </div>
         <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-          <JSONSchemaEditor mode={1} schemaType="params" />
+          <SchemaEditor
+            mode={1}
+            schemaType="params"
+            schema={[...formData?.parameters, ...(jsonSchemaToTreeNode(formData?.requestBody)?.children as [])]}
+          />
         </div>
       </div>
       {data?.parameters && (
-        <Form
-          schema={getSchema(data.parameters)}
-          validator={validator}
-          onChange={(data) => handleSubmit(data, 'parameters')}
-          uiSchema={{
-            'ui:submitButtonOptions': { norender: true },
+        <RjsfAntd
+          formRef={refs.parametersRef}
+          onSubmit={(data) => handleSubmit(data, 'parameters')}
+          schema={injectDefaults(getSchema(data.parameters), formData?.metaExe?.parameters)}
+          uiProps={{
+            mentions: [...flattenSchemaToMentions(getSchema(formData.parameters)), ...flattenSchemaToMentions(formData.requestBody)]
           }}
         />
       )}
       {selectedMediaType && schema && (
-        <Form
-          schema={schema}
-          validator={validator}
-          onChange={(data) => handleSubmit(data, 'requestBody')}
-          uiSchema={{
-            'ui:submitButtonOptions': { norender: true },
+        <RjsfAntd
+          formRef={refs.requestBodyRef}
+          onSubmit={(data) => handleSubmit(data, 'requestBody')}
+          schema={injectDefaults(schema, formData?.metaExe?.requestBody)}
+          uiProps={{
+            mentions: [...flattenSchemaToMentions(getSchema(formData.parameters)), ...flattenSchemaToMentions(formData.requestBody)]
           }}
         />
       )}
-      {responses?.properties && (
-        <Form
-          schema={responses}
-          validator={validator}
-          onChange={(data) => handleSubmit(data, 'responses')}
-          uiSchema={{
-            'ui:submitButtonOptions': { norender: true },
-          }}
-        />
+      {apiResponses?.properties && (
+        <>
+          <div className="border border-gray-200  dark:border-gray-600 rounded">
+            <div className="font-medium bg-gray-50 px-4 py-2">
+              Responses comes from api2
+            </div>
+            <div className="divide-y divide-gray-100">
+              <SchemaEditor
+                mode={1}
+                schemaType="responses"
+                schema={jsonSchemaToTreeNode(apiResponses).children || []}
+              />
+            </div>
+          </div>
+          <div className="border border-gray-200  dark:border-gray-600 rounded">
+            <div className="font-medium bg-gray-50 px-4 py-2">
+              Responses comes from api1
+            </div>
+            <div className="divide-y divide-gray-100">
+              <RjsfAntd
+                formRef={refs.responsesRef}
+                onSubmit={(data) => handleSubmit(data, 'responsesApiOne')}
+                schema={injectDefaults(formData.responses || {}, formData.metaExe.responsesApiOne)}
+                uiProps={{
+                  mentions: flattenSchemaToMentions(apiResponses || {})
+                }}
+              />
+            </div>
+          </div>
+        </>
       )}
-      <div className="border border-gray-200  dark:border-gray-600 rounded">
-        <div className="font-medium bg-gray-50 px-4 py-2">
-          Responses comes from api1
-        </div>
-        <div className="divide-y divide-gray-100">
-          <JSONSchemaEditor mode={1} schemaType="responses" />
-        </div>
-      </div>
     </div>
   )
 }

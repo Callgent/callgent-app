@@ -44,7 +44,6 @@ export const getSchema = (data: any) => {
     const originalSchema = param.schema
     let jsonSchema = openapiSchemaToJsonSchema(originalSchema)
     jsonSchema.in = param.in || null
-    jsonSchema.required = param.in || true
     jsonSchema.schema = param.schema || {}
     if (param.description) {
       jsonSchema.description = param.description || null
@@ -85,91 +84,77 @@ export function generateId() {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 }
 
-export const addSchemaChild = (tree: SchemaNode, parentId: string) => {
-  const walk = (n: SchemaNode): SchemaNode => {
+export const createSchemaNode = (
+  type: 'string' | 'object' = 'string',
+  name = '',
+): any => ({
+  id: generateId(),
+  name,
+  editingName: true,
+  type,
+  required: true,
+  in: 'body',
+  ...(type === 'object' ? { children: [] } : {}),
+});
+export const addSchemaChild = (tree: any, parentId: string): any => {
+  const walk = (node: any): any => {
     if (parentId === 'root') {
       return {
-        ...n,
-        children: [
-          ...(n.children || []),
-          {
-            id: generateId(),
-            name: '',
-            editingName: true,
-            type: 'string',
-            required: false,
-            in: 'body',
-          },
-        ],
-      }
+        ...node,
+        children: [...(node.children || []), createSchemaNode()],
+      };
     }
-    if (n.id === parentId) {
-      if (n.type === 'object') {
+    if (node.id === parentId) {
+      if (node.type === 'object') {
         return {
-          ...n,
-          children: [
-            ...(n.children || []),
-            {
-              id: generateId(),
-              name: '',
-              editingName: true,
-              type: 'string',
-              required: false,
-              in: 'body',
-            },
-          ],
-        }
+          ...node,
+          children: [...(node.children || []), createSchemaNode()],
+        };
       }
-      if (n.type === 'array') {
-        if (!n.item || n.item.type !== 'object') {
+      if (node.type === 'array') {
+        if (!node.item || node.item.type !== 'object') {
           return {
-            ...n,
-            item: {
-              id: generateId(),
-              name: 'item',
-              editingName: true,
-              type: 'object',
-              required: false,
-              in: 'body',
-              children: [],
-            },
-          }
+            ...node,
+            item: createSchemaNode('object', 'item'),
+          };
         } else {
           return {
-            ...n,
+            ...node,
             item: {
-              ...n.item,
-              children: [
-                ...(n.item.children || []),
-                {
-                  id: generateId(),
-                  name: '',
-                  editingName: true,
-                  type: 'string',
-                  required: false,
-                  in: 'body',
-                },
-              ],
+              ...node.item,
+              children: [...(node.item.children || []), createSchemaNode()],
             },
-          }
+          };
         }
       }
     }
-    if (n.children) return { ...n, children: n.children.map(walk) }
-    if (n.item) return { ...n, item: walk(n.item) }
-    return n
-  }
-  return walk(tree)
-}
+    if (node.children) {
+      return {
+        ...node,
+        children: node.children.map(walk),
+      };
+    }
+    if (node.item) {
+      return {
+        ...node,
+        item: walk(node.item),
+      };
+    }
+
+    return node;
+  };
+
+  return walk(tree);
+};
 // tree转schema
-export function treeNodeToSchema(node: SchemaNode): any {
+export function treeNodeToSchema(node: any): any {
   const s: any = { type: node.type }
   if (node.description) s.description = node.description
   if (node.default !== undefined) s.default = node.default
   if (node.type === 'object') {
     s.properties = {}
     const reqs: string[] = []
-    node.children?.forEach(c => {
+    node.children?.forEach((c: any) => {
       s.properties[c.name] = treeNodeToSchema(c)
       if (c.required) reqs.push(c.name)
     })
@@ -258,13 +243,13 @@ export function injectDefaults(schema: any, data: any): any {
   return { ...schema, default: data }
 }
 // parameters
-export function injectParametersDefaults(parameters: any[], data: any): any {
+export function injectParametersDefaults(parameters: any[], data: any = {}): any {
   return parameters.map((item) => ({
     ...item,
-    default: data[item.name],
+    default: data[item?.name] ?? null,
     schema: {
       ...item.schema,
-      default: data[item.name]
+      default: data[item?.name] ?? null
     }
   }))
 }

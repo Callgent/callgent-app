@@ -31,7 +31,7 @@ export const useEndpointStore = create<EndpointState>()(
       const responsesSchema = extractFirst2xxJsonSchema(data?.responses)
       const responses = jsonSchemaToTreeNode(responsesSchema).children
       set({
-        status: 'read_only',
+        status: 'define',
         endpointName: data?.path || null,
         editId: id,
         parameters: requestBody ? [...parameters, ...(jsonSchemaToTreeNode(requestBody).children as [])] : parameters,
@@ -89,7 +89,7 @@ export const useEndpointStore = create<EndpointState>()(
           "200": {
             content: {
               "application/json": {
-                schema: injectDefaults(extractFirst2xxJsonSchema(api_data?.responses), formData.metaExe.responses) || {}
+                schema: injectDefaults(formData.responses, formData.metaExe.responsesApiOne) || {}
               }
             }
           }

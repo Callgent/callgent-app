@@ -352,3 +352,25 @@ export const findNode = (tree: any[], key: string): any => {
   }
   return null
 }
+
+// schema转options
+export function flattenSchemaToMentions(schema: any, parentPath = ''): any[] {
+  const result: any[] = [];
+  if (schema.type === 'object' && schema.properties) {
+    for (const key in schema.properties) {
+      const prop = schema.properties[key];
+      const currentPath = parentPath ? `${parentPath}.${key}` : key;
+      result.push(...flattenSchemaToMentions(prop, currentPath));
+    }
+  } else if (schema.type === 'array' && schema.items) {
+    const currentPath = parentPath + '[]';
+    result.push(...flattenSchemaToMentions(schema.items, currentPath));
+  } else {
+    const field = parentPath;
+    result.push({
+      value: `${field}}}`,
+      label: field,
+    });
+  }
+  return result;
+}

@@ -12,7 +12,7 @@ import {
 import ApiMap from './api-map'
 import { extractFirst2xxJsonSchema } from './util'
 
-export default function EndpointSelectApi() {
+export default function EndpointSelectApi({ refs }: { refs: { parametersRef: any, requestBodyRef: any, responsesRef: any } }) {
   const location = useLocation()
   const query = new URLSearchParams(location.search)
   const callgentId = query.get('callgentId') || ''
@@ -20,7 +20,6 @@ export default function EndpointSelectApi() {
 
   const [treeData, setTreeData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [currentApi, setCurrentApi] = useState<any | null>(null)
 
   // Initialize top-level nodes
   const init = async () => {
@@ -69,7 +68,6 @@ export default function EndpointSelectApi() {
     if (!node?.fullData) return
     try {
       const { data } = await getEndpointApi(value);
-      setCurrentApi(data)
       setFormData({ ...formData, metaExe: { apiMap: { epName: data.name, api_data: data } } })
     } catch (err) {
       message.error('Failed to load API parameters')
@@ -91,8 +89,9 @@ export default function EndpointSelectApi() {
           showSearch
           disabled={status === 'read_only'}
         />
-        <ApiMap data={currentApi?.params || formData?.metaExe?.apiMap?.api_data?.params || {}}
-          responses={extractFirst2xxJsonSchema(currentApi?.responses || formData?.metaExe?.apiMap?.api_data?.responses)}
+        <ApiMap data={formData?.metaExe?.apiMap?.api_data?.params || {}}
+          refs={refs}
+          apiResponses={extractFirst2xxJsonSchema(formData?.metaExe?.apiMap?.api_data?.responses)}
         />
       </Spin>
     </div>

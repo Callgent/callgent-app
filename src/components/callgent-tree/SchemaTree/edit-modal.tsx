@@ -1,4 +1,3 @@
-// SchemaDetailModal.tsx
 import React from 'react'
 import { Modal, Form, Input, Select, Checkbox } from 'antd'
 

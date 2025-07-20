@@ -3,8 +3,9 @@ import { Icon } from '@iconify/react'
 import { Button, Form, Input, InputRef, Modal, Select } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore from '@/models/callgentTreeStore'
-import JSONSchemaEditor from './schema-editor'
-import { requestMethods } from './util'
+import { categorizeNodes, requestMethods } from './util'
+import SchemaEditor from '../SchemaTree/SchemaEditor'
+import { SchemaNode } from './type'
 
 export default function Payload() {
   const {
@@ -16,6 +17,8 @@ export default function Payload() {
     setEndpointName,
     isEndpointOpen,
     formData,
+    parameters,
+    responses,
     setFormData
   } = useEndpointStore()
 
@@ -26,7 +29,14 @@ export default function Payload() {
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
-
+  const submitSchema = (nodes: any, schemaType: string) => {
+    const { parameters, requestBody } = nodes
+    if (schemaType === 'params') {
+      setFormData({ ...formData, parameters: parameters, requestBody: requestBody })
+    } else {
+      setFormData({ ...formData, responses: requestBody })
+    }
+  }
   return (
     <>
       <div className="flex items-center space-x-2">
@@ -62,7 +72,12 @@ export default function Payload() {
           Payload
         </div>
         <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-          <JSONSchemaEditor mode={status === 'read_only' ? 1 : 2} schemaType="params" />
+          <SchemaEditor
+            mode={2}
+            schemaType="params"
+            schema={parameters}
+            handleSubmit={(data) => submitSchema(data, "params")}
+          />
         </div>
       </div>
       <div className="border border-gray-200  dark:border-gray-600 rounded mt-2">
@@ -70,7 +85,12 @@ export default function Payload() {
           Responses
         </div>
         <div className="divide-y divide-gray-100">
-          <JSONSchemaEditor mode={status === 'read_only' ? 1 : 2} schemaType="responses" />
+          <SchemaEditor
+            mode={2}
+            schemaType="params"
+            schema={responses}
+            handleSubmit={(data) => submitSchema(data, "responses")}
+          />
         </div>
       </div>
       <Modal
