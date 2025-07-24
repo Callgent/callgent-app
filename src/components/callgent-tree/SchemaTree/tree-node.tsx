@@ -11,6 +11,7 @@ interface TreeNodeProps {
   depth: number
   mode: 1 | 2 | 3
   collapsed: boolean
+  schemaType: 'params' | 'responses'
   toggleCollapse: () => void
   updateNode: (id: string, partial: any) => void
   addChild: (parentId: string) => void
@@ -24,6 +25,7 @@ export default function TreeNode({
   depth,
   mode,
   collapsed,
+  schemaType,
   toggleCollapse,
   updateNode,
   addChild,
@@ -43,7 +45,7 @@ export default function TreeNode({
     if (v) updateNode(node.id, { name: v, editingName: false })
     else deleteNode(node.id)
   }
-  const { inputOptions } = useSchemaTreeStore();
+  const { paramsOptions, responsesOptions } = useSchemaTreeStore();
   const [typePopoverOpen, setTypePopoverOpen] = useState(false)
 
   return (
@@ -196,7 +198,7 @@ export default function TreeNode({
               placeholder="Type {{ to mention…"
               defaultValue={node.default}
               onChange={(value) => { updateNode(node.id, { default: value }) }}
-              options={inputOptions}
+              options={schemaType === 'params' ? paramsOptions : responsesOptions}
               rows={2}
             />
           </div>

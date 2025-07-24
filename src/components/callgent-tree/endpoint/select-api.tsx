@@ -11,7 +11,7 @@ import {
 } from '@/utils/callgent-tree'
 import ApiMap from './api-map'
 import { useSchemaTreeStore } from '../SchemaTree/store'
-import { jsonSchemaToTreeNode } from '../SchemaTree/utils'
+import { generateId, jsonSchemaToTreeNode } from '../SchemaTree/utils'
 
 export default function EndpointSelectApi() {
   const location = useLocation()
@@ -69,7 +69,7 @@ export default function EndpointSelectApi() {
     if (!node?.fullData) return
     try {
       const { data } = await getEndpointApi(value);
-      const params = [...data?.params?.parameters, ...(jsonSchemaToTreeNode(data?.params?.requestBody?.content?.["application/json"]?.schema).children as [])]
+      const params = [...data?.params?.parameters.map((i: any) => ({ ...i, id: generateId() })), ...(jsonSchemaToTreeNode(data?.params?.requestBody?.content?.["application/json"]?.schema).children as [])]
       setParams(params)
       setDefResponses(jsonSchemaToTreeNode(formData?.responses).children)
       setFormData({

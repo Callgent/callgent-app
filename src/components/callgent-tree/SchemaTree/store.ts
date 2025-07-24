@@ -4,13 +4,14 @@ import { flattenSchemaToMentions } from "./utils";
 
 export const useSchemaTreeStore = create<any>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       params: [],
       defResponses: [],
       parameters: [],
       requestBody: [],
       responses: [],
-      inputOptions: [],
+      paramsOptions: [],
+      responsesOptions: [],
       isEdit: false,
 
       setIsEdit: (isEdit: boolean) => {
@@ -32,8 +33,11 @@ export const useSchemaTreeStore = create<any>()(
         set({ defResponses: responses });
       },
       // 表达式提示
-      setInputOptions: (schema: any) => {
-        set({ inputOptions: flattenSchemaToMentions(schema) });
+      setParamsOptions: (schema: any) => {
+        set({ paramsOptions: flattenSchemaToMentions(schema) });
+      },
+      setResponsesOptions: (schema: any) => {
+        set({ responsesOptions: flattenSchemaToMentions(schema) });
       },
     }),
     {

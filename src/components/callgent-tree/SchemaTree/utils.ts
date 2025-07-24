@@ -279,7 +279,7 @@ export function jsonSchemaToTreeNode(
 
 // tree转schema
 export function treeNodeToJsonSchema(node: any): any {
-  if (!node) return null;
+  if (node?.length < 1) return { type: "object", properties: {} };
   const {
     children,
     item,

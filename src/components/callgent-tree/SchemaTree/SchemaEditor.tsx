@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import TreeNode from './tree-node'
 import SchemaDetailModal from './edit-modal'
-import { addSchemaChild, categorizeNodes, extractFirst2xxJsonSchema, getParams, jsonSchemaToTreeNode } from './utils'
+import { addSchemaChild, categorizeNodes, extractFirst2xxJsonSchema, getParams, jsonSchemaToTreeNode, treeNodeToJsonSchema } from './utils'
 import { Button } from 'antd'
 import { useSchemaTreeStore } from './store'
 import { useEndpointStore } from '@/models/endpoint'
@@ -11,12 +11,8 @@ interface JSONSchemaEditorProps {
     schemaType: 'params' | 'responses'
 }
 
-export default function JSONSchemaEditor({
-    mode,
-    schemaType
-}: JSONSchemaEditorProps) {
-    // 
-    const { params, defResponses, setParameters, setRequestBody, setResponses, setIsEdit, isEdit } = useSchemaTreeStore();
+export default function JSONSchemaEditor({ mode, schemaType }: JSONSchemaEditorProps) {
+    const { params, defResponses, setParameters, setRequestBody, setResponses, setIsEdit, isEdit, setResponsesOptions, setParamsOptions } = useSchemaTreeStore();
     const submitSchema = (nodes: any) => {
         const { data, body } = categorizeNodes(nodes)
         if (schemaType === 'params') {
@@ -31,9 +27,8 @@ export default function JSONSchemaEditor({
     const [tree, setTree] = useState<any>([])
     const { formData } = useEndpointStore()
     useEffect(() => {
+        const api_data = formData?.metaExe?.apiMap?.api_data
         if (mode === 1) {
-            console.log(formData);
-            const api_data = formData?.metaExe?.apiMap?.api_data
             const newChildren = schemaType === 'params' ? getParams(formData) : jsonSchemaToTreeNode(extractFirst2xxJsonSchema(api_data?.responses))?.children
             setTree((prev: any) => ({ ...prev, children: newChildren }))
         } else {
@@ -42,6 +37,22 @@ export default function JSONSchemaEditor({
             submitSchema({ ...initialData, children: newChildren })
         }
     }, [params, defResponses])
+    useEffect(() => {
+        const api_data = formData?.metaExe?.apiMap?.api_data
+        if (mode === 3 && api_data) {
+            const tree = {
+                id: "root",
+                name: "",
+                editingName: false,
+                type: "object",
+                required: false,
+                in: "body",
+                children: getParams(formData)
+            }
+            setParamsOptions(treeNodeToJsonSchema(tree))
+            setResponsesOptions(extractFirst2xxJsonSchema(api_data?.responses))
+        }
+    }, [formData])
     // collapsedIds 存放“被折叠”的节点
 
     // 弹窗状态
@@ -175,6 +186,7 @@ export default function JSONSchemaEditor({
                     node={n}
                     depth={depth}
                     mode={mode}
+                    schemaType={schemaType}
                     collapsed={collapsedIds.has(n.id)}
                     toggleCollapse={() => toggleCollapse(n.id)}
                     updateNode={updateNode}
@@ -190,7 +202,6 @@ export default function JSONSchemaEditor({
                 }
             </React.Fragment>
         ))
-
 
     return (
         <div className="px-2 w-full">
