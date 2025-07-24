@@ -3,9 +3,9 @@ import { Icon } from '@iconify/react'
 import { Button, Form, Input, InputRef, Modal, Select } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore from '@/models/callgentTreeStore'
-import { categorizeNodes, requestMethods } from './util'
+import { requestMethods } from '../SchemaTree/utils'
 import SchemaEditor from '../SchemaTree/SchemaEditor'
-import { SchemaNode } from './type'
+import { useSchemaTreeStore } from '../SchemaTree/store'
 
 export default function Payload() {
   const {
@@ -26,17 +26,13 @@ export default function Payload() {
   const { currentNode } = useTreeActionStore()
 
   const inputRef = useRef<InputRef>(null)
+  const { setParams, setDefResponses } = useSchemaTreeStore();
   useEffect(() => {
     inputRef.current?.focus()
+    setParams(parameters)
+    setDefResponses(responses)
   }, [])
-  const submitSchema = (nodes: any, schemaType: string) => {
-    const { parameters, requestBody } = nodes
-    if (schemaType === 'params') {
-      setFormData({ ...formData, parameters: parameters, requestBody: requestBody })
-    } else {
-      setFormData({ ...formData, responses: requestBody })
-    }
-  }
+
   return (
     <>
       <div className="flex items-center space-x-2">
@@ -75,8 +71,6 @@ export default function Payload() {
           <SchemaEditor
             mode={2}
             schemaType="params"
-            schema={parameters}
-            handleSubmit={(data) => submitSchema(data, "params")}
           />
         </div>
       </div>
@@ -87,9 +81,7 @@ export default function Payload() {
         <div className="divide-y divide-gray-100">
           <SchemaEditor
             mode={2}
-            schemaType="params"
-            schema={responses}
-            handleSubmit={(data) => submitSchema(data, "responses")}
+            schemaType="responses"
           />
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Modal, Form, Input, Select, Checkbox } from 'antd'
+import { typeOptions } from './utils'
 
 interface DetailModalProps {
     visible: boolean
@@ -11,8 +12,8 @@ interface DetailModalProps {
 }
 
 const fieldsConfig: Record<string, string[]> = {
-    params: ['name', 'in', 'required', 'default', 'description'],
-    responses: ['name', 'default', 'description'],
+    params: ['name', 'in', 'type', 'default', 'required', 'description'],
+    responses: ['name', 'type', 'default', 'description'],
 }
 
 export default function SchemaDetailModal({
@@ -69,6 +70,20 @@ export default function SchemaDetailModal({
                                             { label: 'body', value: 'body' },
                                         ]}
                                         disabled={!editable('in')}
+                                    />
+                                </Form.Item>
+                            )
+                        case 'type':
+                            return (
+                                <Form.Item
+                                    key="type"
+                                    name="type"
+                                    label="类型"
+                                    rules={[{ required: true, message: '请选择类型' }]}
+                                >
+                                    <Select
+                                        options={typeOptions.map((item) => ({ label: item, value: item }))}
+                                        disabled={!editable('type')}
                                     />
                                 </Form.Item>
                             )

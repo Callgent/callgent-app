@@ -1,6 +1,6 @@
 import { EndpointState } from '#/store'
 import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
-import { categorizeNodes, extractFirst2xxJsonSchema, generateId, injectDefaults, injectParametersDefaults, jsonSchemaToTreeNode } from '@/components/callgent-tree/endpoint/util';
+import { jsonSchemaToTreeNode, categorizeNodes, extractFirst2xxJsonSchema, generateId, injectDefaults, injectParametersDefaults } from '@/components/callgent-tree/SchemaTree/utils';
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { create } from 'zustand'
 
@@ -52,14 +52,15 @@ export const useEndpointStore = create<EndpointState>()(
     // 提交ep
     handleConfirm: async (currentNode) => {
       const { formData, endpointName, whatFor, how2Ops, editId } = get()
-      const param = categorizeNodes({ children: formData.parameters })
       const data = convertToOpenAPI({
         path: endpointName,
         operationId: endpointName,
         endpointConfig: formData.endpoint || {},
         whatFor,
+        how2Ops,
+        responses: formData.responses,
         params: {
-          parameters: param.data || {},
+          parameters: formData?.parameters || [],
           requestBody: {
             content: {
               "application/json": {
@@ -67,20 +68,17 @@ export const useEndpointStore = create<EndpointState>()(
               }
             }
           }
-        },
-        responses: formData.responses,
-        how2Ops,
+        }
       })
-      const api_data = formData?.metaExe?.apiMap?.api_data || {}
       const apiMap = (currentNode?.type === 'CLIENT' && formData?.metaExe?.apiMap?.epName) ? {
         epName: formData.metaExe?.apiMap?.epName,
         entry: formData.entry || formData?.metaExe?.apiMap?.entry,
         params: {
-          parameters: injectParametersDefaults(api_data?.params?.parameters, formData.metaExe.parameters) || {},
+          parameters: formData.metaExe.parameters || [],
           requestBody: {
             content: {
               "application/json": {
-                schema: injectDefaults(api_data?.params?.requestBody?.content['application/json']?.schema, formData.metaExe.requestBody) || {},
+                schema: formData.metaExe.requestBody || {},
               }
             }
           }
@@ -89,7 +87,7 @@ export const useEndpointStore = create<EndpointState>()(
           "200": {
             content: {
               "application/json": {
-                schema: injectDefaults(formData.responses, formData.metaExe.responsesApiOne) || {}
+                schema: formData.metaExe.responses || {}
               }
             }
           }

@@ -10,9 +10,10 @@ import {
   updateTreeNode
 } from '@/utils/callgent-tree'
 import ApiMap from './api-map'
-import { extractFirst2xxJsonSchema } from './util'
+import { useSchemaTreeStore } from '../SchemaTree/store'
+import { jsonSchemaToTreeNode } from '../SchemaTree/utils'
 
-export default function EndpointSelectApi({ refs }: { refs: { parametersRef: any, requestBodyRef: any, responsesRef: any } }) {
+export default function EndpointSelectApi() {
   const location = useLocation()
   const query = new URLSearchParams(location.search)
   const callgentId = query.get('callgentId') || ''
@@ -48,7 +49,6 @@ export default function EndpointSelectApi({ refs }: { refs: { parametersRef: any
     if (treeNode.children?.length > 0) return
     const callgentId = treeNode.callgentIds?.[0]
     if (!callgentId) return
-
     try {
       const { data } = await getCallgentApiList(`${callgentId}^${treeNode.host}`)
       const endpoints = data.endpoints || []
@@ -64,11 +64,22 @@ export default function EndpointSelectApi({ refs }: { refs: { parametersRef: any
   }
 
   // Handle API selection and load parameters
+  const { setParams, setDefResponses } = useSchemaTreeStore();
   const handleApiSelect = async (value: string, node: any) => {
     if (!node?.fullData) return
     try {
       const { data } = await getEndpointApi(value);
-      setFormData({ ...formData, metaExe: { apiMap: { epName: data.name, api_data: data } } })
+      const params = [...data?.params?.parameters, ...(jsonSchemaToTreeNode(data?.params?.requestBody?.content?.["application/json"]?.schema).children as [])]
+      setParams(params)
+      setDefResponses(jsonSchemaToTreeNode(formData?.responses).children)
+      setFormData({
+        ...formData,
+        metaExe: {
+          ...data?.params,
+          requestBody: data?.params?.requestBody?.content?.["application/json"]?.schema,
+          apiMap: { epName: data.name, api_data: data }
+        }
+      })
     } catch (err) {
       message.error('Failed to load API parameters')
     }
@@ -89,10 +100,7 @@ export default function EndpointSelectApi({ refs }: { refs: { parametersRef: any
           showSearch
           disabled={status === 'read_only'}
         />
-        <ApiMap data={formData?.metaExe?.apiMap?.api_data?.params || {}}
-          refs={refs}
-          apiResponses={extractFirst2xxJsonSchema(formData?.metaExe?.apiMap?.api_data?.responses)}
-        />
+        <ApiMap />
       </Spin>
     </div>
   )

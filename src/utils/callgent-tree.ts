@@ -374,3 +374,24 @@ export function flattenSchemaToMentions(schema: any, parentPath = ''): any[] {
   }
   return result;
 }
+
+export const setObjectDefault = (htmlId: string, value: any, schema: any) => {
+  const idSchemaPath = htmlId.replace(/^root_?/, "root").replace(/_/g, ".");
+  const path = idSchemaPath
+    .replace(/^root\.?/, "")
+    .split(".")
+    .filter(Boolean);
+  let current = schema;
+  for (let i = 0; i < path.length; i++) {
+    const key = path[i];
+    if (
+      current?.type !== "object" ||
+      !current.properties ||
+      !current.properties[key]
+    )
+      return;
+    current = current.properties[key];
+  }
+  current.default = value;
+  return schema;
+};

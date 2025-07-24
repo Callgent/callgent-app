@@ -3,7 +3,7 @@ import { Input, InputRef, Tabs } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import EndpointSelectApi from './select-api'
 
-export default function Mapping({ refs }: { refs: { parametersRef: any, requestBodyRef: any, responsesRef: any } }) {
+export default function Mapping() {
   const { how2Ops, setHow2Ops, status } = useEndpointStore()
   const inputRef = useRef<InputRef>(null)
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function Mapping({ refs }: { refs: { parametersRef: any, requestB
           label: 'Endpoint Select',
           children: (
             <div className="p-2">
-              <EndpointSelectApi refs={refs} />
+              <EndpointSelectApi />
             </div>
           ),
         },

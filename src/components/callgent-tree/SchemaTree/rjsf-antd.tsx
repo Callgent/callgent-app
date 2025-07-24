@@ -3,11 +3,12 @@ import { Theme as AntDTheme } from '@rjsf/antd';
 import validator from '@rjsf/validator-ajv8';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Mentions } from 'antd';
-export default function RjsfAntd({ onSubmit, formRef, schema, uiProps }: {
+export default function RjsfAntd({ onSubmit, formRef, schema, uiProps, setObjectDefault }: {
     onSubmit: (form: any) => void;
     formRef: React.Ref<any>;
     schema: any;
     uiProps: any;
+    setObjectDefault: (idSchema: string, form: any) => void;
 }) {
     // 自定义 ArrayFieldTemplate，带 Tailwind 样式
     const ArrayFieldTemplate = (props: any) => {
@@ -114,6 +115,14 @@ export default function RjsfAntd({ onSubmit, formRef, schema, uiProps }: {
 
     return (
         <div className="p-4 rounded border">
+            <Mentions
+                prefix="{{"
+                placeholder="Type {{ to mention…"
+                value={schema.default}
+                onChange={(e) => setObjectDefault('root', e)}
+                options={uiProps.mentions}
+                rows={3}
+            />
             <CustomForm
                 schema={schema}
                 validator={validator}

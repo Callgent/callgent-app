@@ -4,21 +4,12 @@ import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import Payload from './payload'
 import Mapping from './mapping'
+import { useSchemaTreeStore } from '../SchemaTree/store'
 
 export default function EndpointPage() {
-  const {
-    status,
-    endpointName,
-    formData,
-    handleConfirm,
-    clear,
-    setFormData
-  } = useEndpointStore()
-
+  const { status, endpointName, formData, handleConfirm, clear, setFormData } = useEndpointStore()
   const { currentNode } = useTreeActionStore()
   const { closeModal } = useTreeActions()
-
-
   // 受控页签 key，'1' = Define，'2' = Implement
   const [activeKey, setActiveKey] = useState('1')
 
@@ -26,8 +17,17 @@ export default function EndpointPage() {
   const [aiInputVisible, setAiInputVisible] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
 
+  const { setParams, setDefResponses, parameters, requestBody, responses } = useSchemaTreeStore();
   // 点击 Next，跳到下一页签；如果已是最后一页，可执行提交或禁用按钮
   const handleNext = () => {
+    setFormData({
+      ...formData,
+      parameters,
+      requestBody,
+      responses
+    });
+    setParams([]);
+    setDefResponses([]);
     if (activeKey === '1') {
       setActiveKey('2')
     }
@@ -59,19 +59,25 @@ export default function EndpointPage() {
     inputRef.current?.focus()
   }, [])
 
-  const parametersRef = useRef<any>(null);
-  const requestBodyRef = useRef<any>(null);
-  const responsesRef = useRef<any>(null);
   const handleSubmit = (currentNode: any) => {
-    setFormData({
-      ...formData,
-      metaExe: {
-        ...formData?.metaExe,
-        'parameters': parametersRef.current?.state?.formData,
-        'requestBody': requestBodyRef.current?.state?.formData,
-        'responsesApiOne': responsesRef.current?.state?.formData,
-      }
-    })
+    if (currentNode?.type === 'CLIENT') {
+      setFormData({
+        ...formData,
+        metaExe: {
+          ...formData?.metaExe,
+          parameters,
+          requestBody,
+          responses
+        }
+      })
+    } else {
+      setFormData({
+        ...formData,
+        parameters,
+        requestBody,
+        responses
+      })
+    }
     setTimeout(() => {
       handleConfirm(currentNode)
     }, 50);
@@ -97,7 +103,7 @@ export default function EndpointPage() {
                   onChange={(e: string) => setActiveKey(e)}
                   items={[
                     { key: '1', label: 'Define', children: <Payload />, disabled: false },
-                    { key: '2', label: 'Implement', children: <Mapping refs={{ parametersRef, requestBodyRef, responsesRef }} />, disabled: false },
+                    { key: '2', label: 'Implement', children: <Mapping />, disabled: false },
                   ]}
                 />
               ) : (<Payload />)}
@@ -130,7 +136,7 @@ export default function EndpointPage() {
                 </Button>
               )
             ) : (
-              <Button type="primary" onClick={() => handleConfirm(currentNode)}>
+              <Button type="primary" onClick={() => handleSubmit(currentNode)}>
                 Confirm
               </Button>
             )
