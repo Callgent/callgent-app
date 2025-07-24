@@ -5,6 +5,7 @@ import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import Payload from './payload'
 import Mapping from './mapping'
 import { useSchemaTreeStore } from '../SchemaTree/store'
+import { getParams, jsonSchemaToTreeNode } from '../SchemaTree/utils'
 
 export default function EndpointPage() {
   const { status, endpointName, formData, handleConfirm, clear, setFormData } = useEndpointStore()
@@ -17,20 +18,23 @@ export default function EndpointPage() {
   const [aiInputVisible, setAiInputVisible] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
 
-  const { setParams, setDefResponses, parameters, requestBody, responses } = useSchemaTreeStore();
+  const { setParams, setDefResponses, parameters, requestBody, responses, isEdit } = useSchemaTreeStore();
   // 点击 Next，跳到下一页签；如果已是最后一页，可执行提交或禁用按钮
-  const handleNext = () => {
-    setFormData({
-      ...formData,
-      parameters,
-      requestBody,
-      responses
-    });
-    setParams([]);
-    setDefResponses([]);
-    if (activeKey === '1') {
-      setActiveKey('2')
+  const handleNext = (activeKey: string) => {
+    if (activeKey === "2") {
+      setFormData({
+        ...formData,
+        parameters,
+        requestBody,
+        responses
+      });
+      setParams([]);
+      setDefResponses([]);
+    } else {
+      setParams(getParams(formData))
+      setDefResponses(jsonSchemaToTreeNode(formData?.responses).children)
     }
+    setActiveKey(activeKey)
   }
 
   // Reset all states on cancel
@@ -100,9 +104,9 @@ export default function EndpointPage() {
               {(currentNode?.type === 'CLIENT') ? (
                 <Tabs
                   activeKey={activeKey}
-                  onChange={(e: string) => setActiveKey(e)}
+                  onChange={(e: string) => handleNext(e)}
                   items={[
-                    { key: '1', label: 'Define', children: <Payload />, disabled: false },
+                    { key: '1', label: 'Define', children: <Payload />, disabled: isEdit },
                     { key: '2', label: 'Implement', children: <Mapping />, disabled: false },
                   ]}
                 />
@@ -127,7 +131,7 @@ export default function EndpointPage() {
           {status === 'define' && (
             currentNode?.type === 'CLIENT' && !aiInputVisible ? (
               activeKey === '1' ? (
-                <Button type="primary" onClick={handleNext} disabled={endpointName ? false : true}>
+                <Button type="primary" onClick={() => handleNext("2")} disabled={endpointName ? false : true}>
                   Save
                 </Button>
               ) : (

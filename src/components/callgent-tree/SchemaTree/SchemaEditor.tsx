@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import TreeNode from './tree-node'
 import SchemaDetailModal from './edit-modal'
-import { addSchemaChild, categorizeNodes } from './utils'
+import { addSchemaChild, categorizeNodes, extractFirst2xxJsonSchema, getParams, jsonSchemaToTreeNode } from './utils'
 import { Button } from 'antd'
 import { useSchemaTreeStore } from './store'
+import { useEndpointStore } from '@/models/endpoint'
 
 interface JSONSchemaEditorProps {
     mode: 1 | 2 | 3
@@ -15,7 +16,7 @@ export default function JSONSchemaEditor({
     schemaType
 }: JSONSchemaEditorProps) {
     // 
-    const { params, defResponses, setParameters, setRequestBody, setResponses } = useSchemaTreeStore();
+    const { params, defResponses, setParameters, setRequestBody, setResponses, setIsEdit, isEdit } = useSchemaTreeStore();
     const submitSchema = (nodes: any) => {
         const { data, body } = categorizeNodes(nodes)
         if (schemaType === 'params') {
@@ -27,11 +28,19 @@ export default function JSONSchemaEditor({
     }
     // 根节点（虚拟）
     const initialData = { id: 'root', name: '', type: 'object', required: false, in: 'body' }
-    const [tree, setTree] = useState<any>({ ...initialData, children: schemaType === 'params' ? params : defResponses })
+    const [tree, setTree] = useState<any>([])
+    const { formData } = useEndpointStore()
     useEffect(() => {
-        const newChildren = schemaType === 'params' ? params : defResponses
-        setTree((prev: any) => ({ ...prev, children: newChildren }))
-        submitSchema({ id: 'root', name: '', type: 'object', required: false, in: 'body', children: newChildren })
+        if (mode === 1) {
+            console.log(formData);
+            const api_data = formData?.metaExe?.apiMap?.api_data
+            const newChildren = schemaType === 'params' ? getParams(formData) : jsonSchemaToTreeNode(extractFirst2xxJsonSchema(api_data?.responses))?.children
+            setTree((prev: any) => ({ ...prev, children: newChildren }))
+        } else {
+            const newChildren = schemaType === 'params' ? params : defResponses
+            setTree((prev: any) => ({ ...prev, children: newChildren }))
+            submitSchema({ ...initialData, children: newChildren })
+        }
     }, [params, defResponses])
     // collapsedIds 存放“被折叠”的节点
 
@@ -40,19 +49,21 @@ export default function JSONSchemaEditor({
     const [detailData, setDetailData] = useState<any | null>(null)
 
     // collapsedIds 同理，只在挂载时根据初始 tree 计算一次
-    const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => {
-        const all = new Set<string>()
+    const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
+    useEffect(() => {
+        if (mode !== 1) return; // 只有 mode=1 才折叠
+        const all = new Set<string>();
         const collect = (n: any) => {
-            if ((n.type === 'object' && n.children?.length) || (n.type === 'array' && n.item)) {
-                all.add(n.id)
-                if (n.children) n.children.forEach(collect)
-                if (n.item) collect(n.item)
+            if ((n.type === 'object' || n.type === 'array') && Array.isArray(n.children) && n.children.length > 0) {
+                all.add(n.id);
+                n.children.forEach(collect);
             }
+        };
+        if (Array.isArray(tree.children)) {
+            tree.children.forEach(collect);
         }
-        tree.children?.forEach(collect)
-        // mode=1 全部折叠，2/3 全部展开
-        return mode === 1 ? all : new Set()
-    })
+        setCollapsedIds(all);
+    }, [tree, mode]);
 
     // 切换单个节点折叠/展开
     const toggleCollapse = (id: string) => {
@@ -71,6 +82,7 @@ export default function JSONSchemaEditor({
     }
 
     const updateNode = (id: string, partial: any) => {
+        if (!isEdit) { setIsEdit(true) }
         const walk = (n: any): any => {
             if (n.id === id) {
                 const isTypeChangeToArray = partial?.type === 'array';

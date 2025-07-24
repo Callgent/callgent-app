@@ -507,3 +507,7 @@ export const requestMethods = [
   { value: 'CONNECT', description: 'Establish tunnel connection' },
   { value: 'TRACE', description: 'Echoes request (debugging)' },
 ]
+
+export const getParams = (formData: any) => {
+  return [...formData?.parameters, ...(jsonSchemaToTreeNode(formData?.requestBody).children as [])]
+}

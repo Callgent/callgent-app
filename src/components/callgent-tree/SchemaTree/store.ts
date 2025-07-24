@@ -11,7 +11,11 @@ export const useSchemaTreeStore = create<any>()(
       requestBody: [],
       responses: [],
       inputOptions: [],
+      isEdit: false,
 
+      setIsEdit: (isEdit: boolean) => {
+        set({ isEdit });
+      },
       setParams: (params: any) => {
         set({ params: params });
       },
