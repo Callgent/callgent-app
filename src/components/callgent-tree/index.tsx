@@ -7,6 +7,7 @@ import useTreeActionStore, { useFetchAdaptor, useFetchCallgentTree, useTreeActio
 import { enhanceNode, setAdaptor } from '@/utils/callgent-tree';
 import { CircleLoading } from '../layouts/loading';
 import Endpoint from './endpoint';
+import { useEndpointStore } from '@/models/endpoint';
 
 export default function CallgentInfo() {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -54,17 +55,26 @@ export default function CallgentInfo() {
       setIsLoading(false);
     }
   }, [getAllIds, navigate]);
-
+  const { toggletheEP } = useEndpointStore()
+  const getApi = async (apiId: string, apiType: string) => {
+    const { data }: any = await toggletheEP(apiId)
+    useTreeActionStore.setState({ action: 'virtualApi' })
+    useTreeActionStore.setState({ currentNode: { ...data, type: apiType } })
+  }
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const id = queryParams.get('callgentId');
+    const apiId = queryParams.get('apiId');
+    const apiType = queryParams.get('type');
     if (id) {
       loadData(id);
     } else {
       navigate("/callgent/callgents", { replace: true });
     }
-  }, [location.search, loadData]);
-
+    if (apiId && apiType) {
+      getApi(apiId, apiType)
+    }
+  }, [loadData]);
   if (isLoading) {
     return <CircleLoading />;
   }

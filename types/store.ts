@@ -64,7 +64,7 @@ export interface EndpointState {
   editIndex: number
   editType: string
 
-  toggletheEP: (id: string) => Promise<void>
+  toggletheEP: (id: string) => Promise<any>
   handleConfirm: (currentNode: any) => Promise<void>
   setStatus: (status: 'define' | 'implement' | 'edit' | null) => void
   setEditId: (name: string | null) => void

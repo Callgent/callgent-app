@@ -17,8 +17,6 @@ export default function Payload() {
     setEndpointName,
     isEndpointOpen,
     formData,
-    parameters,
-    responses,
     setFormData
   } = useEndpointStore()
 
@@ -26,11 +24,10 @@ export default function Payload() {
   const { currentNode } = useTreeActionStore()
 
   const inputRef = useRef<InputRef>(null)
-  const { setParams, setDefResponses } = useSchemaTreeStore();
+  const { setFormData1 } = useSchemaTreeStore();
   useEffect(() => {
     inputRef.current?.focus()
-    setParams(parameters)
-    setDefResponses(responses)
+    setFormData1(formData)
   }, [])
 
   return (
@@ -61,16 +58,25 @@ export default function Payload() {
             placeholder='Explain to caller, when and how to use this endpoint' />
         </div>
       )}
-
-      {/* Parameters */}
       <div className="border border-gray-200 dark:border-gray-600 rounded">
         <div className="font-medium bg-gray-50  px-4 py-2">
-          Payload
+          Parameters
         </div>
         <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
           <SchemaEditor
             mode={2}
-            schemaType="params"
+            schemaType="parameters"
+          />
+        </div>
+      </div>
+      <div className="border border-gray-200 dark:border-gray-600 rounded">
+        <div className="font-medium bg-gray-50  px-4 py-2">
+          RequestBody
+        </div>
+        <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
+          <SchemaEditor
+            mode={2}
+            schemaType="requestBody"
           />
         </div>
       </div>

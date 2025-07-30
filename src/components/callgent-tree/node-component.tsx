@@ -1,8 +1,9 @@
 import { CallgentInfo } from "#/entity";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useTreeActionStore } from '@/models/callgentTreeStore';
 import { useEndpointStore } from "@/models/endpoint";
 import { Modal } from "antd";
+import { useSchemaTreeStore } from "./SchemaTree/store";
 
 export default function NodeComponent({ node, callgentId, level }: { node: CallgentInfo, callgentId: string, level: number }) {
   let content = (
@@ -40,7 +41,11 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
   }
   const { toggletheEP, status } = useEndpointStore()
   // 编辑切换 ep
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { setFormData1 } = useSchemaTreeStore();
   const toEditApi = async (node: any) => {
+    const params = new URLSearchParams(location.search)
     if (status === 'define' || status === 'implement') {
       Modal.confirm({
         title: '确认取消修改？',
@@ -50,15 +55,23 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
         centered: true,
         okButtonProps: { className: 'bg-primary text-white border-none' },
         async onOk() {
-          await toggletheEP(node.id)
+          params.set('apiId', node.id)
+          params.set('type', node?.parentType)
+          navigate(`${location.pathname}?${params.toString()}`, { replace: true })
+          const { formData } = await toggletheEP(node.id)
           useTreeActionStore.setState({ action: 'virtualApi' })
           useTreeActionStore.setState({ currentNode: { ...node, type: node?.parentType } })
+          setFormData1(formData)
         }
       });
     } else {
-      await toggletheEP(node.id)
+      params.set('apiId', node.id)
+      params.set('type', node?.parentType)
+      navigate(`${location.pathname}?${params.toString()}`, { replace: true })
+      const { formData } = await toggletheEP(node.id)
       useTreeActionStore.setState({ action: 'virtualApi' })
       useTreeActionStore.setState({ currentNode: { ...node, type: node?.parentType } })
+      setFormData1(formData)
     }
   }
   if (level === 4) {

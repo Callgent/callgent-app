@@ -1,6 +1,6 @@
 import { EndpointState } from '#/store'
 import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
-import { jsonSchemaToTreeNode, categorizeNodes, extractFirst2xxJsonSchema, generateId, injectDefaults, injectParametersDefaults } from '@/components/callgent-tree/SchemaTree/utils';
+import { jsonSchemaToTreeNode, extractFirst2xxJsonSchema, generateId, treeToSchema } from '@/components/callgent-tree/SchemaTree/utils';
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { create } from 'zustand'
 
@@ -26,15 +26,15 @@ export const useEndpointStore = create<EndpointState>()(
     // 切换ep
     toggletheEP: async (id: string) => {
       const { data } = await getEndpointApi(id);
-      let parameters = data?.params?.parameters?.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() })) || []
-      const requestBody = data?.params?.requestBody?.content["application/json"]?.schema
+      const parameters = data?.params?.parameters?.map((item: any) => ({ ...(item?.schema || {}), ...item, editingName: false, id: generateId() })) || []
+      const requestBody = jsonSchemaToTreeNode(data?.params?.requestBody?.content["application/json"]?.schema)?.children || []
       const responsesSchema = extractFirst2xxJsonSchema(data?.responses)
-      const responses = jsonSchemaToTreeNode(responsesSchema).children
+      const responses = jsonSchemaToTreeNode(responsesSchema)?.children || []
       set({
         status: 'define',
         endpointName: data?.path || null,
         editId: id,
-        parameters: requestBody ? [...parameters, ...(jsonSchemaToTreeNode(requestBody).children as [])] : parameters,
+        parameters: requestBody ? [...parameters, ...requestBody] : parameters,
         whatFor: data?.whatFor || null,
         how2Ops: data?.how2Ops || null,
         responses,
@@ -42,12 +42,13 @@ export const useEndpointStore = create<EndpointState>()(
           ...get().formData,
           parameters: parameters,
           requestBody: requestBody,
-          responses: responsesSchema || {},
+          responses: responses,
           endpoint: {
             method: data?.method || 'POST'
           }
         }
       })
+      return { data, formData: { parameters, requestBody, responses } }
     },
     // 提交ep
     handleConfirm: async (currentNode) => {
@@ -58,13 +59,13 @@ export const useEndpointStore = create<EndpointState>()(
         endpointConfig: formData.endpoint || {},
         whatFor,
         how2Ops,
-        responses: formData.responses,
+        responses: treeToSchema(formData.responses),
         params: {
           parameters: formData?.parameters || [],
           requestBody: {
             content: {
               "application/json": {
-                schema: formData.requestBody || {},
+                schema: treeToSchema(formData.requestBody) || {},
               }
             }
           }
@@ -73,22 +74,22 @@ export const useEndpointStore = create<EndpointState>()(
       const apiMap = (currentNode?.type === 'CLIENT' && formData?.metaExe?.apiMap?.epName) ? {
         epName: formData.metaExe?.apiMap?.epName,
         entry: formData.entry || formData?.metaExe?.apiMap?.entry,
-        code: formData.metaExe?.code || '',
         params: {
           parameters: formData.metaExe.parameters || [],
           requestBody: {
             content: {
               "application/json": {
-                schema: formData.metaExe.requestBody || {},
+                schema: treeToSchema(formData.metaExe.requestBody) || {},
               }
             }
           }
         },
         responses: {
+          statusCode: formData.metaExe?.statusCode || '',
           "200": {
             content: {
               "application/json": {
-                schema: formData.metaExe.responses || {}
+                schema: treeToSchema(formData.metaExe.responses) || {}
               }
             }
           }

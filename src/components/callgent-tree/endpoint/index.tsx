@@ -5,7 +5,6 @@ import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import Payload from './payload'
 import Mapping from './mapping'
 import { useSchemaTreeStore } from '../SchemaTree/store'
-import { getParams, jsonSchemaToTreeNode } from '../SchemaTree/utils'
 
 export default function EndpointPage() {
   const { status, endpointName, formData, handleConfirm, clear, setFormData } = useEndpointStore()
@@ -18,7 +17,7 @@ export default function EndpointPage() {
   const [aiInputVisible, setAiInputVisible] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
 
-  const { setParams, setDefResponses, parameters, requestBody, responses, isEdit } = useSchemaTreeStore();
+  const { setFormData1, setFormData2, parameters, requestBody, responses, formData1, setParameters, setRequestBody, setResponses } = useSchemaTreeStore();
   // 点击 Next，跳到下一页签；如果已是最后一页，可执行提交或禁用按钮
   const handleNext = (activeKey: string) => {
     if (activeKey === "2") {
@@ -28,12 +27,25 @@ export default function EndpointPage() {
         requestBody,
         responses
       });
-      setParams([]);
-      setDefResponses([]);
+      setFormData1({ parameters, requestBody, responses })
     } else {
-      setParams(getParams(formData))
-      setDefResponses(jsonSchemaToTreeNode(formData?.responses).children)
+      setFormData2({ parameters, requestBody, responses })
+      setTimeout(() => {
+        setParameters(formData1?.parameters)
+        setRequestBody(formData1?.requestBody)
+        setFormData({
+          ...formData,
+          metaExe: {
+            ...formData?.metaExe,
+            parameters,
+            requestBody
+          }
+        });
+      }, 10);
     }
+    setTimeout(() => {
+      setResponses(responses)
+    }, 10);
     setActiveKey(activeKey)
   }
 
@@ -106,8 +118,8 @@ export default function EndpointPage() {
                   activeKey={activeKey}
                   onChange={(e: string) => handleNext(e)}
                   items={[
-                    { key: '1', label: 'Define', children: <Payload />, disabled: isEdit },
-                    { key: '2', label: 'Implement', children: <Mapping />, disabled: false },
+                    { key: '1', label: 'Define', children: <Payload /> },
+                    { key: '2', label: 'Implement', children: <Mapping /> },
                   ]}
                 />
               ) : (<Payload />)}

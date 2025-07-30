@@ -15,19 +15,21 @@ export function generateId() {
 // 查找2XX的响应
 export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
   try {
-    const statusCodes = Object.keys(openapiResponses).filter(code => /^2\d\d$/.test(code))
+    const statusCodes = Object.keys(openapiResponses).filter((code) =>
+      /^2\d\d$/.test(code)
+    );
     for (const status of statusCodes) {
-      const response = openapiResponses[status]
-      const content = response?.content
-      const json = content?.["application/json"]
+      const response = openapiResponses[status];
+      const content = response?.content;
+      const json = content?.["application/json"];
       if (json?.schema?.properties) {
-        return json.schema
+        return json.schema;
       }
     }
     // message.error("Unsupported response type")
-    return null
+    return null;
   } catch (error) {
-    return null
+    return null;
   }
 }
 
@@ -40,7 +42,7 @@ export const createSchemaNode = (
   editingName: true,
   type,
   required: true,
-  in: "body",
+  in: "query",
   ...(type === "object" ? { children: [] } : {}),
 });
 
@@ -63,19 +65,19 @@ export const addSchemaChild = (tree: any, parentId: string): any => {
         const children = node.children || [];
         // 模板项：优先从 children[0] 取，否则 fallback 到 node.item
         const template = children[0] || node.item;
-
         // 如果还没有任何子项，先初始化第一个
         if (!template) {
           // 根据 node.item?.type 决定是对象还是基础类型，默认对象
-          const baseType = node.item?.type || "object";
+          const baseType = node.item?.type || "string";
           let first;
           if (baseType === "object") {
             // 对象数组
-            first = createSchemaNode("object", "item-1");
+            first = createSchemaNode("object", "item");
           } else {
             // 基础类型数组
             first = {
-              ...createSchemaNode(baseType as any, "item-1"),
+              ...createSchemaNode(baseType as any, "item"),
+              parentType: "array",
               default: "",
             };
           }
@@ -86,9 +88,7 @@ export const addSchemaChild = (tree: any, parentId: string): any => {
             item: undefined,
           };
         }
-
         // 已有子项，克隆模板
-        // 深度克隆并保留 default
         const cloneNode = (n: any): any => {
           const newId = generateId();
           const copy: any = { ...n, id: newId };
@@ -100,7 +100,7 @@ export const addSchemaChild = (tree: any, parentId: string): any => {
         // 对象类型数组
         if (template.type === "object") {
           const newItem = cloneNode(template);
-          newItem.name = `item-${children.length + 1}`;
+          newItem.name = `item`;
           return {
             ...node,
             children: [...children, newItem],
@@ -111,8 +111,8 @@ export const addSchemaChild = (tree: any, parentId: string): any => {
           const newLeaf = {
             ...template,
             id: generateId(),
-            name: `item-${children.length + 1}`,
-            default: template.default ?? "",
+            name: `item`,
+            default: template.default ?? `{{''}}`,
           };
           return {
             ...node,
@@ -165,40 +165,11 @@ export function flattenSchemaToMentions(schema: any, parentPath = ""): any[] {
   return result;
 }
 
-// 区分in body
-export function categorizeNodes(nodes: any): { body?: any; data: any[] } {
-  const result: any = { data: [], body: [] };
-  if (!nodes?.children) {
-    return result;
-  }
-  nodes?.children.forEach((node: any) => {
-    if (node.in === "body" || !node.in) {
-      result.body.push(node);
-    } else {
-      result.data.push({
-        ...node,
-        schema: { type: node.type, default: node.default },
-      });
-    }
-  });
-  const body = treeNodeToJsonSchema({
-    id: "root",
-    name: "",
-    editingName: false,
-    type: "object",
-    required: false,
-    in: "body",
-    children: result.body,
-  });
-  const data = result.data;
-  return { body, data };
-}
-
 // 将 JSON Schema 转成内部树节点
 export function jsonSchemaToTreeNode(
   schema: any,
   name = "",
-  inLocation = "body"
+  inLocation = "query"
 ): any {
   if (!schema) return null;
   // 先浅拷贝 schema，排除递归用的字段 properties, items
@@ -311,7 +282,6 @@ export function treeNodeToJsonSchema(node: any): any {
       const defaultArray: any[] = [];
       for (const child of children) {
         const itemSchema = treeNodeToJsonSchema(child);
-
         if (itemSchema?.properties) {
           for (const key in itemSchema.properties) {
             if (!allProperties[key]) {
@@ -321,20 +291,19 @@ export function treeNodeToJsonSchema(node: any): any {
             }
           }
         }
-
         if (itemSchema?.required) {
           itemSchema.required.forEach((key: string) => requiredFields.add(key));
         }
-
         const defaultItem: Record<string, any> = {};
         if (child.children) {
           for (const field of child.children) {
+            const item: any = { type: field.type };
             if (field.default !== undefined) {
-              defaultItem[field.name] = field.default;
+              item.default = field.default;
             }
+            defaultItem[field.name] = item;
           }
         }
-
         defaultArray.push(defaultItem);
       }
       s.items = {
@@ -366,6 +335,19 @@ export function treeNodeToJsonSchema(node: any): any {
   }
 
   return s;
+}
+
+// tree to schema
+export function treeToSchema(node: any) {
+  return treeNodeToJsonSchema({
+    "type": "object",
+    "id": "1753844670780_h9d22o",
+    "name": "",
+    "editingName": false,
+    "required": false,
+    "in": "query",
+    "children": node
+  })
 }
 
 /**
@@ -422,24 +404,17 @@ export function addArrayItemNode(tree: any, arrayNodeId: string): any {
 
       // 如果还没有 children，就先初始化第一个 item
       // 从 node.item.type（或者 schemaType）里拿类型，否则默认 string
-      const baseType = node.item?.type || "string";
+      const baseType = "string";
       let firstItem: any;
-
-      if (baseType === "object") {
-        // 对象数组，调用 createSchemaNode 生成空对象
-        firstItem = createSchemaNode("object", "item-1");
-      } else {
-        // 原始类型数组，手动生成 leaf
-        firstItem = {
-          id: generateId(),
-          name: "item-1",
-          type: baseType,
-          required: false,
-          in: node.in,
-          editingName: false,
-          default: "",
-        };
-      }
+      firstItem = {
+        id: generateId(),
+        name: "item-1",
+        type: baseType,
+        required: false,
+        in: node.in,
+        editingName: false,
+        default: "",
+      };
       return {
         ...node,
         children: [firstItem],
@@ -454,60 +429,75 @@ export function addArrayItemNode(tree: any, arrayNodeId: string): any {
   return walk(tree);
 }
 
-// schema
-export function injectDefaults(schema: any, data: any): any {
-  if (!schema) return schema
-  if (schema.type === 'object' && schema.properties && typeof data === 'object' && data !== null) {
-    const newProperties: any = {}
-    for (const key in schema.properties) {
-      const propSchema = schema.properties[key]
-      const propValue = data?.[key]
-      newProperties[key] = injectDefaults(propSchema, propValue)
-    }
-    return {
-      ...schema,
-      properties: newProperties
-    }
-  }
-  if (schema.type === 'array' && Array.isArray(data)) {
-    const itemsSchema = schema.items
-    if (itemsSchema && typeof itemsSchema === 'object') {
-      return {
-        ...schema,
-        default: data,
-        items: itemsSchema
-      }
-    }
-    return { ...schema, default: data }
-  }
-  return { ...schema, default: data }
-}
-
 // parameters
-export function injectParametersDefaults(parameters: any[], data: any = {}): any {
+export function injectParametersDefaults(
+  parameters: any[],
+  data: any = {}
+): any {
   return parameters.map((item) => ({
     ...item,
     default: data[item?.name] ?? null,
     schema: {
       ...item.schema,
-      default: data[item?.name] ?? null
-    }
-  }))
+      default: data[item?.name] ?? null,
+    },
+  }));
 }
 
 // Request methods
 export const requestMethods = [
-  { value: 'GET', description: 'Retrieve data' },
-  { value: 'POST', description: 'Create new data' },
-  { value: 'PUT', description: 'Update/replace data' },
-  { value: 'PATCH', description: 'Partially update data' },
-  { value: 'DELETE', description: 'Remove data' },
-  { value: 'HEAD', description: 'Get metadata (no body)' },
-  { value: 'OPTIONS', description: 'List allowed methods' },
-  { value: 'CONNECT', description: 'Establish tunnel connection' },
-  { value: 'TRACE', description: 'Echoes request (debugging)' },
-]
+  { value: "GET", description: "Retrieve data" },
+  { value: "POST", description: "Create new data" },
+  { value: "PUT", description: "Update/replace data" },
+  { value: "PATCH", description: "Partially update data" },
+  { value: "DELETE", description: "Remove data" },
+  { value: "HEAD", description: "Get metadata (no body)" },
+  { value: "OPTIONS", description: "List allowed methods" },
+  { value: "CONNECT", description: "Establish tunnel connection" },
+  { value: "TRACE", description: "Echoes request (debugging)" },
+];
 
 export const getParams = (formData: any) => {
-  return [...formData?.parameters, ...(jsonSchemaToTreeNode(formData?.requestBody).children as [])]
-}
+  return [
+    ...formData?.parameters,
+    ...formData?.requestBody,
+  ];
+};
+
+// 更新节点
+export const updateNode = (tree: any, id: string, partial: any) => {
+  const walk = (n: any): any => {
+    if (n.id === id) {
+      const isTypeChangeToArray = ["array", "object"].includes(partial?.type);
+      const updated = { ...n, ...partial };
+      if (!isTypeChangeToArray && partial?.type !== undefined) {
+        updated.children = [];
+      }
+      return updated;
+    }
+    if (n.children) {
+      return { ...n, children: n.children.map(walk) };
+    }
+    if (n.item) {
+      return { ...n, item: walk(n.item) };
+    }
+    return n;
+  };
+  return walk(tree);
+};
+
+// 删除节点
+export const deleteNode = (tree: any, id: string) => {
+  const walk = (n: any): any => {
+    if (n.children) {
+      n.children = n.children.filter((c: any) => c.id !== id).map(walk);
+    }
+    if (n.item?.id === id) {
+      n.item = undefined;
+    } else if (n.item) {
+      n.item = walk(n.item);
+    }
+    return { ...n };
+  };
+  return walk(tree);
+};

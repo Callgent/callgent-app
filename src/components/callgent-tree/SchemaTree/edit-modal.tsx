@@ -5,14 +5,15 @@ import { typeOptions } from './utils'
 interface DetailModalProps {
     visible: boolean
     mode: 1 | 2 | 3
-    schemaType: 'responses' | 'params'
+    schemaType: 'requestBody' | 'parameters' | 'responses'
     onCancel: () => void
     onOk: (values: any) => void
     initialValues: any
 }
 
 const fieldsConfig: Record<string, string[]> = {
-    params: ['name', 'in', 'type', 'default', 'required', 'description'],
+    parameters: ['name', 'in', 'type', 'default', 'required', 'description'],
+    requestBody: ['name', 'type', 'default', 'required', 'description'],
     responses: ['name', 'type', 'default', 'description'],
 }
 
@@ -28,6 +29,7 @@ export default function SchemaDetailModal({
     React.useEffect(() => {
         form.setFieldsValue(initialValues)
     }, [initialValues])
+    console.log(initialValues);
 
     const onFinish = (vals: any) => onOk(vals)
 
@@ -60,14 +62,16 @@ export default function SchemaDetailModal({
                                 </Form.Item>
                             )
                         case 'in':
+                            if (initialValues?.__parent?.id !== 'root') {
+                                return null
+                            }
                             return (
                                 <Form.Item key="in" name="in" label="位置">
                                     <Select
                                         options={[
                                             { label: 'query', value: 'query' },
                                             { label: 'path', value: 'path' },
-                                            { label: 'header', value: 'header' },
-                                            { label: 'body', value: 'body' },
+                                            { label: 'header', value: 'header' }
                                         ]}
                                         disabled={!editable('in')}
                                     />

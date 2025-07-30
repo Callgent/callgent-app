@@ -64,14 +64,16 @@ export default function EndpointSelectApi() {
   }
 
   // Handle API selection and load parameters
-  const { setParams, setDefResponses } = useSchemaTreeStore();
+  const { setFormData2, formData2, setSelectApi, selectApi } = useSchemaTreeStore();
   const handleApiSelect = async (value: string, node: any) => {
     if (!node?.fullData) return
     try {
       const { data } = await getEndpointApi(value);
-      const params = [...data?.params?.parameters.map((i: any) => ({ ...i, id: generateId() })), ...(jsonSchemaToTreeNode(data?.params?.requestBody?.content?.["application/json"]?.schema).children as [])]
-      setParams(params)
-      setDefResponses(jsonSchemaToTreeNode(formData?.responses).children)
+      setFormData2({
+        ...formData2,
+        parameters: data?.params?.parameters.map((i: any) => ({ ...i, id: generateId() })),
+        requestBody: jsonSchemaToTreeNode(data?.params?.requestBody?.content?.["application/json"]?.schema).children,
+      })
       setFormData({
         ...formData,
         metaExe: {
@@ -80,11 +82,11 @@ export default function EndpointSelectApi() {
           apiMap: { epName: data.name, api_data: data }
         }
       })
+      setSelectApi(data)
     } catch (err) {
       message.error('Failed to load API parameters')
     }
   }
-
   return (
     <div className="py-4">
       <Spin spinning={loading}>
@@ -95,7 +97,7 @@ export default function EndpointSelectApi() {
           onSelect={handleApiSelect}
           placeholder="Select an API"
           treeDefaultExpandAll={false}
-          defaultValue={formData?.metaExe?.api_data?.name || null}
+          defaultValue={selectApi?.name || null}
           allowClear
           showSearch
           disabled={status === 'read_only'}

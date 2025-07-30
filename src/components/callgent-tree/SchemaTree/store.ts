@@ -5,20 +5,18 @@ import { flattenSchemaToMentions } from "./utils";
 export const useSchemaTreeStore = create<any>()(
   persist(
     (set) => ({
-      params: [],
-      defResponses: [],
       parameters: [],
       requestBody: [],
       responses: [],
       paramsOptions: [],
       responsesOptions: [],
       isEdit: false,
+      formData1: {},
+      formData2: {},
+      selectApi: {},
 
       setIsEdit: (isEdit: boolean) => {
         set({ isEdit });
-      },
-      setParams: (params: any) => {
-        set({ params: params });
       },
       setParameters: (parameters: any) => {
         set({ parameters });
@@ -29,8 +27,14 @@ export const useSchemaTreeStore = create<any>()(
       setResponses: (responses: any) => {
         set({ responses: responses });
       },
-      setDefResponses: (responses: any) => {
-        set({ defResponses: responses });
+      setFormData1: (formData1: any) => {
+        set({ formData1 });
+      },
+      setFormData2: (formData2: any) => {
+        set({ formData2 });
+      },
+      setSelectApi: (selectApi: any) => {
+        set({ selectApi })
       },
       // 表达式提示
       setParamsOptions: (schema: any) => {

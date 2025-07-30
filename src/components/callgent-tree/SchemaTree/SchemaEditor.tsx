@@ -1,213 +1,277 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import TreeNode from './tree-node'
 import SchemaDetailModal from './edit-modal'
-import { addSchemaChild, categorizeNodes, extractFirst2xxJsonSchema, getParams, jsonSchemaToTreeNode, treeNodeToJsonSchema } from './utils'
+import {
+    addSchemaChild,
+    deleteNode,
+    extractFirst2xxJsonSchema,
+    getParams,
+    jsonSchemaToTreeNode,
+    treeNodeToJsonSchema,
+    updateNode,
+} from './utils'
 import { Button } from 'antd'
 import { useSchemaTreeStore } from './store'
-import { useEndpointStore } from '@/models/endpoint'
 
 interface JSONSchemaEditorProps {
     mode: 1 | 2 | 3
-    schemaType: 'params' | 'responses'
+    schemaType: 'requestBody' | 'parameters' | 'responses'
+}
+
+interface TreeNodeData {
+    id: string
+    name: string
+    type: string
+    required: boolean
+    in?: string
+    children?: TreeNodeData[]
+    item?: TreeNodeData
+    editingName?: boolean
+    [key: string]: any
 }
 
 export default function JSONSchemaEditor({ mode, schemaType }: JSONSchemaEditorProps) {
-    const { params, defResponses, setParameters, setRequestBody, setResponses, setIsEdit, isEdit, setResponsesOptions, setParamsOptions } = useSchemaTreeStore();
-    const submitSchema = (nodes: any) => {
-        const { data, body } = categorizeNodes(nodes)
-        if (schemaType === 'params') {
-            setParameters(data)
-            setRequestBody(body)
-        } else {
-            setResponses(body)
-        }
-    }
-    // 根节点（虚拟）
-    const initialData = { id: 'root', name: '', type: 'object', required: false, in: 'body' }
-    const [tree, setTree] = useState<any>([])
-    const { formData } = useEndpointStore()
+    const {
+        setParameters,
+        setRequestBody,
+        setResponses,
+        setIsEdit,
+        isEdit,
+        formData1,
+        formData2,
+        selectApi,
+        setParamsOptions,
+        setResponsesOptions
+    } = useSchemaTreeStore()
+
+    // 整个 schema 树
+    const [tree, setTree] = useState<TreeNodeData>({
+        id: 'root',
+        name: '',
+        type: 'object',
+        required: false,
+        in: 'query',
+        children: [],
+    })
+
+    // 折叠状态
+    const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set())
+
+    // 详情弹窗
+    const [detail, setDetail] = useState<{
+        id: string
+        data: TreeNodeData & { __parent?: Partial<TreeNodeData> }
+    } | null>(null)
+
+    // 提交函数，提取 params 或 responses
+    const submitSchema = useCallback(
+        (nodes: TreeNodeData) => {
+            switch (schemaType) {
+                case "parameters":
+                    setParameters(nodes.children)
+                    break
+                case "requestBody":
+                    setRequestBody(nodes.children)
+                    break
+                case "responses":
+                    setResponses(nodes.children)
+                    break
+            }
+        },
+        [schemaType, setParameters, setRequestBody, setResponses]
+    )
+
+    // 初始化 & 同步 tree、store
     useEffect(() => {
-        const api_data = formData?.metaExe?.apiMap?.api_data
+        let children: TreeNodeData[] = []
         if (mode === 1) {
-            const newChildren = schemaType === 'params' ? getParams(formData) : jsonSchemaToTreeNode(extractFirst2xxJsonSchema(api_data?.responses))?.children
-            setTree((prev: any) => ({ ...prev, children: newChildren }))
-        } else {
-            const newChildren = schemaType === 'params' ? params : defResponses
-            setTree((prev: any) => ({ ...prev, children: newChildren }))
-            submitSchema({ ...initialData, children: newChildren })
+            children = formData1[schemaType] || []
+            if (schemaType === 'responses') {
+                children = jsonSchemaToTreeNode(extractFirst2xxJsonSchema(selectApi.responses))?.children || []
+            }
+            setTree((t) => ({ ...t, children }))
+        } else if (mode === 2) {
+            children = formData1[schemaType] || []
+            setTree((t) => ({ ...t, children }))
+            submitSchema({ ...tree, children })
+        } else if (mode === 3) {
+            children = formData2[schemaType] || []
+            if (schemaType === 'responses') {
+                children = formData1[schemaType]
+            }
+            setTree((t) => ({ ...t, children }))
+            submitSchema({ ...tree, children })
         }
-    }, [params, defResponses])
-    useEffect(() => {
-        const api_data = formData?.metaExe?.apiMap?.api_data
-        if (mode === 3 && api_data) {
-            const tree = {
-                id: "root",
-                name: "",
-                editingName: false,
-                type: "object",
+        if (mode === 3 && selectApi) {
+            const paramTree = {
+                id: 'root',
+                name: '',
+                type: 'object',
                 required: false,
-                in: "body",
-                children: getParams(formData)
+                in: 'query',
+                children: getParams(formData1),
             }
-            setParamsOptions(treeNodeToJsonSchema(tree))
-            setResponsesOptions(extractFirst2xxJsonSchema(api_data?.responses))
+            setParamsOptions(treeNodeToJsonSchema(paramTree) || {})
+            setResponsesOptions(extractFirst2xxJsonSchema(selectApi.responses) || {})
         }
-    }, [formData])
-    // collapsedIds 存放“被折叠”的节点
+        // 首次展开前就折叠所有 object/array
+        setCollapsedIds(
+            new Set(
+                children.flatMap((n) => {
+                    const ids: string[] = []
+                    const dfs = (node: any) => {
+                        if (
+                            (node.type === 'object' || node.type === 'array') &&
+                            node.children?.length
+                        ) {
+                            ids.push(node.id)
+                            node.children.forEach(dfs)
+                        }
+                    }
+                    dfs(n)
+                    return ids
+                })
+            )
+        )
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mode, schemaType, formData1, formData2])
 
-    // 弹窗状态
-    const [detailId, setDetailId] = useState<string | null>(null)
-    const [detailData, setDetailData] = useState<any | null>(null)
-
-    // collapsedIds 同理，只在挂载时根据初始 tree 计算一次
-    const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
-    useEffect(() => {
-        if (mode !== 1) return; // 只有 mode=1 才折叠
-        const all = new Set<string>();
-        const collect = (n: any) => {
-            if ((n.type === 'object' || n.type === 'array') && Array.isArray(n.children) && n.children.length > 0) {
-                all.add(n.id);
-                n.children.forEach(collect);
-            }
-        };
-        if (Array.isArray(tree.children)) {
-            tree.children.forEach(collect);
-        }
-        setCollapsedIds(all);
-    }, [tree, mode]);
-
-    // 切换单个节点折叠/展开
-    const toggleCollapse = (id: string) => {
-        setCollapsedIds(prev => {
+    // 回调：折叠/展开
+    const toggleCollapse = useCallback((id: string) => {
+        setCollapsedIds((prev) => {
             const next = new Set(prev)
-            if (next.has(id)) next.delete(id)
-            else next.add(id)
+            prev.has(id) ? next.delete(id) : next.add(id)
             return next
         })
-    }
+    }, [])
 
-    // 增/删/改 & 提交逻辑
-    const addChild = (parentId: string) => {
-        if (mode === 1) return
-        setTree(addSchemaChild(tree, parentId))
-    }
+    // 回调：新增子节点
+    const addChild = useCallback(
+        (parentId: string) => {
+            setTree((t) => addSchemaChild(t, parentId))
+        },
+        [mode]
+    )
 
-    const updateNode = (id: string, partial: any) => {
-        if (!isEdit) { setIsEdit(true) }
-        const walk = (n: any): any => {
-            if (n.id === id) {
-                const isTypeChangeToArray = partial?.type === 'array';
-                const updated = { ...n, ...partial };
-                if (isTypeChangeToArray) {
-                    const defaultItem = {
-                        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-                        name: 'item-1',
-                        type: 'string',
-                        required: false,
-                        in: 'body',
-                    };
-                    updated.item = { ...defaultItem, name: 'item' };
-                    updated.children = [defaultItem];
-                }
-                return updated;
-            }
-            if (n.children) {
-                return { ...n, children: n.children.map(walk) };
-            }
-            if (n.item) {
-                return { ...n, item: walk(n.item) };
-            }
-            return n;
-        };
-        const newTree = walk(tree);
-        setTree(newTree);
-        submitSchema(newTree);
-    };
+    // 回调：更新节点
+    const updateNode_ = useCallback(
+        (id: string, partial: Partial<TreeNodeData>) => {
+            if (!isEdit) setIsEdit(true)
+            setTree((t) => {
+                const updated = updateNode(t, id, partial)
+                submitSchema(updated)
+                return updated
+            })
+        },
+        [isEdit, setIsEdit, submitSchema]
+    )
 
+    // 回调：删除节点
+    const deleteNode_ = useCallback(
+        (id: string) => {
+            setTree((t) => {
+                const updated = deleteNode(t, id)
+                submitSchema(updated)
+                return updated
+            })
+        },
+        [mode, submitSchema]
+    )
 
-    const deleteNode = (id: string) => {
-        if (mode !== 2) return
-        const walk = (n: any): any => {
-            if (n.children) {
-                n.children = n.children.filter((c: any) => c.id !== id).map(walk)
-            }
-            if (n.item?.id === id) {
-                n.item = undefined
-            } else if (n.item) {
-                n.item = walk(n.item)
-            }
-            return { ...n }
-        }
-        const newTree = walk(tree)
-        setTree(newTree)
-        submitSchema(newTree)
-    }
-
-    const openDetail = (id: string) => {
-        const findWithParent = (n: any, parent: any = null): { node: any; parent: any } | null => {
-            if (n.id === id) return { node: n, parent }
-            if (n.children) {
-                for (const c of n.children) {
-                    const res = findWithParent(c, n)
+    // 回调：打开详情
+    const openDetail = useCallback(
+        (id: string) => {
+            // 深度优先查找节点及其父节点
+            const findWithParent = (
+                node: TreeNodeData,
+                parent?: TreeNodeData
+            ): { node: TreeNodeData; parent?: TreeNodeData } | null => {
+                if (node.id === id) return { node, parent }
+                for (const child of node.children || []) {
+                    const res = findWithParent(child, node)
                     if (res) return res
                 }
-            }
-            if (n.item) {
-                const res = findWithParent(n.item, n)
-                if (res) return res
-            }
-            return null
-        }
-        const result = findWithParent(tree)
-        if (result) {
-            const { node, parent } = result
-            const cleanParent = parent
-                ? {
-                    ...parent,
-                    children: undefined,
-                    item: undefined,
+                if (node.item) {
+                    const res = findWithParent(node.item, node)
+                    if (res) return res
                 }
-                : undefined
-            setDetailData({ ...node, __parent: cleanParent })
-            setDetailId(id)
-        }
-    }
+                return null
+            }
+            const res = findWithParent(tree)
+            if (res) {
+                const { node, parent } = res
+                setDetail({
+                    id,
+                    data: {
+                        ...node,
+                        __parent: parent
+                            ? { id: parent.id, name: parent.name, type: parent.type }
+                            : undefined,
+                    },
+                })
+            }
+        },
+        [tree]
+    )
 
-    const saveDetail = (vals: any) => {
-        if (detailId) updateNode(detailId, vals)
-        setDetailId(null)
-    }
+    // 回调：保存详情
+    const saveDetail = useCallback(
+        (vals: Partial<TreeNodeData>) => {
+            if (detail) {
+                updateNode_(detail.id, vals)
+                setDetail(null)
+            }
+        },
+        [detail, updateNode_]
+    )
 
-    // 渲染：子节点是否渲染由 !collapsedIds.has(n.id) 决定
-    const renderTree = (nodes: any[], depth = 0): React.ReactNode =>
-        nodes.map(n => (
-            <React.Fragment key={n.id}>
-                <TreeNode
-                    node={n}
-                    depth={depth}
-                    mode={mode}
-                    schemaType={schemaType}
-                    collapsed={collapsedIds.has(n.id)}
-                    toggleCollapse={() => toggleCollapse(n.id)}
-                    updateNode={updateNode}
-                    addChild={addChild}
-                    openDetail={openDetail}
-                    deleteNode={deleteNode}
-                />
-                {
-                    n.children &&
-                    !collapsedIds.has(n.id) &&
-                    ['object', 'array'].includes(n.type) &&
-                    renderTree(n.children, depth + 1)
-                }
-            </React.Fragment>
-        ))
+    // 渲染树状结构的组件，memo 化，减少重复渲染
+    const SchemaTree = useMemo(
+        () =>
+            React.memo<{
+                nodes: TreeNodeData[]
+                depth?: number
+            }>(({ nodes, depth = 0 }) =>
+                nodes.map((n) => (
+                    <React.Fragment key={n.id}>
+                        <TreeNode
+                            node={n}
+                            depth={depth}
+                            mode={mode}
+                            schemaType={schemaType}
+                            collapsed={collapsedIds.has(n.id)}
+                            toggleCollapse={() => toggleCollapse(n.id)}
+                            updateNode={updateNode_}
+                            addChild={addChild}
+                            openDetail={openDetail}
+                            deleteNode={deleteNode_}
+                        />
+                        {n.children &&
+                            !collapsedIds.has(n.id) &&
+                            ['object', 'array'].includes(n.type) && (
+                                <SchemaTree nodes={n.children} depth={depth + 1} />
+                            )}
+                    </React.Fragment>
+                ))
+            ),
+        [
+            mode,
+            schemaType,
+            collapsedIds,
+            toggleCollapse,
+            updateNode_,
+            addChild,
+            openDetail,
+            deleteNode_,
+        ]
+    )
 
     return (
         <div className="px-2 w-full">
             <div className="overflow-auto bg-white rounded mb-2 w-full">
-                {tree.children && renderTree(tree.children)}
+                {tree.children && <SchemaTree nodes={tree.children} />}
             </div>
+
             {mode === 2 && (
                 <Button
                     className="mb-2 w-full text-center py-2 border border-dashed border-gray-400 rounded-md text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
@@ -216,13 +280,14 @@ export default function JSONSchemaEditor({ mode, schemaType }: JSONSchemaEditorP
                     + Add
                 </Button>
             )}
-            {detailData && detailId && (
+
+            {detail && (
                 <SchemaDetailModal
                     visible
                     mode={mode}
                     schemaType={schemaType}
-                    initialValues={detailData}
-                    onCancel={() => setDetailId(null)}
+                    initialValues={detail.data}
+                    onCancel={() => setDetail(null)}
                     onOk={saveDetail}
                 />
             )}
