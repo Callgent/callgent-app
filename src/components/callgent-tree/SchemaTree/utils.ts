@@ -142,7 +142,6 @@ export const addSchemaChild = (tree: any, parentId: string): any => {
 // schema转options
 export function flattenSchemaToMentions(schema: any, parentPath = ""): any[] {
   const result: any[] = [];
-
   if (schema.type === "object" && schema.properties) {
     for (const key in schema.properties) {
       const prop = schema.properties[key];
@@ -251,6 +250,7 @@ export function jsonSchemaToTreeNode(
 // tree转schema
 export function treeNodeToJsonSchema(node: any): any {
   if (node?.length < 1) return { type: "object", properties: {} };
+
   const {
     children,
     item,
@@ -259,12 +259,22 @@ export function treeNodeToJsonSchema(node: any): any {
     id,
     name,
     in: inLocation,
+    default: nodeDefault,
     ...rest
   } = node;
+
+  // 辅助：格式化 default 值，空字符串转为 {{''}}
+  function formatDefault(def: any) {
+    if (def === "") return "{{''}}";
+    return def;
+  }
+
   const s: any = {
     ...rest,
     type: node.type,
   };
+
+  // 1. object 类型
   if (node.type === "object") {
     s.properties = {};
     const reqs: string[] = [];
@@ -273,39 +283,63 @@ export function treeNodeToJsonSchema(node: any): any {
       if (c.required) reqs.push(c.name);
     });
     if (reqs.length) s.required = reqs;
+    if (nodeDefault !== undefined) {
+      s.default = formatDefault(nodeDefault);
+    }
+    return s;
   }
+
+  // 2. array 类型
   if (node.type === "array") {
-    const itemType = node.children[0]?.type || "string";
+    // 如果数组本身有 default
+    if (nodeDefault !== undefined) {
+      s.default = Array.isArray(nodeDefault)
+        ? nodeDefault.map(formatDefault)
+        : formatDefault(nodeDefault);
+    }
+
+    const itemType = node.children?.[0]?.type || "string";
+
+    // 2.1 元素是 object
     if (itemType === "object" && Array.isArray(children)) {
       const allProperties: Record<string, any> = {};
       const requiredFields = new Set<string>();
       const defaultArray: any[] = [];
+
       for (const child of children) {
+        // 子节点自身 default，直接当完整元素
+        if (child.default !== undefined) {
+          defaultArray.push(formatDefault(child.default));
+        }
+
         const itemSchema = treeNodeToJsonSchema(child);
-        if (itemSchema?.properties) {
+        if (itemSchema.properties) {
           for (const key in itemSchema.properties) {
             if (!allProperties[key]) {
-              const prop = itemSchema.properties[key];
+              const prop = { ...itemSchema.properties[key] };
               delete prop.default;
               allProperties[key] = prop;
             }
           }
         }
-        if (itemSchema?.required) {
-          itemSchema.required.forEach((key: string) => requiredFields.add(key));
+        if (itemSchema.required) {
+          itemSchema.required.forEach((k: string) => requiredFields.add(k));
         }
-        const defaultItem: Record<string, any> = {};
-        if (child.children) {
+
+        // 如果子节点没有 default，则按子字段组合默认值对象
+        if (child.default === undefined && child.children) {
+          const defaultItem: Record<string, any> = {};
           for (const field of child.children) {
-            const item: any = { type: field.type };
+            const prop: any = { type: field.type };
             if (field.default !== undefined) {
-              item.default = field.default;
+              prop.default = formatDefault(field.default);
             }
-            defaultItem[field.name] = item;
+            defaultItem[field.name] = prop;
           }
+          defaultArray.push(defaultItem);
         }
-        defaultArray.push(defaultItem);
       }
+
       s.items = {
         type: "object",
         properties: allProperties,
@@ -316,26 +350,32 @@ export function treeNodeToJsonSchema(node: any): any {
       if (defaultArray.length) {
         s.items.default = defaultArray;
       }
-    } else if (!["object"].includes(itemType)) {
-      s.items = {
-        type: itemType,
-      };
-      const defaultArray: any[] = [];
-      if (Array.isArray(children)) {
-        for (const child of children) {
-          if (child.default !== undefined) {
-            defaultArray.push(child.default);
-          }
-        }
-      }
-      if (defaultArray.length) {
-        s.items.default = defaultArray;
+      return s;
+    }
+
+    // 2.2 基本类型数组
+    s.items = { type: itemType };
+    const defaultArray: any[] = [];
+    for (const child of children || []) {
+      if (child.default !== undefined) {
+        defaultArray.push(formatDefault(child.default));
       }
     }
+    if (defaultArray.length) {
+      s.items.default = defaultArray;
+    }
+    return s;
+  }
+
+  // 3. 基本类型（string、number、boolean 等）
+  if (nodeDefault !== undefined) {
+    s.default = formatDefault(nodeDefault);
   }
 
   return s;
 }
+
+
 
 // tree to schema
 export function treeToSchema(node: any) {

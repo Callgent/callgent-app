@@ -1,20 +1,22 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { flattenSchemaToMentions } from "./utils";
+const initData = {
+  parameters: [],
+  requestBody: [],
+  responses: [],
+  paramsOptions: [],
+  responsesOptions: [],
+  isEdit: false,
+  formData1: {},
+  formData2: {},
+  selectApi: {},
+}
 
 export const useSchemaTreeStore = create<any>()(
   persist(
     (set) => ({
-      parameters: [],
-      requestBody: [],
-      responses: [],
-      paramsOptions: [],
-      responsesOptions: [],
-      isEdit: false,
-      formData1: {},
-      formData2: {},
-      selectApi: {},
-
+      ...initData,
       setIsEdit: (isEdit: boolean) => {
         set({ isEdit });
       },
@@ -42,6 +44,9 @@ export const useSchemaTreeStore = create<any>()(
       },
       setResponsesOptions: (schema: any) => {
         set({ responsesOptions: flattenSchemaToMentions(schema) });
+      },
+      clearSchemaTreeStore: () => {
+        set({ ...initData })
       },
     }),
     {
