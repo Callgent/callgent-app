@@ -9,8 +9,9 @@ import { deleteNode } from '@/utils/callgent-tree';
 import NodeComponent from './node-component';
 import { createSearchParams, shouldPreventNavigation } from '@/utils';
 import { useEndpointStore } from '@/models/endpoint';
-import { useRouter } from '@/router/hooks';
+import { useRouter, useSearchParams } from '@/router/hooks';
 import { unsavedGuard } from '@/router/utils';
+import { useSchemaTreeStore } from './SchemaTree/store';
 
 interface TreeNodeProps {
   nodes: CallgentInfoType[];
@@ -22,11 +23,11 @@ interface TreeNodeProps {
 }
 
 const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, className }: TreeNodeProps) => {
-  if (nodes.length === 0) {
-    return null
-  }
+  if (nodes.length === 0) { return null }
   const { openModal, setCallgentTree, setCurrentNode } = useTreeActions();
-  const { clear } = useEndpointStore()
+  const { clear, setActiveKey } = useEndpointStore()
+  const { clearSchemaTreeStore } = useSchemaTreeStore()
+  const { closeModal } = useTreeActions()
   const { push } = useRouter()
   const node = nodes[0]
   const iconSrc = useMemo(() => {
@@ -42,8 +43,11 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id!);
   const handleAction = (actionType: TreeAction) => {
-    if (shouldPreventNavigation()) {
-      return null
+    if (unsavedGuard.hasUnsavedChanges()) {
+      const shouldProceed = window.confirm('确定要离开吗？未保存的更改将会丢失');
+      if (shouldProceed) {
+        unsavedGuard.setUnsavedChanges(false);
+      } else return null
     }
     switch (actionType) {
       case 'add':
@@ -82,8 +86,12 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
         });
         break;
       case 'virtualApi':
+        push(`/callgent/tree?callgentId=${callgentId}`)
         setCurrentNode(node);
         clear()
+        clearSchemaTreeStore()
+        closeModal()
+        setActiveKey('1')
       // push(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
     }
     useTreeActionStore.setState({ action: actionType });

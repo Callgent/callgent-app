@@ -1,14 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
-import { Input, Button, InputRef, Tabs, Modal } from 'antd'
+import { useEffect, useState } from 'react'
+import { Input, Button, Tabs, Modal } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import Payload from './payload'
 import Mapping from './mapping'
 import { useSchemaTreeStore } from '../SchemaTree/store'
-import { useBeforeunload } from 'react-beforeunload';
-import { unsavedGuard } from '@/router/utils'
-import { shouldPreventNavigation } from '@/utils'
-
 export default function EndpointPage() {
   const { status, formData, activeKey, handleConfirm, clear, setFormData, setActiveKey } = useEndpointStore()
   const { currentNode } = useTreeActionStore()
@@ -29,16 +25,6 @@ export default function EndpointPage() {
     setRequestBody,
     setResponses,
   } = useSchemaTreeStore()
-
-  // 拿到组件最外层容器的 ref
-  const containerRef = useRef<HTMLDivElement>(null)
-  // 输入框 ref，用于自动聚焦
-  const inputRef = useRef<InputRef>(null)
-
-  // 自动聚焦第一个输入框
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
 
   // 点击 Next，跳到下一页签；如果已是最后一页，可执行保存或确认
   const handleNext = (key: '1' | '2') => {
@@ -114,14 +100,13 @@ export default function EndpointPage() {
       handleConfirm(node)
     }, 50)
   }
-  useBeforeunload(() => {
-    console.log(shouldPreventNavigation());
 
-    return shouldPreventNavigation({ confirm: false }) ? 'back' : false;
-  });
+  // useBeforeunload(() => {
+  //   return shouldPreventNavigation({ confirm: false }) ? 'back' : false;
+  // });
 
   return (
-    <div ref={containerRef} className="w-full mr-4">
+    <div className="w-full mr-4">
       <div className="mx-auto rounded-lg p-6 space-y-6 border-2 border-gray-300 dark:border-gray-600">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-semibold font-sans">Functional Endpoint</h2>
@@ -132,7 +117,6 @@ export default function EndpointPage() {
             AI Generate
           </button>
         </div>
-
         {!aiInputVisible ? (
           currentNode?.type === 'CLIENT' ? (
             <Tabs
@@ -149,7 +133,6 @@ export default function EndpointPage() {
         ) : (
           <div className="space-y-2">
             <Input.TextArea
-              ref={inputRef}
               rows={6}
               placeholder="Example: Generate an OpenAPI 3.0 JSON document for listing users..."
               value={aiPrompt}
@@ -157,7 +140,6 @@ export default function EndpointPage() {
             />
           </div>
         )}
-
         <div className="mt-4 flex justify-end space-x-3">
           <Button onClick={handleCancel}>Cancel</Button>
           {status === 'define' && (
