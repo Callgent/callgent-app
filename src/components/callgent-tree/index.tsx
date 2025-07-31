@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 import { CallgentInfo as CallgentInfoType } from '#/entity';
 import TreeNode from './node';
 import { TreeActionModal } from './model';
@@ -8,11 +8,12 @@ import { enhanceNode, setAdaptor } from '@/utils/callgent-tree';
 import { CircleLoading } from '../layouts/loading';
 import Endpoint from './endpoint';
 import { useEndpointStore } from '@/models/endpoint';
+import { useRouter } from '@/router/hooks';
 
 export default function CallgentInfo() {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  const { push } = useRouter()
   const location = useLocation();
 
   const { callgentTree, action } = useTreeActionStore();
@@ -50,11 +51,11 @@ export default function CallgentInfo() {
       setCallgentAdaptor(adaptor);
     } catch (error) {
       console.error("Failed to load data:", error);
-      navigate("/callgent/callgents", { replace: true });
+      push("/callgent/callgents", { replace: false });
     } finally {
       setIsLoading(false);
     }
-  }, [getAllIds, navigate]);
+  }, [getAllIds, push]);
   const { toggletheEP } = useEndpointStore()
   const getApi = async (apiId: string, apiType: string) => {
     const { data }: any = await toggletheEP(apiId)
@@ -69,7 +70,7 @@ export default function CallgentInfo() {
     if (id) {
       loadData(id);
     } else {
-      navigate("/callgent/callgents", { replace: true });
+      push("/callgent/callgents", { replace: false });
     }
     if (apiId && apiType) {
       getApi(apiId, apiType)

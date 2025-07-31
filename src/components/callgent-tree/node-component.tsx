@@ -1,9 +1,10 @@
 import { CallgentInfo } from "#/entity";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation } from "react-router";
 import { useTreeActionStore } from '@/models/callgentTreeStore';
 import { useEndpointStore } from "@/models/endpoint";
 import { Modal } from "antd";
 import { useSchemaTreeStore } from "./SchemaTree/store";
+import { useRouter } from "@/router/hooks";
 
 export default function NodeComponent({ node, callgentId, level }: { node: CallgentInfo, callgentId: string, level: number }) {
   let content = (
@@ -42,7 +43,7 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
   const { toggletheEP, status } = useEndpointStore()
   // 编辑切换 ep
   const location = useLocation()
-  const navigate = useNavigate()
+  const { push } = useRouter()
   const { setFormData1 } = useSchemaTreeStore();
   const toEditApi = async (node: any) => {
     const params = new URLSearchParams(location.search)
@@ -57,7 +58,7 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
         async onOk() {
           params.set('apiId', node.id)
           params.set('type', node?.parentType)
-          navigate(`${location.pathname}?${params.toString()}`, { replace: true })
+          push(`${location.pathname}?${params.toString()}`, { replace: false })
           const { formData } = await toggletheEP(node.id)
           useTreeActionStore.setState({ action: 'virtualApi' })
           useTreeActionStore.setState({ currentNode: { ...node, type: node?.parentType } })
@@ -67,7 +68,7 @@ export default function NodeComponent({ node, callgentId, level }: { node: Callg
     } else {
       params.set('apiId', node.id)
       params.set('type', node?.parentType)
-      navigate(`${location.pathname}?${params.toString()}`, { replace: true })
+      push(`${location.pathname}?${params.toString()}`, { replace: false })
       const { formData } = await toggletheEP(node.id)
       useTreeActionStore.setState({ action: 'virtualApi' })
       useTreeActionStore.setState({ currentNode: { ...node, type: node?.parentType } })

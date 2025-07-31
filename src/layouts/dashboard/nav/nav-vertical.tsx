@@ -1,8 +1,8 @@
 import { Layout, Menu, type MenuProps } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { useMatches, useNavigate } from "react-router";
+import { useMatches } from "react-router";
 import Scrollbar from "@/components/scrollbar";
-import { useFlattenedRoutes, usePathname, usePermissionRoutes, useRouteToMenuFn } from "@/router/hooks";
+import { useFlattenedRoutes, usePathname, usePermissionRoutes, useRouter, useRouteToMenuFn } from "@/router/hooks";
 import { menuFilter } from "@/router/utils";
 import { useSettingActions, useSettings } from "@/models/settingStore";
 import { NAV_WIDTH } from "../config";
@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function NavVertical(props: Props) {
-	const navigate = useNavigate();
+	const { push } = useRouter()
 	const matches = useMatches();
 	const pathname = usePathname();
 
@@ -63,8 +63,7 @@ export default function NavVertical(props: Props) {
 			window.open(nextLink?.frameSrc, "_blank");
 			return;
 		}
-
-		navigate(key);
+		push(key);
 		props?.closeSideBarDrawer?.();
 	};
 

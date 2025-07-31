@@ -1,15 +1,14 @@
 import { Menu, type MenuProps } from "antd";
 import { useMemo } from "react";
-import { useNavigate } from "react-router";
 
-import { useFlattenedRoutes, usePathname, usePermissionRoutes, useRouteToMenuFn } from "@/router/hooks";
+import { useFlattenedRoutes, usePathname, usePermissionRoutes, useRouter, useRouteToMenuFn } from "@/router/hooks";
 import { menuFilter } from "@/router/utils";
 
 import { themeVars } from "@/theme/theme.css";
 import { NAV_HORIZONTAL_HEIGHT } from "../config";
 
 export default function NavHorizontal() {
-	const navigate = useNavigate();
+	const { push } = useRouter()
 	const pathname = usePathname();
 
 	const routeToMenuFn = useRouteToMenuFn();
@@ -32,7 +31,7 @@ export default function NavHorizontal() {
 			window.open(nextLink?.frameSrc, "_blank");
 			return;
 		}
-		navigate(key);
+		push(key);
 	};
 
 	return (

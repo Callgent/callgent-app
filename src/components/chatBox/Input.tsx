@@ -1,24 +1,25 @@
 import { postRequestApi } from '@/api/services/callgentService';
 import useChatBoxStore from '@/models/chatBox';
+import { useRouter } from '@/router/hooks';
 import { getSearchParamsAsJson } from '@/utils';
 import React, { useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 
 const InputField: React.FC = () => {
     const { actions } = useChatBoxStore();
+    const { push } = useRouter()
     const { addMessage } = actions;
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-    const navigate = useNavigate();
     const params = getSearchParamsAsJson();
     const { taskId } = getSearchParamsAsJson();
     const location = useLocation();
     const addQueryParam = (key: string, value: string) => {
         const searchParams = new URLSearchParams(location.search);
         searchParams.set(key, value);
-        navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
+        push(`${location.pathname}?${searchParams.toString()}`, { replace: false });
     };
     const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
         const items = e.clipboardData.items;
@@ -40,7 +41,7 @@ const InputField: React.FC = () => {
         setIsLoading(true);
         addMessage({ role: 'user', message: input });
         if (!params.callgentId) {
-            navigate('/callgent/callgents', { replace: true });
+            push('/callgent/callgents', { replace: false });
             setIsLoading(false);
             return;
         }

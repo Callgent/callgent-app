@@ -7,9 +7,9 @@ import { useDeleteCallgent } from '@/models/callgentStore';
 import { delCallgentApi, deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
 import NodeComponent from './node-component';
-import { useNavigate } from 'react-router';
 import { createSearchParams } from '@/utils';
 import { useEndpointStore } from '@/models/endpoint';
+import { useRouter } from '@/router/hooks';
 
 interface TreeNodeProps {
   nodes: CallgentInfoType[];
@@ -26,8 +26,8 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
   }
   const { openModal, setCallgentTree, setCurrentNode } = useTreeActions();
   const { clear } = useEndpointStore()
+  const { push } = useRouter()
   const node = nodes[0]
-  const navigate = useNavigate();
   const iconSrc = useMemo(() => {
     if (node.icon_url) return node.icon_url;
     switch (level) {
@@ -67,7 +67,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
           nodeId: node?.id,
           realmKey: "apiKey:header::api.api.abbb:init",
         });
-        navigate(`/callgent/auth?${params.toString()}`)
+        push(`/callgent/auth?${params.toString()}`)
         break;
       case 'select':
         openModal({
@@ -80,7 +80,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
       case 'virtualApi':
         setCurrentNode(node);
         clear()
-      // navigate(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
+      // push(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
     }
     useTreeActionStore.setState({ action: actionType });
   }
@@ -97,7 +97,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
     try {
       if (level === 1) {
         await delCallgent(node.id!);
-        navigate('/callgent/callgents')
+        push('/callgent/callgents')
       } else if (level === 4) {
         await delCallgentApi(node.id!)
       } else {

@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -7,6 +6,7 @@ import { toast } from "sonner";
 import type { UserInfo } from "#/entity";
 import { StorageEnum } from "#/enum";
 import { findUserInfo, signin, SignInReq } from "@/api/services/userService";
+import { useRouter } from "@/router/hooks";
 
 const { VITE_APP_HOMEPAGE: HOMEPAGE, VITE_COOKIE_NAME } = import.meta.env;
 
@@ -48,11 +48,11 @@ export const useUserPermission = () => useUserStore((state) => state.userInfo.pe
 export const useUserActions = () => useUserStore((state) => state.actions);
 
 export const useSignIn = () => {
-	const navigatge = useNavigate();
+	const { push } = useRouter()
 	const signIn = async (loginData: SignInReq) => {
 		try {
 			await signin(loginData);
-			navigatge(HOMEPAGE, { replace: true });
+			push(HOMEPAGE, { replace: false });
 			toast.success("Sign in success!");
 		} catch (err) {
 			toast.error(err.message, {

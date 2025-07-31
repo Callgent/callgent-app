@@ -15,7 +15,7 @@ import { useTheme } from "@/theme/hooks";
  */
 
 export default function AccountDropdown() {
-	const { replace } = useRouter();
+	const { push } = useRouter();
 	const { name, email, avatar } = useUserInfo();
 	const userInfo = useFetchUserInfo();
 	const init = async () => {
@@ -33,7 +33,7 @@ export default function AccountDropdown() {
 			clearUserInfoAndToken();
 			backToLogin();
 		} finally {
-			replace("/login");
+			push("/login", { replace: false });
 		}
 	};
 	const {

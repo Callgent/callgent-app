@@ -4,7 +4,7 @@ import { Avatar, Card, Popconfirm, Rate, Typography } from 'antd';
 import type React from 'react';
 import { useState } from 'react';
 import type { CallgentInfo } from '#/entity';
-import { useNavigate } from 'react-router';
+import { useRouter } from '@/router/hooks';
 
 const { Paragraph } = Typography;
 
@@ -16,8 +16,7 @@ interface CallgentCardProps {
 const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const navigate = useNavigate();
-
+  const { push } = useRouter()
   const showPopconfirm = () => {
     setOpenConfirm(true);
   };
@@ -39,7 +38,7 @@ const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
   };
 
   const handleCardClick = () => {
-    navigate(`/callgent/tree?callgentId=${item.id}`);
+    push(`/callgent/tree?callgentId=${item.id}`);
   };
 
   return (

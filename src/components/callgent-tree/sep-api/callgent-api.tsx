@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "antd";
 import { restoreDataFromOpenApi } from "@/utils/callgent-tree";
 import { postEndpointsApi, putEndpointApi } from "@/api/services/callgentService";
-import { useNavigate } from "react-router";
+import { useRouter } from "@/router/hooks";
 
 export default function SwaggerEditor({ openApi }: { openApi: any }) {
   const [spec, setSpec] = useState(JSON.stringify(openApi, null, 2));
@@ -16,7 +16,7 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
   const [error, setError] = useState(null);
   const [runLoading, setRunLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
-  const navigate = useNavigate()
+  const { push } = useRouter()
   const handleEditorChange = (value: any) => {
     setSpec(value);
     setError(null);
@@ -57,7 +57,7 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
         const restoreData = restoreDataFromOpenApi(dataToSave);
         await postEndpointsApi({ ...restoreData, callgentId: callgentId, entryId: entryId });
       } else {
-        navigate("/callgent/callgents", { replace: true });
+        push("/callgent/callgents", { replace: false });
       }
       setParsedSpec(dataToSave)
       toast.success("OpenAPI spec saved successfully!");

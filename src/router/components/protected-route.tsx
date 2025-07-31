@@ -10,14 +10,14 @@ type Props = {
 };
 const { VITE_COOKIE_NAME } = import.meta.env;
 export default function ProtectedRoute({ children }: Props) {
-	const router = useRouter();
+	const { push } = useRouter();
 	const token = getCookie(VITE_COOKIE_NAME || 'x-callgent-jwt');
 
 	const check = useCallback(() => {
 		if (!token) {
-			router.replace("/login");
+			push("/login", { replace: false });
 		}
-	}, [router, name]);
+	}, [push, name]);
 
 	useEffect(() => {
 		check();

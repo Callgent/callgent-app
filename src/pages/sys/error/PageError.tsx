@@ -13,11 +13,11 @@ import type { FallbackProps } from "react-error-boundary";
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
 export default function PageError({ error, resetErrorBoundary }: FallbackProps) {
-	const { replace } = useRouter();
+	const { push } = useRouter();
 
 	const goHome = () => {
 		resetErrorBoundary();
-		replace(HOMEPAGE);
+		push(HOMEPAGE, { replace: false });
 	};
 	return (
 		<div>

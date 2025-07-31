@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router";
+import { NavigateOptions, useNavigate } from "react-router";
 
 export function useRouter() {
 	const navigate = useNavigate();
@@ -9,7 +9,7 @@ export function useRouter() {
 			back: () => navigate(-1),
 			forward: () => navigate(1),
 			reload: () => window.location.reload(),
-			push: (href: string) => navigate(href),
+			push: (href: string, options: NavigateOptions = {}) => navigate(href, options),
 			replace: (href: string) => navigate(href, { replace: true }),
 		}),
 		[navigate],

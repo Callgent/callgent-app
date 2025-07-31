@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router";
 import { Tabs, Spin } from "antd";
 import { getCallgentTree } from "@/api/services/callgentService";
 import { Realm } from "#/entity";
@@ -7,16 +6,17 @@ import useTreeActionStore, { useTreeActions } from "@/models/callgentTreeStore";
 import NewAuth from "@/components/callgent-tree/auth/create-auth";
 import Card from "@/components/layouts/card";
 import { getSearchParamsAsJson } from "@/utils";
+import { useRouter } from "@/router/hooks";
 
 export default function CallgentAuth() {
-  const navigate = useNavigate();
+  const { push } = useRouter()
   const { id } = getSearchParamsAsJson();
   const [loading, setLoading] = useState<boolean>(false);
   const { realms, realmKey } = useTreeActionStore();
   const { setCallgentRealms, setRealmKey } = useTreeActions();
   const redirectToCallgents = useCallback(() => {
-    navigate("/callgent/callgents", { replace: true });
-  }, [navigate]);
+    push("/callgent/callgents", { replace: false });
+  }, [push]);
 
   const init = useCallback(async () => {
     if (!id) {

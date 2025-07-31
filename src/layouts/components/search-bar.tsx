@@ -14,7 +14,7 @@ import { rgbAlpha } from "@/utils/theme";
 
 export default function SearchBar() {
 	const { t } = useTranslation();
-	const { replace } = useRouter();
+	const { push } = useRouter();
 	const inputRef = useRef<InputRef>(null);
 	const listRef = useRef<HTMLDivElement>(null);
 
@@ -118,7 +118,7 @@ export default function SearchBar() {
 	};
 
 	const handleSelect = (key: string) => {
-		replace(key);
+		push(key);
 		handleCancel();
 	};
 
