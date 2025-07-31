@@ -1,15 +1,13 @@
 import { EndpointState } from '#/store'
 import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
 import { jsonSchemaToTreeNode, extractFirst2xxJsonSchema, generateId, treeToSchema } from '@/components/callgent-tree/SchemaTree/utils';
+import { unsavedGuard } from '@/router/utils';
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { create } from 'zustand'
 
 const initData = {
   status: null,
   editId: null,
-  endpointName: '',
-  whatFor: '',
-  how2Ops: '',
   parameters: [],
   responses: [],
   formData: {},
@@ -18,6 +16,8 @@ const initData = {
   isEndpointOpen: false,
   editIndex: -1,
   editType: '',
+  information: {},
+  activeKey: "1"
 }
 
 export const useEndpointStore = create<EndpointState>()(
@@ -32,33 +32,37 @@ export const useEndpointStore = create<EndpointState>()(
       const responses = jsonSchemaToTreeNode(responsesSchema)?.children || []
       set({
         status: 'define',
-        endpointName: data?.path || null,
         editId: id,
         parameters: requestBody ? [...parameters, ...requestBody] : parameters,
-        whatFor: data?.whatFor || null,
-        how2Ops: data?.how2Ops || null,
         responses,
         formData: {
           ...get().formData,
           parameters: parameters,
           requestBody: requestBody,
           responses: responses,
+        },
+        information: {
+          endpointName: data?.path || null,
+          whatFor: data?.whatFor || null,
+          how2Ops: data?.how2Ops || null,
           endpoint: {
             method: data?.method || 'POST'
-          }
-        }
+          },
+        },
+        activeKey: "1"
       })
+      unsavedGuard.setUnsavedChanges(false);
       return { data, formData: { parameters, requestBody, responses } }
     },
     // 提交ep
     handleConfirm: async (currentNode) => {
-      const { formData, endpointName, whatFor, how2Ops, editId } = get()
+      const { formData, information, editId } = get()
       const data = convertToOpenAPI({
-        path: endpointName,
-        operationId: endpointName,
-        endpointConfig: formData.endpoint || {},
-        whatFor,
-        how2Ops,
+        path: information?.endpointName,
+        operationId: information?.endpointName,
+        endpointConfig: information.endpoint || {},
+        whatFor: information?.whatFor,
+        how2Ops: information?.how2Ops,
         responses: treeToSchema(formData.responses),
         params: {
           parameters: formData?.parameters || [],
@@ -103,12 +107,17 @@ export const useEndpointStore = create<EndpointState>()(
       } else {
         await postEndpointsApi(request)
       }
+      unsavedGuard.setUnsavedChanges(false);
+    },
+    setInformation: (information: any) => {
+      unsavedGuard.setUnsavedChanges(true);
+      set({ information: { ...get().information, ...information } })
+    },
+    setActiveKey: (activeKey) => {
+      set({ activeKey })
     },
     setStatus: (type) => set({ status: type }),
     setEditId: (text) => set({ editId: text }),
-    setEndpointName: (name) => set({ endpointName: name }),
-    setWhatFor: (text) => set({ whatFor: text }),
-    setHow2Ops: (text) => set({ how2Ops: text }),
     setParameters: (params) => set({ parameters: params }),
     setResponses: (resps) => set({ responses: resps }),
     setFormData: (data) => set({ formData: data }),

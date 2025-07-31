@@ -128,6 +128,9 @@ importers:
       react-apexcharts:
         specifier: ^1.4.1
         version: 1.4.1(apexcharts@3.43.0)(react@18.2.0)
+      react-beforeunload:
+        specifier: ^2.6.0
+        version: 2.6.0(react@18.2.0)
       react-dom:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
@@ -219,6 +222,9 @@ importers:
       '@types/react':
         specifier: ^18.2.28
         version: 18.2.28
+      '@types/react-beforeunload':
+        specifier: ^2.1.5
+        version: 2.1.5
       '@types/react-dom':
         specifier: ^18.2.13
         version: 18.2.13
@@ -1848,6 +1854,9 @@ packages:
 
   '@types/ramda@0.30.2':
     resolution: {integrity: sha512-PyzHvjCalm2BRYjAU6nIB3TprYwMNOUY/7P/N8bSzp9W/yM2YrtGtAnnVtaCNSeOZ8DzKyFDvaqQs7LnWwwmBA==}
+
+  '@types/react-beforeunload@2.1.5':
+    resolution: {integrity: sha512-xrczkBsJ26lidA/Y/Oln0lYgux79KUkpomaOdnQFPRV9Sx1Mgx53RkYsgZ234HG1ZMKGCmzpk7jO5T4h3bmjvg==}
 
   '@types/react-dom@18.2.13':
     resolution: {integrity: sha512-eJIUv7rPP+EC45uNYp/ThhSpE16k22VJUknt5OLoH9tbXoi8bMhwLf5xRuWMywamNbWzhrSmU7IBJfPup1+3fw==}
@@ -4376,6 +4385,11 @@ packages:
     peerDependencies:
       apexcharts: ^3.41.0
       react: '>=0.13'
+
+  react-beforeunload@2.6.0:
+    resolution: {integrity: sha512-aKrGaRNc7fZQlDnmSYrXu4cbz9QEPhScA4A2mLxhjcULDy4VILLyLhSEjg2goIw3o5LQ1zss44kmQh5LXWYGCw==}
+    peerDependencies:
+      react: ^16.8.0 || 17 || 18
 
   react-copy-to-clipboard@5.1.0:
     resolution: {integrity: sha512-k61RsNgAayIJNoy9yDsYzDe/yAZAzEbEgcz3DZMhF686LEyukcE1hzurxe85JandPUG+yTfGVFzuEw3xt8WP/A==}
@@ -7504,6 +7518,10 @@ snapshots:
     dependencies:
       types-ramda: 0.30.1
 
+  '@types/react-beforeunload@2.1.5':
+    dependencies:
+      '@types/react': 18.2.28
+
   '@types/react-dom@18.2.13':
     dependencies:
       '@types/react': 18.2.28
@@ -10510,6 +10528,10 @@ snapshots:
     dependencies:
       apexcharts: 3.43.0
       prop-types: 15.8.1
+      react: 18.2.0
+
+  react-beforeunload@2.6.0(react@18.2.0):
+    dependencies:
       react: 18.2.0
 
   react-copy-to-clipboard@5.1.0(react@18.2.0):

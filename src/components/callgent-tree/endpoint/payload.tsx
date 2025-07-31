@@ -1,44 +1,28 @@
-import { useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
-import { Button, Form, Input, InputRef, Modal, Select } from 'antd'
+import { Button, Form, Input, Modal, Select } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore from '@/models/callgentTreeStore'
 import { requestMethods } from '../SchemaTree/utils'
 import SchemaEditor from '../SchemaTree/SchemaEditor'
-import { useSchemaTreeStore } from '../SchemaTree/store'
 
 export default function Payload() {
   const {
     status,
-    endpointName,
-    whatFor,
     setIsEndpointOpen,
-    setWhatFor,
-    setEndpointName,
     isEndpointOpen,
-    formData,
-    setFormData
+    information,
+    setInformation
   } = useEndpointStore()
 
   const [formEndpoint] = Form.useForm()
   const { currentNode } = useTreeActionStore()
 
-  const inputRef = useRef<InputRef>(null)
-  const { setFormData1 } = useSchemaTreeStore();
-  useEffect(() => {
-    inputRef.current?.focus()
-    setFormData1(formData)
-  }, [])
-
   return (
     <>
       <div className="flex items-center space-x-2">
         <Input
-          ref={inputRef}
-          defaultValue="mysite"
-          value={endpointName}
-          onChange={(e) => setEndpointName(e.target.value)}
-          disabled={status === 'read_only'}
+          defaultValue={information?.endpointName}
+          onChange={(e) => setInformation({ endpointName: e.target.value })}
           placeholder="Please enter endpoint name starting with /"
         />
         <button onClick={() => setIsEndpointOpen(true)} className="p-2 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-300">
@@ -52,8 +36,8 @@ export default function Payload() {
           <label className="block font-medium mb-2">whatFor</label>
           <Input.TextArea
             rows={2}
-            value={whatFor}
-            onChange={(e) => setWhatFor(e.target.value)}
+            defaultValue={information?.whatFor}
+            onChange={(e) => setInformation({ whatFor: e.target.value })}
             disabled={status === 'read_only'}
             placeholder='Explain to caller, when and how to use this endpoint' />
         </div>
@@ -109,7 +93,7 @@ export default function Payload() {
             type="primary"
             onClick={() => {
               formEndpoint.validateFields().then(values => {
-                setFormData({ ...formData, endpoint: values })
+                setInformation({ endpoint: values })
                 setIsEndpointOpen(false)
               })
             }}
@@ -119,10 +103,9 @@ export default function Payload() {
           </Button>
         ]}
       >
-        <Form form={formEndpoint} layout="vertical" initialValues={formData.endpoint}>
+        <Form form={formEndpoint} layout="vertical" initialValues={information.endpoint}>
           <Form.Item name="method" label="HTTP Method" rules={[{ required: true }]}>
             <Select className="w-full"
-              disabled={status === 'read_only'}
               options={requestMethods.map((item) => ({
                 value: item.value,
                 label: (

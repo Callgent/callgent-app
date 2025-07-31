@@ -78,3 +78,18 @@ export function setLocalStorageItem(key: string, value: string) {
 	const event = new Event('localStorageChange');
 	window.dispatchEvent(event);
 }
+
+// Page not saved
+class UnsavedGuard {
+	private unsavedChanges = false;
+	setUnsavedChanges(hasUnsaved: boolean) {
+		this.unsavedChanges = hasUnsaved;
+	}
+	hasUnsavedChanges() {
+		return this.unsavedChanges;
+	}
+	cleanup() {
+		this.unsavedChanges = false;
+	}
+}
+export const unsavedGuard = new UnsavedGuard();

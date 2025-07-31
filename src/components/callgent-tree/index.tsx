@@ -9,6 +9,7 @@ import { CircleLoading } from '../layouts/loading';
 import Endpoint from './endpoint';
 import { useEndpointStore } from '@/models/endpoint';
 import { useRouter } from '@/router/hooks';
+import { useSchemaTreeStore } from './SchemaTree/store';
 
 export default function CallgentInfo() {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
@@ -57,25 +58,29 @@ export default function CallgentInfo() {
     }
   }, [getAllIds, push]);
   const { toggletheEP } = useEndpointStore()
+  const { setFormData1 } = useSchemaTreeStore();
   const getApi = async (apiId: string, apiType: string) => {
-    const { data }: any = await toggletheEP(apiId)
+    const { data, formData }: any = await toggletheEP(apiId)
     useTreeActionStore.setState({ action: 'virtualApi' })
     useTreeActionStore.setState({ currentNode: { ...data, type: apiType } })
+    setFormData1(formData)
   }
+  const queryParams = new URLSearchParams(location.search);
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
     const id = queryParams.get('callgentId');
-    const apiId = queryParams.get('apiId');
-    const apiType = queryParams.get('type');
     if (id) {
       loadData(id);
     } else {
       push("/callgent/callgents", { replace: false });
     }
+  }, [loadData]);
+  useEffect(() => {
+    const apiId = queryParams.get('apiId');
+    const apiType = queryParams.get('type');
     if (apiId && apiType) {
       getApi(apiId, apiType)
     }
-  }, [loadData]);
+  }, [location])
   if (isLoading) {
     return <CircleLoading />;
   }

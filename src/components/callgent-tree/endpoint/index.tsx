@@ -5,19 +5,17 @@ import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import Payload from './payload'
 import Mapping from './mapping'
 import { useSchemaTreeStore } from '../SchemaTree/store'
+import { useBeforeunload } from 'react-beforeunload';
+import { unsavedGuard } from '@/router/utils'
+import { shouldPreventNavigation } from '@/utils'
 
 export default function EndpointPage() {
-  const { status, endpointName, formData, handleConfirm, clear, setFormData } = useEndpointStore()
+  const { status, formData, activeKey, handleConfirm, clear, setFormData, setActiveKey } = useEndpointStore()
   const { currentNode } = useTreeActionStore()
   const { closeModal } = useTreeActions()
-
-  // 受控页签 key，'1' = Define，'2' = Implement
-  const [activeKey, setActiveKey] = useState<'1' | '2'>('1')
   // AI generation states
   const [aiInputVisible, setAiInputVisible] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
-  // 正在展示 “确认丢弃” 弹窗
-  const [confirming, setConfirming] = useState(false)
 
   const {
     setFormData1,
@@ -36,35 +34,6 @@ export default function EndpointPage() {
   const containerRef = useRef<HTMLDivElement>(null)
   // 输入框 ref，用于自动聚焦
   const inputRef = useRef<InputRef>(null)
-
-  // // 在组件内部注册全局点击监听：点击发生在 containerRef 以外时触发回调
-  // useEffect(() => {
-  //   const handleClickOutside = (e: MouseEvent) => {
-  //     const target = e.target as Node
-
-  //     // 如果当前正在展示 Confirm 弹窗，就不处理外部点击
-  //     if (confirming) return
-
-  //     // 如果点击在 AntD Modal 范围内，也不处理
-  //     const modalEl = document.querySelector('.ant-modal')
-  //     if (modalEl && modalEl.contains(target)) return
-
-  //     // 点击在组件内部，则忽略
-  //     if (containerRef.current?.contains(target)) return
-
-  //     // 真正的外部点击
-  //     if (aiInputVisible) {
-  //       setAiInputVisible(false)
-  //     } else {
-  //       handleCancel()
-  //     }
-  //   }
-
-  //   document.addEventListener('mousedown', handleClickOutside)
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleClickOutside)
-  //   }
-  // }, [aiInputVisible, confirming, status])
 
   // 自动聚焦第一个输入框
   useEffect(() => {
@@ -101,7 +70,6 @@ export default function EndpointPage() {
     setTimeout(() => {
       setResponses(responses)
     }, 10)
-
     setActiveKey(key)
   }
 
@@ -111,8 +79,6 @@ export default function EndpointPage() {
       close()
       return
     }
-
-    setConfirming(true)
     Modal.confirm({
       title: '确认关闭？',
       content: '所有未保存的更改将会丢失，是否确定取消？',
@@ -122,11 +88,7 @@ export default function EndpointPage() {
       centered: true,
       onOk() {
         close()
-        setConfirming(false)
-      },
-      onCancel() {
-        setConfirming(false)
-      },
+      }
     })
   }
 
@@ -152,6 +114,11 @@ export default function EndpointPage() {
       handleConfirm(node)
     }, 50)
   }
+  useBeforeunload(() => {
+    console.log(shouldPreventNavigation());
+
+    return shouldPreventNavigation({ confirm: false }) ? 'back' : false;
+  });
 
   return (
     <div ref={containerRef} className="w-full mr-4">
@@ -193,14 +160,12 @@ export default function EndpointPage() {
 
         <div className="mt-4 flex justify-end space-x-3">
           <Button onClick={handleCancel}>Cancel</Button>
-
           {status === 'define' && (
             currentNode?.type === 'CLIENT' && !aiInputVisible ? (
               activeKey === '1' ? (
                 <Button
                   type="primary"
                   onClick={() => handleNext('2')}
-                  disabled={!endpointName}
                 >
                   Save
                 </Button>

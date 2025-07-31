@@ -7,9 +7,10 @@ import { useDeleteCallgent } from '@/models/callgentStore';
 import { delCallgentApi, deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
 import NodeComponent from './node-component';
-import { createSearchParams } from '@/utils';
+import { createSearchParams, shouldPreventNavigation } from '@/utils';
 import { useEndpointStore } from '@/models/endpoint';
 import { useRouter } from '@/router/hooks';
+import { unsavedGuard } from '@/router/utils';
 
 interface TreeNodeProps {
   nodes: CallgentInfoType[];
@@ -41,6 +42,9 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id!);
   const handleAction = (actionType: TreeAction) => {
+    if (shouldPreventNavigation()) {
+      return null
+    }
     switch (actionType) {
       case 'add':
       case 'import':

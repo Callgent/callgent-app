@@ -52,9 +52,6 @@ export interface ModalNode {
 export interface EndpointState {
   status: 'define' | 'implement' | 'read_only' | 'edit' | null
   editId: string | null
-  endpointName: string
-  whatFor: string
-  how2Ops: string
   parameters: any[]
   responses: any[]
   formData: Record<string, any>
@@ -63,14 +60,14 @@ export interface EndpointState {
   isEndpointOpen: boolean
   editIndex: number
   editType: string
-
+  information: any
+  activeKey: string
+  setActiveKey: (key: any) => void
+  setInformation: (information: any) => void
   toggletheEP: (id: string) => Promise<any>
   handleConfirm: (currentNode: any) => Promise<void>
   setStatus: (status: 'define' | 'implement' | 'edit' | null) => void
   setEditId: (name: string | null) => void
-  setEndpointName: (name: string) => void
-  setWhatFor: (text: string) => void
-  setHow2Ops: (text: string) => void
   setParameters: (params: any[]) => void
   setResponses: (resps: any[]) => void
   setFormData: (data: Record<string, any>) => void

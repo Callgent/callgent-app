@@ -1,3 +1,5 @@
+import { unsavedGuard } from "@/router/utils";
+
 // 类型列表
 export const typeOptions = [
   "string",
@@ -506,6 +508,7 @@ export const getParams = (formData: any) => {
 
 // 更新节点
 export const updateNode = (tree: any, id: string, partial: any) => {
+  unsavedGuard.setUnsavedChanges(true);
   const walk = (n: any): any => {
     if (n.id === id) {
       const isTypeChangeToArray = ["array", "object"].includes(partial?.type);

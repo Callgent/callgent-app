@@ -1,3 +1,4 @@
+import { unsavedGuard } from "@/router/utils";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -23,3 +24,19 @@ export const getSearchParamsAsJson = (): Record<string, string | undefined> => {
 	});
 	return paramsObj;
 };
+
+export const shouldPreventNavigation = (config: { confirm?: boolean } = { confirm: true }) => {
+	const { confirm } = config
+	if (!confirm) {
+		return true
+	}
+	if (unsavedGuard.hasUnsavedChanges()) {
+		const shouldProceed = window.confirm('确定要离开吗？未保存的更改将会丢失');
+		if (shouldProceed) {
+			unsavedGuard.setUnsavedChanges(false);
+			return false;
+		}
+		return true;
+	}
+	return false;
+}

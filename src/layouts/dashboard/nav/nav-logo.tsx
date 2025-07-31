@@ -4,17 +4,17 @@ import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { ThemeLayout } from "#/enum";
 import { HEADER_HEIGHT } from "../config";
 import Logo from "@/assets/images/logo.svg";
-import { NavLink } from "react-router";
+import { useRouter } from "@/router/hooks";
 type Props = {
 	collapsed: boolean;
 	onToggle: () => void;
 };
 export default function NavLogo({ collapsed, onToggle }: Props) {
 	const { themeLayout } = useSettings();
-
+	const { push } = useRouter()
 	return (
 		<div style={{ height: `${HEADER_HEIGHT}px` }} className="relative flex items-center justify-center py-4">
-			<NavLink to="/">
+			<span onClick={() => { push("/") }} className="cursor-pointer">
 				<div className="flex items-center">
 					<img
 						src={Logo}
@@ -23,7 +23,7 @@ export default function NavLogo({ collapsed, onToggle }: Props) {
 					/>
 					{themeLayout !== ThemeLayout.Mini && <span className="ml-2 text-xl font-bold text-primary">Callgent</span>}
 				</div>
-			</NavLink>
+			</span>
 			<div
 				onClick={onToggle}
 				onKeyDown={onToggle}

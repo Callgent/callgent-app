@@ -2,7 +2,6 @@ import { Divider, type MenuProps } from "antd";
 import Dropdown, { type DropdownProps } from "antd/es/dropdown/dropdown";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink } from "react-router";
 
 import { IconButton } from "@/components/icon";
 import { useLoginStateContext } from "@/pages/sys/login/providers/LoginStateProvider";
@@ -25,6 +24,7 @@ export default function AccountDropdown() {
 	useEffect(() => {
 		init()
 	}, [])
+
 	const { clearUserInfoAndToken } = useUserActions();
 	const { backToLogin } = useLoginStateContext();
 	const { t } = useTranslation();
@@ -63,11 +63,11 @@ export default function AccountDropdown() {
 
 	const items: MenuProps["items"] = [
 		{
-			label: <NavLink to="/management/user/profile">{t("sys.menu.user.profile")}</NavLink>,
+			label: <span onClick={() => { push("/management/user/profile") }} >{t("sys.menu.user.profile")}</span>,
 			key: "0",
 		},
 		{
-			label: <NavLink to="/management/system/organization">{t("sys.menu.system.organization")}</NavLink>,
+			label: <span onClick={() => { push("/management/system/organization") }} >{t("sys.menu.system.organization")}</span>,
 			key: "1",
 		},
 		{ type: "divider" },
