@@ -265,17 +265,15 @@ export function treeNodeToJsonSchema(node: any): any {
     ...rest
   } = node;
 
-  // 辅助：格式化 default 值，空字符串转为 {{''}}
+  // 格式化 default 值，空字符串转为 {{''}}
   function formatDefault(def: any) {
     if (def === "") return "{{''}}";
     return def;
   }
-
   const s: any = {
     ...rest,
     type: node.type,
   };
-
   // 1. object 类型
   if (node.type === "object") {
     s.properties = {};
@@ -290,94 +288,34 @@ export function treeNodeToJsonSchema(node: any): any {
     }
     return s;
   }
-
   // 2. array 类型
   if (node.type === "array") {
-    // 如果数组本身有 default
+    // 数组本身有 default
     if (nodeDefault !== undefined) {
       s.default = Array.isArray(nodeDefault)
         ? nodeDefault.map(formatDefault)
         : formatDefault(nodeDefault);
     }
-
-    const itemType = node.children?.[0]?.type || "string";
-
-    // 2.1 元素是 object
-    if (itemType === "object" && Array.isArray(children)) {
-      const allProperties: Record<string, any> = {};
-      const requiredFields = new Set<string>();
-      const defaultArray: any[] = [];
-
+    // 统一使用 items: [schema1, schema2, ...] 格式
+    if (Array.isArray(children)) {
+      const itemsArray: any[] = [];
       for (const child of children) {
-        // 子节点自身 default，直接当完整元素
-        if (child.default !== undefined) {
-          defaultArray.push(formatDefault(child.default));
-        }
-
         const itemSchema = treeNodeToJsonSchema(child);
-        if (itemSchema.properties) {
-          for (const key in itemSchema.properties) {
-            if (!allProperties[key]) {
-              const prop = { ...itemSchema.properties[key] };
-              delete prop.default;
-              allProperties[key] = prop;
-            }
-          }
-        }
-        if (itemSchema.required) {
-          itemSchema.required.forEach((k: string) => requiredFields.add(k));
-        }
-
-        // 如果子节点没有 default，则按子字段组合默认值对象
-        if (child.default === undefined && child.children) {
-          const defaultItem: Record<string, any> = {};
-          for (const field of child.children) {
-            const prop: any = { type: field.type };
-            if (field.default !== undefined) {
-              prop.default = formatDefault(field.default);
-            }
-            defaultItem[field.name] = prop;
-          }
-          defaultArray.push(defaultItem);
-        }
+        itemsArray.push(itemSchema);
       }
-
-      s.items = {
-        type: "object",
-        properties: allProperties,
-      };
-      if (requiredFields.size) {
-        s.items.required = Array.from(requiredFields);
-      }
-      if (defaultArray.length) {
-        s.items.default = defaultArray;
-      }
-      return s;
-    }
-
-    // 2.2 基本类型数组
-    s.items = { type: itemType };
-    const defaultArray: any[] = [];
-    for (const child of children || []) {
-      if (child.default !== undefined) {
-        defaultArray.push(formatDefault(child.default));
-      }
-    }
-    if (defaultArray.length) {
-      s.items.default = defaultArray;
+      s.items = itemsArray;
+    } else {
+      const itemType = node.children?.[0]?.type || "string";
+      s.items = { type: itemType };
     }
     return s;
   }
-
   // 3. 基本类型（string、number、boolean 等）
   if (nodeDefault !== undefined) {
     s.default = formatDefault(nodeDefault);
   }
-
   return s;
 }
-
-
 
 // tree to schema
 export function treeToSchema(node: any) {
