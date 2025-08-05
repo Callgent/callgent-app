@@ -6,6 +6,7 @@ import {
   Tag,
   Popconfirm,
   Mentions,
+  Form,
 } from 'antd'
 import {
   PlusOutlined,
@@ -29,6 +30,7 @@ interface TreeNodeProps {
   addChild: (parentId: string) => void
   openDetail: (id: string) => void
   deleteNode: (id: string) => void
+  setFormData: any
 }
 
 function TreeNodeInner({
@@ -43,6 +45,7 @@ function TreeNodeInner({
   addChild,
   openDetail,
   deleteNode,
+  setFormData
 }: TreeNodeProps) {
   const indent = depth * 16
   const { paramsOptions, responsesOptions } = useSchemaTreeStore()
@@ -106,14 +109,6 @@ function TreeNodeInner({
   const onToggleRequired = useCallback(() => {
     updateNode(node.id, { required: !node.required })
   }, [node.id, node.required, updateNode])
-
-  // 默认值变更（mode=3）
-  const onDefaultChange = useCallback(
-    (value: string) => {
-      updateNode(node.id, { default: value })
-    },
-    [node.id, updateNode]
-  )
 
   // 渲染名称或编辑框
   const NameField = useMemo(() => {
@@ -272,20 +267,19 @@ function TreeNodeInner({
           )}
         </div>
       </div>
-
+      {node.id}
       {/* mode=3 时显示默认值 Mentions */}
       {mode === 3 && (
         <div style={{ marginLeft: indent }} className="mt-1">
-          <Mentions
-            prefix="{{"
-            placeholder="Type {{ to mention…"
-            defaultValue={node.default}
-            onBlur={(e) =>
-              onDefaultChange((e.target as HTMLTextAreaElement).value)
-            }
-            options={schemaType !== "responses" ? paramsOptions : responsesOptions}
-            rows={2}
-          />
+          <Form.Item name={[node.id, node.name]} initialValue={node?.default}>
+            <Mentions
+              prefix="{{"
+              placeholder="Type {{ to mention…"
+              onBlur={(e) => setFormData({ id: node.id, name: 'default', value: (e.target as HTMLTextAreaElement).value })}
+              options={schemaType !== "responses" ? paramsOptions : responsesOptions}
+              rows={2}
+            />
+          </Form.Item>
         </div>
       )}
     </div>

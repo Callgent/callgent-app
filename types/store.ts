@@ -55,6 +55,7 @@ export interface EndpointState {
   parameters: any[]
   responses: any[]
   formData: Record<string, any>
+  schemaData: Record<string, any>
   isParameterOpen: boolean
   isResponseOpen: boolean
   isEndpointOpen: boolean
@@ -71,7 +72,9 @@ export interface EndpointState {
   setParameters: (params: any[]) => void
   setResponses: (resps: any[]) => void
   setFormData: (data: Record<string, any>) => void
+  setSchemaData: (data: Record<string, any>) => void
   setIsEndpointOpen: (open: boolean) => void
+  selectApi: (id: string, entry: string[], apiMap: any) => Promise<void>
   clear: () => void
 }
 

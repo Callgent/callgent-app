@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { TreeSelect, Spin, message } from 'antd'
-import { getEndpointApi, getCallgentApiList } from '@/api/services/callgentService'
+import { getCallgentApiList } from '@/api/services/callgentService'
 import { useLocation } from 'react-router'
 import { useEndpointStore } from '@/models/endpoint'
 
@@ -10,14 +10,12 @@ import {
   updateTreeNode
 } from '@/utils/callgent-tree'
 import ApiMap from './api-map'
-import { useSchemaTreeStore } from '../SchemaTree/store'
-import { generateId, jsonSchemaToTreeNode } from '../SchemaTree/utils'
 
 export default function EndpointSelectApi() {
   const location = useLocation()
   const query = new URLSearchParams(location.search)
   const callgentId = query.get('callgentId') || ''
-  const { setFormData, formData, status } = useEndpointStore()
+  const { setFormData, formData, selectApi } = useEndpointStore()
 
   const [treeData, setTreeData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -63,26 +61,10 @@ export default function EndpointSelectApi() {
     }
   }
 
-  // Handle API selection and load parameters
-  const { setFormData2, formData2, setSelectApi, selectApi } = useSchemaTreeStore();
   const handleApiSelect = async (value: string, node: any) => {
     if (!node?.fullData) return
     try {
-      const { data } = await getEndpointApi(value);
-      setFormData2({
-        ...formData2,
-        parameters: data?.params?.parameters.map((i: any) => ({ ...i, id: generateId() })),
-        requestBody: jsonSchemaToTreeNode(data?.params?.requestBody?.content?.["application/json"]?.schema).children,
-      })
-      setFormData({
-        ...formData,
-        metaExe: {
-          ...data?.params,
-          requestBody: data?.params?.requestBody?.content?.["application/json"]?.schema,
-          apiMap: { epName: data.name, api_data: data }
-        }
-      })
-      setSelectApi(data)
+      await selectApi(value, node.fullData?.entry?.callgentIds, {})
     } catch (err) {
       message.error('Failed to load API parameters')
     }
@@ -97,10 +79,9 @@ export default function EndpointSelectApi() {
           onSelect={handleApiSelect}
           placeholder="Select an API"
           treeDefaultExpandAll={false}
-          defaultValue={selectApi?.name || null}
+          defaultValue={formData?.metaExe?.apiMap?.epName || null}
           allowClear
           showSearch
-          disabled={status === 'read_only'}
         />
         <ApiMap />
       </Spin>

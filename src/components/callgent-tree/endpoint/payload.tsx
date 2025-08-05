@@ -3,7 +3,7 @@ import { Button, Form, Input, Modal, Select } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore from '@/models/callgentTreeStore'
 import { requestMethods } from '../SchemaTree/utils'
-import SchemaEditor from '../SchemaTree/SchemaEditor'
+import SchemaEditor from '../SchemaTree/schema-editor'
 
 export default function Payload() {
   const {
@@ -11,12 +11,21 @@ export default function Payload() {
     setIsEndpointOpen,
     isEndpointOpen,
     information,
-    setInformation
+    setInformation,
+    schemaData,
+    setSchemaData
   } = useEndpointStore()
 
   const [formEndpoint] = Form.useForm()
-  const { currentNode } = useTreeActionStore()
+  const { currentNode, } = useTreeActionStore()
 
+  // 更新
+  const submitSchema = (data: any, form: string) => {
+    setSchemaData((prevSchemaData: any) => ({
+      ...prevSchemaData,
+      [form]: data?.children || []
+    }))
+  }
   return (
     <>
       <div className="flex items-center space-x-2">
@@ -50,6 +59,9 @@ export default function Payload() {
           <SchemaEditor
             mode={2}
             schemaType="parameters"
+            schema={schemaData?.parameters}
+            submitSchema={(data: any) => submitSchema(data, 'parameters')}
+            setFormData={null}
           />
         </div>
       </div>
@@ -61,6 +73,9 @@ export default function Payload() {
           <SchemaEditor
             mode={2}
             schemaType="requestBody"
+            schema={schemaData?.requestBody}
+            submitSchema={(data: any) => submitSchema(data, 'requestBody')}
+            setFormData={null}
           />
         </div>
       </div>
@@ -72,6 +87,9 @@ export default function Payload() {
           <SchemaEditor
             mode={2}
             schemaType="responses"
+            schema={schemaData?.responses}
+            submitSchema={(data: any) => submitSchema(data, 'responses')}
+            setFormData={null}
           />
         </div>
       </div>

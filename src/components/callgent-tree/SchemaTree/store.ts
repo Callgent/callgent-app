@@ -2,41 +2,31 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { flattenSchemaToMentions } from "./utils";
 const initData = {
-  parameters: [],
-  requestBody: [],
-  responses: [],
+  schemaData: {},
   paramsOptions: [],
   responsesOptions: [],
-  isEdit: false,
-  formData1: {},
-  formData2: {},
-  selectApi: {},
-}
+  formData: {},
+};
 
 export const useSchemaTreeStore = create<any>()(
   persist(
     (set) => ({
       ...initData,
-      setIsEdit: (isEdit: boolean) => {
-        set({ isEdit });
+      setSchemaData: (schemaData: any) => {
+        set((state: any) => ({
+          schemaData:
+            typeof schemaData === "function"
+              ? schemaData(state.schemaData)
+              : { ...state.schemaData, ...schemaData },
+        }));
       },
-      setParameters: (parameters: any) => {
-        set({ parameters });
-      },
-      setRequestBody: (requestBody: any) => {
-        set({ requestBody });
-      },
-      setResponses: (responses: any) => {
-        set({ responses: responses });
-      },
-      setFormData1: (formData1: any) => {
-        set({ formData1 });
-      },
-      setFormData2: (formData2: any) => {
-        set({ formData2 });
-      },
-      setSelectApi: (selectApi: any) => {
-        set({ selectApi })
+      setFormData: (formData: any) => {
+        set((state: any) => ({
+          formData:
+            typeof formData === "function"
+              ? formData(state.formData)
+              : { ...state.formData, ...formData },
+        }));
       },
       // 表达式提示
       setParamsOptions: (schema: any) => {
@@ -45,8 +35,8 @@ export const useSchemaTreeStore = create<any>()(
       setResponsesOptions: (schema: any) => {
         set({ responsesOptions: flattenSchemaToMentions(schema) });
       },
-      clearSchemaTreeStore: () => {
-        set({ ...initData })
+      clear: () => {
+        set({ ...initData });
       },
     }),
     {

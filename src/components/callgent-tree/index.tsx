@@ -58,12 +58,10 @@ export default function CallgentInfo() {
     }
   }, [getAllIds, push]);
   const { toggletheEP } = useEndpointStore()
-  const { setFormData1 } = useSchemaTreeStore();
   const getApi = async (apiId: string, apiType: string) => {
-    const { data, formData }: any = await toggletheEP(apiId)
+    const { data }: any = await toggletheEP(apiId)
     useTreeActionStore.setState({ action: 'virtualApi' })
     useTreeActionStore.setState({ currentNode: { ...data, type: apiType } })
-    setFormData1(formData)
   }
   const queryParams = new URLSearchParams(location.search);
   useEffect(() => {

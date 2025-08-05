@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Input, Button, Tabs, Modal } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
@@ -12,52 +12,7 @@ export default function EndpointPage() {
   // AI generation states
   const [aiInputVisible, setAiInputVisible] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
-
-  const {
-    setFormData1,
-    setFormData2,
-    parameters,
-    requestBody,
-    responses,
-    clearSchemaTreeStore,
-    formData1,
-    setParameters,
-    setRequestBody,
-    setResponses,
-  } = useSchemaTreeStore()
-
-  // 点击 Next，跳到下一页签；如果已是最后一页，可执行保存或确认
-  const handleNext = (key: '1' | '2') => {
-    if (key === '2') {
-      setFormData({
-        ...formData,
-        parameters,
-        requestBody,
-        responses,
-      })
-      setFormData1({ parameters, requestBody, responses })
-    } else {
-      setFormData2({ parameters, requestBody, responses })
-      // 恢复之前的 define 数据
-      setTimeout(() => {
-        setParameters(formData1?.parameters)
-        setRequestBody(formData1?.requestBody)
-        setFormData({
-          ...formData,
-          metaExe: {
-            ...formData?.metaExe,
-            parameters,
-            requestBody,
-          },
-        })
-      }, 10)
-    }
-    // 保证 responses 在下一次渲染时更新
-    setTimeout(() => {
-      setResponses(responses)
-    }, 10)
-    setActiveKey(key)
-  }
+  const { parameters, requestBody, responses, clearSchemaTreeStore } = useSchemaTreeStore()
 
   // Reset all states or 弹出确认框
   const handleCancel = () => {
@@ -121,7 +76,7 @@ export default function EndpointPage() {
           currentNode?.type === 'CLIENT' ? (
             <Tabs
               activeKey={activeKey}
-              onChange={key => handleNext(key as '1' | '2')}
+              onChange={setActiveKey}
               items={[
                 { key: '1', label: 'Define', children: <Payload /> },
                 { key: '2', label: 'Implement', children: <Mapping /> },
@@ -147,7 +102,7 @@ export default function EndpointPage() {
               activeKey === '1' ? (
                 <Button
                   type="primary"
-                  onClick={() => handleNext('2')}
+                  onClick={() => setActiveKey('2')}
                 >
                   Save
                 </Button>

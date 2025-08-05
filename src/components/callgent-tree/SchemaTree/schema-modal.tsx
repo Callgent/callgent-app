@@ -1,15 +1,7 @@
 import React from 'react'
 import { Modal, Form, Input, Select, Checkbox } from 'antd'
 import { typeOptions } from './utils'
-
-interface DetailModalProps {
-    visible: boolean
-    mode: 1 | 2 | 3
-    schemaType: 'requestBody' | 'parameters' | 'responses'
-    onCancel: () => void
-    onOk: (values: any) => void
-    initialValues: any
-}
+import type { SchemaModalProps } from './types'
 
 const fieldsConfig: Record<string, string[]> = {
     parameters: ['name', 'in', 'type', 'default', 'required', 'description'],
@@ -17,19 +9,11 @@ const fieldsConfig: Record<string, string[]> = {
     responses: ['name', 'type', 'default', 'description'],
 }
 
-export default function SchemaDetailModal({
-    visible,
-    mode,
-    schemaType,
-    onCancel,
-    onOk,
-    initialValues,
-}: DetailModalProps) {
+function SchemaDetailModal({ visible, mode, schemaType, onCancel, onOk, initialValues }: SchemaModalProps) {
     const [form] = Form.useForm()
     React.useEffect(() => {
         form.setFieldsValue(initialValues)
     }, [initialValues])
-    console.log(initialValues);
 
     const onFinish = (vals: any) => onOk(vals)
 
@@ -140,3 +124,5 @@ export default function SchemaDetailModal({
         </Modal>
     )
 }
+
+export default React.memo(SchemaDetailModal, (prev, next) => { return (prev === next) })
