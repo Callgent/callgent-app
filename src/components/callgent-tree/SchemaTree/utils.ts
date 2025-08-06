@@ -315,19 +315,21 @@ export function treeNodeToJsonSchema(node: any): any {
     in: inLocation,
     default: nodeDefault,
     schema,
+    type: nodeType,
     ...rest
   } = node;
-  // 格式化 default 值，空字符串转为
+  const effectiveType = nodeType || schema?.type;
+  const effectiveDefault = nodeDefault !== undefined ? nodeDefault : schema?.default;
   function formatDefault(def: any) {
     if (def === "") return "";
     return def;
   }
   const s: any = {
     ...rest,
-    type: node.type,
+    type: effectiveType,
   };
   // 1. object 类型
-  if (node.type === "object") {
+  if (effectiveType === "object") {
     s.properties = {};
     const reqs: string[] = [];
     children?.forEach((c: any) => {
@@ -335,18 +337,18 @@ export function treeNodeToJsonSchema(node: any): any {
       if (c.required) reqs.push(c.name);
     });
     if (reqs.length) s.required = reqs;
-    if (nodeDefault !== undefined) {
-      s.default = formatDefault(nodeDefault);
+    if (effectiveDefault !== undefined) {
+      s.default = formatDefault(effectiveDefault);
     }
     return s;
   }
   // 2. array 类型
-  if (node.type === "array") {
+  if (effectiveType === "array") {
     // 数组本身有 default
-    if (nodeDefault !== undefined) {
-      s.default = Array.isArray(nodeDefault)
-        ? nodeDefault.map(formatDefault)
-        : formatDefault(nodeDefault);
+    if (effectiveDefault !== undefined) {
+      s.default = Array.isArray(effectiveDefault)
+        ? effectiveDefault.map(formatDefault)
+        : formatDefault(effectiveDefault);
     }
 
     // 直接将所有 children 作为 items 数组项
@@ -365,8 +367,8 @@ export function treeNodeToJsonSchema(node: any): any {
     return s;
   }
   // 3. 基本类型（string、number、boolean 等）
-  if (nodeDefault !== undefined) {
-    s.default = formatDefault(nodeDefault);
+  if (effectiveDefault !== undefined) {
+    s.default = formatDefault(effectiveDefault);
   }
   return s;
 }
@@ -375,7 +377,7 @@ export function treeNodeToJsonSchema(node: any): any {
 export function treeToSchema(node: any) {
   return treeNodeToJsonSchema({
     type: "object",
-    id: "1753844670780_h9d22o",
+    id: "root",
     name: "",
     editingName: false,
     required: false,
@@ -591,3 +593,18 @@ export const updateNode_ = (tree: any, id: string, partial: any) => {
   };
   return walk(tree);
 };
+
+export function transformArrayItems(arr: any[]) {
+  return arr.map((item: any) => {
+    const transformedItem = {
+      ...item,
+      schema: item.schema ? { ...item.schema } : {}
+    };
+    if (item.default !== undefined && item.default !== null && item.default !== '') {
+      transformedItem.schema.default = item.default;
+    }
+    delete transformedItem.type
+    delete transformedItem.default
+    return transformedItem;
+  });
+}

@@ -139,39 +139,6 @@ function TreeNodeInner({
         </div>
         {node.required && <div style={{ color: 'red', cursor: 'pointer' }} className='w-3 text-center' onClick={mode === 2 ? onToggleRequired : undefined} title='是否必填？'>*</div>}
         {!node.required && mode === 2 && <div className='w-3 h-3 border-2 border-gray-500 cursor-pointer rounded-sm' onClick={onToggleRequired} title='是否必填？'></div>}
-        {mode === 2 && (
-          <div className="w-32 mx-2 flex">
-            {node.editingDescription ? (
-              <Input
-                size="small"
-                autoFocus
-                defaultValue={node.description}
-                placeholder="请输入描述"
-                className="border-0 border-b border-gray-300 focus:border-blue-500 focus:shadow-none rounded-none"
-                onBlur={(e) => {
-                  updateNode(node.id, {
-                    description: (e.target as HTMLInputElement).value,
-                    editingDescription: false,
-                  })
-                }}
-                onPressEnter={(e) => {
-                  updateNode(node.id, {
-                    description: (e.target as HTMLInputElement).value,
-                    editingDescription: false,
-                  })
-                }}
-              />
-            ) : (
-              <div
-                className="text-gray-600 cursor-pointer border-b border-dashed border-transparent hover:border-gray-400 truncate w-32"
-                onClick={() => updateNode(node.id, { editingDescription: true })}
-                title={node.description}
-              >
-                {node.description || '添加描述...'}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     )
   }, [
@@ -204,7 +171,41 @@ function TreeNodeInner({
           {/* 名称 */}
           <div>{NameField}</div>
         </div>
-
+        <div className='flex-1 pl-2 pr-4'>
+          {mode === 2 && (
+            <div className="mx-2 flex w-full">
+              {node.editingDescription ? (
+                <Input
+                  size="small"
+                  autoFocus
+                  defaultValue={node.description}
+                  placeholder="请输入描述"
+                  className="border-0 border-b border-gray-300 focus:border-blue-500 focus:shadow-none rounded-none"
+                  onBlur={(e) => {
+                    updateNode(node.id, {
+                      description: (e.target as HTMLInputElement).value,
+                      editingDescription: false,
+                    })
+                  }}
+                  onPressEnter={(e) => {
+                    updateNode(node.id, {
+                      description: (e.target as HTMLInputElement).value,
+                      editingDescription: false,
+                    })
+                  }}
+                />
+              ) : (
+                <div
+                  className="text-gray-600 cursor-pointer border-b border-dashed border-transparent hover:border-gray-400 truncate w-full"
+                  onClick={() => updateNode(node.id, { editingDescription: true })}
+                  title={node.description}
+                >
+                  {node.description || '添加描述...'}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         <div className="flex items-center space-x-2">
           {((mode === 2 && ['object'].includes(node.type)) || (mode === 3 && ['array'].includes(node.type)) || ((mode === 2 && node.children?.length === 0))) && (
             <Button

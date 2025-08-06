@@ -1,6 +1,6 @@
 import { EndpointState } from '#/store'
 import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
-import { jsonSchemaToTreeNode, extractFirst2xxJsonSchema, generateId, treeToSchema, extractAllDefaults, mergeSchemaWithFormData } from '@/components/callgent-tree/SchemaTree/utils';
+import { jsonSchemaToTreeNode, extractFirst2xxJsonSchema, generateId, treeToSchema, extractAllDefaults, mergeSchemaWithFormData, transformArrayItems } from '@/components/callgent-tree/SchemaTree/utils';
 import { unsavedGuard } from '@/router/utils';
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { message } from 'antd';
@@ -79,7 +79,7 @@ export const useEndpointStore = create<EndpointState>()(
           how2Ops: information?.how2Ops,
           responses: treeToSchema(schemaData.responses),
           params: {
-            parameters: schemaData?.parameters || [],
+            parameters: transformArrayItems(schemaData?.parameters) || [],
             requestBody: {
               content: {
                 "application/json": {
@@ -107,7 +107,7 @@ export const useEndpointStore = create<EndpointState>()(
           epName: metaExe?.apiMap?.epName,
           entry: metaExe?.apiMap?.entry,
           params: {
-            parameters: jsonSchemaToTreeNode(apiMapData?.parameters2)?.children || [],
+            parameters: transformArrayItems(jsonSchemaToTreeNode(apiMapData?.parameters2)?.children) || [],
             requestBody: {
               content: {
                 "application/json": {
