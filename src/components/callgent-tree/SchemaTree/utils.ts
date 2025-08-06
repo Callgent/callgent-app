@@ -39,30 +39,35 @@ export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
 
 export const createSchemaNode = (
   type: "string" | "object" = "string",
-  name = ""
-): any => ({
-  id: generateId(),
-  name,
-  editingName: true,
-  type,
-  required: true,
-  in: "query",
-  ...(type === "object" ? { children: [] } : {}),
-});
+  name = "",
+  parentId?: string
+): any => {
+  // 根据是否有 parentId 来生成 id
+  const id = parentId ? `${parentId}_${name}` : "root_";
+  return {
+    id,
+    name,
+    editingName: true,
+    type,
+    required: true,
+    in: "query",
+    ...(type === "object" ? { children: [] } : {}),
+  };
+};
 
 export const addSchemaChild = (tree: any, parentId: string): any => {
   const walk = (node: any): any => {
     if (parentId === "root") {
       return {
         ...node,
-        children: [...(node.children || []), createSchemaNode()],
+        children: [...(node.children || []), createSchemaNode("string", "")],
       };
     }
     if (node.id === parentId) {
       if (node.type === "object") {
         return {
           ...node,
-          children: [...(node.children || []), createSchemaNode()],
+          children: [...(node.children || []), createSchemaNode(node.type, '', node.id)],
         };
       }
       if (node.type === "array") {
@@ -220,64 +225,78 @@ export function jsonSchemaToTreeNode(
       node.children.push(childNode);
     }
   }
-
   if (schema.type === "array" && items) {
     node.children = [];
 
-    if (items?.default && Array.isArray(items.default)) {
-      const defaults = items.default;
+    if (Array.isArray(items)) {
+      // items 是数组，说明是元组（tuple）类型，每个 item 可能结构不同
+      items.forEach((item, index) => {
+        const itemNode = jsonSchemaToTreeNode(
+          {
+            ...item,
+            parentType: "array",
+          },
+          `item_${index + 1}`,
+          inLocation,
+          currentId
+        );
+        node.children.push(itemNode);
+      });
+    } else {
+      // items 是对象，说明是统一类型数组
+      let item = items;
 
-      // 判断是对象数组还是基础类型数组
-      if (items.type === "object") {
-        for (let i = 0; i < defaults.length; i++) {
-          const defaultEntry = defaults[i];
-          const clonedItems = JSON.parse(JSON.stringify(items));
+      if (item?.default && Array.isArray(item.default)) {
+        const defaults = item.default;
 
-          if (clonedItems.properties) {
-            for (const key in clonedItems.properties) {
-              if (defaultEntry[key] !== undefined) {
-                clonedItems.properties[key].default = defaultEntry[key];
+        if (item.type === "object") {
+          for (let i = 0; i < defaults.length; i++) {
+            const defaultEntry = defaults[i];
+            const clonedItems = JSON.parse(JSON.stringify(item));
+            if (clonedItems.properties) {
+              for (const key in clonedItems.properties) {
+                if (defaultEntry[key] !== undefined) {
+                  clonedItems.properties[key].default = defaultEntry[key];
+                }
               }
             }
+            delete clonedItems.default;
+            clonedItems.parentType = "array";
+            const itemNode = jsonSchemaToTreeNode(
+              clonedItems,
+              `item_${i + 1}`,
+              inLocation,
+              currentId
+            );
+            node.children.push(itemNode);
           }
-
-          delete clonedItems.default;
-          clonedItems.parentType = "array";
-
-          const itemNode = jsonSchemaToTreeNode(
-            clonedItems,
-            `item_${i + 1}`,
-            inLocation,
-            currentId // 传递父 ID
-          );
-          node.children.push(itemNode);
+        } else {
+          for (let i = 0; i < defaults.length; i++) {
+            const value = defaults[i];
+            const itemNode = jsonSchemaToTreeNode(
+              {
+                ...item,
+                default: value,
+                parentType: "array",
+              },
+              `item_${i + 1}`,
+              inLocation,
+              currentId
+            );
+            node.children.push(itemNode);
+          }
         }
       } else {
-        for (let i = 0; i < defaults.length; i++) {
-          const value = defaults[i];
-          const itemNode = jsonSchemaToTreeNode(
-            {
-              ...items,
-              default: value,
-              parentType: "array",
-            },
-            `item_${i + 1}`,
-            inLocation,
-            currentId // 传递父 ID
-          );
-          node.children.push(itemNode);
-        }
+        // 没有默认值，添加一个空的 item 节点
+        item.parentType = "array";
+        const itemNode = jsonSchemaToTreeNode(
+          item,
+          "item_1",
+          inLocation,
+          currentId
+        );
+        node.children.push(itemNode);
       }
-    } else {
-      // 没有默认值，添加一个空的 item 节点
-      items.parentType = "array";
-      const itemNode = jsonSchemaToTreeNode(
-        items,
-        "item_1",
-        inLocation,
-        currentId // 传递父 ID
-      );
-      node.children.push(itemNode);
     }
   }
   return node;
@@ -398,24 +417,43 @@ export const getParams = (formData: any) => {
 };
 
 // 更新节点
+// 更新节点
 export const updateNode = (tree: any, id: string, partial: any) => {
   // unsavedGuard.setUnsavedChanges(true);
-  const walk = (n: any): any => {
-    if (n.id === id) {
+  const walk = (n: any, parentId?: string): any => {
+    // 更新当前节点的 ID（如果需要）
+    let currentNode = n;
+    if (parentId && n.name) {
+      const newId = `${parentId}_${n.name}`;
+      currentNode = { ...n, id: newId };
+    }
+    // 检查是否是目标节点
+    if (currentNode.id === id) {
       const isTypeChangeToArray = ["array", "object"].includes(partial?.type);
-      const updated = { ...n, ...partial };
+      const updated = { ...currentNode, ...partial };
       if (!isTypeChangeToArray && partial?.type !== undefined) {
         updated.children = [];
       }
+      // 如果 name 被更新，也需要更新 id
+      if (partial?.name !== undefined && parentId) {
+        updated.id = `${parentId}_${partial.name}`;
+      }
       return updated;
     }
-    if (n.children) {
-      return { ...n, children: n.children.map(walk) };
+    // 处理子节点
+    if (currentNode.children) {
+      return {
+        ...currentNode,
+        children: currentNode.children.map((child: any) => walk(child, currentNode.id))
+      };
     }
-    if (n.item) {
-      return { ...n, item: walk(n.item) };
+    if (currentNode.item) {
+      return {
+        ...currentNode,
+        item: walk(currentNode.item, currentNode.id)
+      };
     }
-    return n;
+    return currentNode;
   };
   return walk(tree);
 };
@@ -516,20 +554,40 @@ export const mergeSchemaWithFormData = (schemaData: any, formData: any) => {
       type: "object",
       required: false,
       in: "query",
+      default: key === 'responses' ? formDataForKey["root_response"]?.default || "" : "",
       children: Array.isArray(value) ? [...value] : [],
     };
-    const rootResponseData = formDataForKey["root_response"];
-    if (rootResponseData) {
-      Object.assign(currentTree, rootResponseData);
-    }
+    // console.log(key, formDataForKey['root_response']);
+
     if (formDataForKey) {
       Object.entries(formDataForKey).forEach(([innerKey, innerValue]) => {
-        currentTree = updateNode(currentTree, innerKey, innerValue);
+        currentTree = updateNode_(currentTree, innerKey, innerValue);
       });
     }
     // 保存结果
-    results[key] = treeNodeToJsonSchema(currentTree);
+    results[key] = { ...treeNodeToJsonSchema(currentTree) };
   });
   return results;
 };
 
+export const updateNode_ = (tree: any, id: string, partial: any) => {
+  // unsavedGuard.setUnsavedChanges(true);
+  const walk = (n: any): any => {
+    if (n.id === id) {
+      const isTypeChangeToArray = ["array", "object"].includes(partial?.type);
+      const updated = { ...n, ...partial };
+      if (!isTypeChangeToArray && partial?.type !== undefined) {
+        updated.children = [];
+      }
+      return updated;
+    }
+    if (n.children) {
+      return { ...n, children: n.children.map(walk) };
+    }
+    if (n.item) {
+      return { ...n, item: walk(n.item) };
+    }
+    return n;
+  };
+  return walk(tree);
+};

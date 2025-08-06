@@ -267,7 +267,6 @@ function TreeNodeInner({
           )}
         </div>
       </div>
-      {node.id}
       {/* mode=3 时显示默认值 Mentions */}
       {mode === 3 && (
         <div style={{ marginLeft: indent }} className="mt-1">

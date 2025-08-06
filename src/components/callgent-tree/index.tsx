@@ -9,7 +9,6 @@ import { CircleLoading } from '../layouts/loading';
 import Endpoint from './endpoint';
 import { useEndpointStore } from '@/models/endpoint';
 import { useRouter } from '@/router/hooks';
-import { useSchemaTreeStore } from './SchemaTree/store';
 
 export default function CallgentInfo() {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());

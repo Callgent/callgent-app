@@ -71,7 +71,6 @@ export const useEndpointStore = create<EndpointState>()(
       // 提交ep
       handleConfirm: async (currentNode) => {
         const { formData, information, editId, schemaData } = get();
-
         const data = convertToOpenAPI({
           path: information?.endpointName,
           operationId: information?.endpointName,
@@ -91,16 +90,18 @@ export const useEndpointStore = create<EndpointState>()(
           }
         })
         const metaExe = formData?.metaExe;
-        const apiMapData = mergeSchemaWithFormData(
+        let apiMapData = mergeSchemaWithFormData(
           {
             parameters2: schemaData?.parameters2,
             requestBody2: schemaData?.requestBody2,
             responses: schemaData?.responses
-          }, {
-          parameters2: formData?.parameters2,
-          requestBody2: formData?.requestBody2,
-          responses: formData?.responses,
-        })
+          },
+          {
+            parameters2: formData?.parameters2,
+            requestBody2: formData?.requestBody2,
+            responses: formData?.responses,
+          }
+        )
         const apiMap = (currentNode?.type === 'CLIENT' && metaExe?.apiMap?.epId) ? {
           epId: metaExe?.apiMap?.epId,
           epName: metaExe?.apiMap?.epName,
@@ -145,8 +146,9 @@ export const useEndpointStore = create<EndpointState>()(
         let requestBody2 = jsonSchemaToTreeNode(data?.params?.requestBody?.content["application/json"]?.schema)?.children || []
         let responses2 = jsonSchemaToTreeNode(extractFirst2xxJsonSchema(data?.responses))?.children || []
         let responses = schemaData?.responses
+        let defaultValue = { response: '', response2: '' }
         if (apiMap) {
-          const parameters2_default = extractAllDefaults(apiMap?.params?.parameters || [])
+          const parameters2_default = extractAllDefaults(apiMap?.params?.parameters.map((item: any) => ({ ...item, id: item?._id })) || [])
           const requestBody2_default = extractAllDefaults(jsonSchemaToTreeNode(apiMap?.params?.requestBody?.content["application/json"]?.schema)?.children || [])
           const responsesDefault = extractFirst2xxJsonSchema(apiMap?.responses)
           const responses_default = extractAllDefaults(jsonSchemaToTreeNode(responsesDefault)?.children || [])
@@ -155,6 +157,7 @@ export const useEndpointStore = create<EndpointState>()(
             requestBody2: requestBody2_default,
             responses: { ...responses_default, root_response: responsesDefault?.default },
           })
+          defaultValue.response = responsesDefault?.default || ""
           parameters2 = jsonSchemaToTreeNode(data?.parameters2).children || []
           requestBody2 = jsonSchemaToTreeNode(data?.requestBody2).children || []
           responses = jsonSchemaToTreeNode(data?.responses).children || []
@@ -162,6 +165,7 @@ export const useEndpointStore = create<EndpointState>()(
         set({
           formData: {
             ...formData,
+            defaultValue,
             metaExe: {
               apiMap: { epId: data.id, epName: data.name, entry }
             }

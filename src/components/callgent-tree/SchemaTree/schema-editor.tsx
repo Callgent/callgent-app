@@ -1,13 +1,14 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import TreeNode from './schema-node'
 import SchemaDetailModal from './schema-modal'
 import { addSchemaChild, deleteNode, findNodeWithParent, getNestedNodeIds, updateNode } from './utils'
 import { Button, Form } from 'antd'
 import type { SchemaEditorProps, TreeNodeData } from './types'
+import { useEndpointStore } from '@/models/endpoint'
 
 function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData }: SchemaEditorProps) {
     const [tree, setTree] = useState<TreeNodeData>({ id: 'root', name: '', type: 'object', required: false, in: 'query', children: [], })
-
+    const { formData } = useEndpointStore()
     // 折叠状态
     const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set())
 
@@ -18,26 +19,41 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
     } | null>(null)
 
     // 初始化 & 同步 tree、store
+    // 使用 ref 存储当前的 children，确保折叠状态计算的准确性
+    const currentChildrenRef = useRef<TreeNodeData[]>([])
     useEffect(() => {
         let children: TreeNodeData[] = schema || []
         if (mode !== 2 && schemaType === "responses") {
+            const { defaultValue } = formData;
             children = [
                 {
                     id: 'root_response',
                     name: 'response',
                     type: 'object',
                     required: false,
-                    in: 'query',
-                    default: '',
+                    in: 'body',
+                    default: mode === 1 ? defaultValue?.response2 : defaultValue?.response,
                     children: children,
                 },
             ];
         }
-        setTree((t) => ({ ...t, children }))
-        // 首次展开前就折叠所有 object/array
-        setCollapsedIds(getNestedNodeIds(children))
-    }, [schema])
 
+        // 更新 ref
+        currentChildrenRef.current = children
+
+        // 先更新 tree
+        setTree((t) => ({ ...t, children }))
+
+        // 然后基于新的 children 更新折叠状态（只在首次初始化时）
+        setCollapsedIds(prevCollapsed => {
+            if (prevCollapsed.size === 0) {
+                // 首次初始化时折叠所有 object/array 节点
+                return getNestedNodeIds(children);
+            }
+            // 后续更新保持现有折叠状态
+            return prevCollapsed;
+        });
+    }, [schema, mode, schemaType])
     // 回调：折叠/展开
     const toggleCollapse = useCallback((id: string) => {
         setCollapsedIds((prev) => {
