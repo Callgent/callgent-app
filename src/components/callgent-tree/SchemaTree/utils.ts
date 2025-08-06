@@ -554,7 +554,7 @@ export const mergeSchemaWithFormData = (schemaData: any, formData: any) => {
       type: "object",
       required: false,
       in: "query",
-      default: key === 'responses' ? formDataForKey["root_response"]?.default || "" : "",
+      default: key === 'responses' ? formDataForKey?.root_response?.default || '' : "",
       children: Array.isArray(value) ? [...value] : [],
     };
     // console.log(key, formDataForKey['root_response']);
