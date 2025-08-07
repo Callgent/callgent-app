@@ -1,4 +1,4 @@
-// import { unsavedGuard } from "@/router/utils";
+import { unsavedGuard } from "@/router/utils";
 
 import type { TreeNodeData } from "./types";
 
@@ -315,21 +315,22 @@ export function treeNodeToJsonSchema(node: any): any {
     in: inLocation,
     default: nodeDefault,
     schema,
-    type: nodeType,
     ...rest
   } = node;
-  const effectiveType = nodeType || schema?.type;
-  const effectiveDefault = nodeDefault !== undefined ? nodeDefault : schema?.default;
+  // 格式化 default 值，空字符串转为
   function formatDefault(def: any) {
     if (def === "") return "";
     return def;
   }
   const s: any = {
     ...rest,
-    type: effectiveType,
+    type: node.type,
   };
+  if (!s?.default) {
+    delete s.default
+  }
   // 1. object 类型
-  if (effectiveType === "object") {
+  if (node.type === "object") {
     s.properties = {};
     const reqs: string[] = [];
     children?.forEach((c: any) => {
@@ -337,20 +338,16 @@ export function treeNodeToJsonSchema(node: any): any {
       if (c.required) reqs.push(c.name);
     });
     if (reqs.length) s.required = reqs;
-    if (effectiveDefault !== undefined) {
-      s.default = formatDefault(effectiveDefault);
-    }
     return s;
   }
   // 2. array 类型
-  if (effectiveType === "array") {
+  if (node.type === "array") {
     // 数组本身有 default
-    if (effectiveDefault !== undefined) {
-      s.default = Array.isArray(effectiveDefault)
-        ? effectiveDefault.map(formatDefault)
-        : formatDefault(effectiveDefault);
+    if (nodeDefault !== undefined) {
+      s.default = Array.isArray(nodeDefault)
+        ? nodeDefault.map(formatDefault)
+        : formatDefault(nodeDefault);
     }
-
     // 直接将所有 children 作为 items 数组项
     if (Array.isArray(children) && children.length > 0) {
       // 转换所有 children 为 items 数组
@@ -365,10 +362,6 @@ export function treeNodeToJsonSchema(node: any): any {
       s.items = { type: "string" };
     }
     return s;
-  }
-  // 3. 基本类型（string、number、boolean 等）
-  if (effectiveDefault !== undefined) {
-    s.default = formatDefault(effectiveDefault);
   }
   return s;
 }
@@ -419,9 +412,8 @@ export const getParams = (formData: any) => {
 };
 
 // 更新节点
-// 更新节点
 export const updateNode = (tree: any, id: string, partial: any) => {
-  // unsavedGuard.setUnsavedChanges(true);
+  unsavedGuard.setUnsavedChanges(true);
   const walk = (n: any, parentId?: string): any => {
     // 更新当前节点的 ID（如果需要）
     let currentNode = n;
@@ -573,7 +565,7 @@ export const mergeSchemaWithFormData = (schemaData: any, formData: any) => {
 };
 
 export const updateNode_ = (tree: any, id: string, partial: any) => {
-  // unsavedGuard.setUnsavedChanges(true);
+  unsavedGuard.setUnsavedChanges(true);
   const walk = (n: any): any => {
     if (n.id === id) {
       const isTypeChangeToArray = ["array", "object"].includes(partial?.type);
