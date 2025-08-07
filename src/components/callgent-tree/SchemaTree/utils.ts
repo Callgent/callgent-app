@@ -598,6 +598,7 @@ export function transformArrayItems(arr: any[]) {
   return arr.map((item: any) => {
     const transformedItem = {
       ...item,
+      _id: item.id,
       schema: item.schema ? { ...item.schema } : {}
     };
     if (item.default !== undefined && item.default !== null && item.default !== '') {
@@ -605,6 +606,7 @@ export function transformArrayItems(arr: any[]) {
     }
     delete transformedItem.type
     delete transformedItem.default
+    delete transformedItem.id
     return transformedItem;
   });
 }
