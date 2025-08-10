@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import {
   Input,
   Button,
@@ -15,8 +15,9 @@ import {
   DownOutlined,
   RightOutlined,
 } from '@ant-design/icons'
-import { generateId, typeOptions } from './utils'
+import { generateId, treeToSchema, typeOptions } from './utils'
 import { useSchemaTreeStore } from './store'
+import { useEndpointStore } from '@/models/endpoint'
 
 interface TreeNodeProps {
   node: any
@@ -150,6 +151,14 @@ function TreeNodeInner({
     updateNode,
     onToggle,
   ])
+
+  const { schemaData } = useEndpointStore()
+  const { setParamsOptions, setResponsesOptions } = useSchemaTreeStore()
+  useEffect(() => {
+    const { parameters = [], requestBody = [], responses2 = [] } = schemaData;
+    setParamsOptions(treeToSchema([...parameters, ...requestBody]) || {})
+    setResponsesOptions(treeToSchema([...parameters, ...requestBody, ...responses2]) || {})
+  }, [schemaData])
 
   return (
     <div
