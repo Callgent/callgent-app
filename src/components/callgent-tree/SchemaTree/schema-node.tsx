@@ -131,7 +131,7 @@ function TreeNodeInner({
           className={`mr-2 ${mode === 1 ? 'text-gray-500' : 'cursor-pointer'
             } flex`}
           onClick={() => {
-            if (mode === 2) updateNode(node.id, { editingName: true })
+            if (mode === 2 && !['array'].includes(node?.parentType)) updateNode(node.id, { editingName: true })
             if (mode === 3) onToggle()
           }}
         >
@@ -277,7 +277,7 @@ function TreeNodeInner({
               placeholder="Type {{ to mention…"
               onBlur={(e) => setFormData({ id: node.id, name: 'default', value: (e.target as HTMLTextAreaElement).value })}
               options={schemaType !== "responses" ? paramsOptions : responsesOptions}
-              rows={2}
+              rows={3}
             />
           </Form.Item>
         </div>

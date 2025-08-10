@@ -303,8 +303,10 @@ export function jsonSchemaToTreeNode(
 }
 
 // tree转schema
+// tree转schema
 export function treeNodeToJsonSchema(node: any): any {
   if (node?.length < 1) return { type: "object", properties: {} };
+
   const {
     children,
     item,
@@ -315,22 +317,29 @@ export function treeNodeToJsonSchema(node: any): any {
     in: inLocation,
     default: nodeDefault,
     schema,
+    type: nodeType,
     ...rest
   } = node;
-  // 格式化 default 值，空字符串转为
+
+  // 获取 type，优先使用节点的 type，如果没有则从 schema 中获取
+  const effectiveType = nodeType || schema?.type;
+
+  // 获取 default，优先使用节点的 default，如果没有则从 schema 中获取
+  const effectiveDefault = nodeDefault !== undefined ? nodeDefault : schema?.default;
+
+  // 格式化 default 值
   function formatDefault(def: any) {
     if (def === "") return "";
     return def;
   }
+
   const s: any = {
     ...rest,
-    type: node.type,
+    type: effectiveType,
   };
-  if (!s?.default) {
-    delete s.default
-  }
+
   // 1. object 类型
-  if (node.type === "object") {
+  if (effectiveType === "object") {
     s.properties = {};
     const reqs: string[] = [];
     children?.forEach((c: any) => {
@@ -338,16 +347,21 @@ export function treeNodeToJsonSchema(node: any): any {
       if (c.required) reqs.push(c.name);
     });
     if (reqs.length) s.required = reqs;
+    if (effectiveDefault !== undefined) {
+      s.default = formatDefault(effectiveDefault);
+    }
     return s;
   }
+
   // 2. array 类型
-  if (node.type === "array") {
+  if (effectiveType === "array") {
     // 数组本身有 default
-    if (nodeDefault !== undefined) {
-      s.default = Array.isArray(nodeDefault)
-        ? nodeDefault.map(formatDefault)
-        : formatDefault(nodeDefault);
+    if (effectiveDefault !== undefined) {
+      s.default = Array.isArray(effectiveDefault)
+        ? effectiveDefault.map(formatDefault)
+        : formatDefault(effectiveDefault);
     }
+
     // 直接将所有 children 作为 items 数组项
     if (Array.isArray(children) && children.length > 0) {
       // 转换所有 children 为 items 数组
@@ -358,10 +372,27 @@ export function treeNodeToJsonSchema(node: any): any {
       });
       s.items = itemsArray; // 保持数组格式，包含所有项
     } else {
-      // 默认情况
-      s.items = { type: "string" };
+      // 默认情况：从 schema.items 获取或使用默认值
+      s.items = schema?.items || { type: "string" };
     }
     return s;
+  }
+
+  // 3. 基本类型（string、number、boolean 等）
+  if (effectiveDefault !== undefined) {
+    s.default = formatDefault(effectiveDefault);
+  }
+
+  // 复制 schema 中的其他属性（除了 type 和 default）
+  if (schema) {
+    Object.keys(schema).forEach(key => {
+      if (key !== 'type' && key !== 'default') {
+        s[key] = schema[key];
+      }
+    });
+  }
+  if (!s?.default || s?.default === "") {
+    delete s?.default
   }
   return s;
 }
@@ -551,12 +582,13 @@ export const mergeSchemaWithFormData = (schemaData: any, formData: any) => {
       default: key === 'responses' ? formDataForKey?.root_response?.default || '' : "",
       children: Array.isArray(value) ? [...value] : [],
     };
-    // console.log(key, formDataForKey['root_response']);
-
     if (formDataForKey) {
       Object.entries(formDataForKey).forEach(([innerKey, innerValue]) => {
         currentTree = updateNode_(currentTree, innerKey, innerValue);
       });
+    }
+    if (!currentTree?.default || currentTree?.default === '') {
+      delete currentTree.default
     }
     // 保存结果
     results[key] = { ...treeNodeToJsonSchema(currentTree) };
@@ -570,6 +602,9 @@ export const updateNode_ = (tree: any, id: string, partial: any) => {
     if (n.id === id) {
       const isTypeChangeToArray = ["array", "object"].includes(partial?.type);
       const updated = { ...n, ...partial };
+      if (!updated?.default || updated?.default === '') {
+        delete updated.default
+      }
       if (!isTypeChangeToArray && partial?.type !== undefined) {
         updated.children = [];
       }
@@ -580,6 +615,9 @@ export const updateNode_ = (tree: any, id: string, partial: any) => {
     }
     if (n.item) {
       return { ...n, item: walk(n.item) };
+    }
+    if (!n?.default || n?.default === '') {
+      delete n.default
     }
     return n;
   };
