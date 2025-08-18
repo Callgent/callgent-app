@@ -112,9 +112,16 @@ export const ActionForm = () => {
         <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please describe the purpose of this entries' }]}>
           <Input.TextArea placeholder="Describe the purpose of this node (e.g., its function or goal)" />
         </Form.Item>
-        <Form.Item label={currentNode?.parentType === "CLIENT" ? "how2Exe" : "how2Ops"} name="how2Ops" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
+        {currentNode?.modelTitle === 'Callgent' && (
+          <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
           <Input.TextArea placeholder="Provide usage instructions for this node (e.g., steps to operate it)" />
         </Form.Item>
+        )}
+        {currentNode?.modelTitle !== 'Callgent' && (
+          <Form.Item label={currentNode?.parentType === "CLIENT" ? "how2Exe" : "how2Ops"} name="how2Ops" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
+          <Input.TextArea placeholder="Provide usage instructions for this node (e.g., steps to operate it)" />
+        </Form.Item>
+        )}
       </>
     ),
     import: (

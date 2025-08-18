@@ -29,7 +29,7 @@ export interface CallgentInfo {
 	name?: string;
 	avatar?: string;
 	whatFor?: string;
-	how2Ops?: string;
+	how2Use?: string;
 	summary?: string;
 	description?: string;
 	selectedOptions?: Array<string>;
