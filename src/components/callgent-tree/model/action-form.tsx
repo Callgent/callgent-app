@@ -37,13 +37,13 @@ export const ActionForm = () => {
           await fetchCallgentTree(callgentTree[0].id!);
           break;
         case 'edit':
-          if (currentNode?.modelTitle !== 'Callgent') {
+          if (currentNode?.parentType === 'root') {
+            await putCallgent(currentNode.id!, values)
+          } else {
             await editCallgentEntry({
               id: currentNode.id!,
               formValues: values,
             });
-          } else {
-            await putCallgent(currentNode.id!, values)
           }
           await fetchCallgentTree(callgentTree[0].id!);
           break;
@@ -114,13 +114,13 @@ export const ActionForm = () => {
         </Form.Item>
         {currentNode?.modelTitle === 'Callgent' && (
           <Form.Item label="how2Use" name="how2Use" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
-          <Input.TextArea placeholder="Provide usage instructions for this node (e.g., steps to operate it)" />
-        </Form.Item>
+            <Input.TextArea placeholder="Provide usage instructions for this node (e.g., steps to operate it)" />
+          </Form.Item>
         )}
         {currentNode?.modelTitle !== 'Callgent' && (
           <Form.Item label={currentNode?.parentType === "CLIENT" ? "how2Exe" : "how2Ops"} name="how2Ops" rules={[{ required: false, message: 'Please explain how to use this entries' }]}>
-          <Input.TextArea placeholder="Provide usage instructions for this node (e.g., steps to operate it)" />
-        </Form.Item>
+            <Input.TextArea placeholder="Provide usage instructions for this node (e.g., steps to operate it)" />
+          </Form.Item>
         )}
       </>
     ),
