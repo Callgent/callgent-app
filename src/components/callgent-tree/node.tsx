@@ -192,7 +192,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
                   <VirtualApi />
                 </div>
               )}
-              {node.import && node.type === "SERVER" && (
+              {node.import && (
                 <div
                   onClick={() => handleAction('import')}
                   className="p-1 hover:bg-gray-200 dark:hover:bg-gray-500 rounded"
