@@ -30,7 +30,7 @@ export default function Payload() {
     <>
       <div className="flex items-center space-x-2">
         <Input
-          defaultValue={information?.endpointName}
+          value={information?.endpointName}
           onChange={(e) => setInformation({ endpointName: e.target.value })}
           placeholder="Please enter endpoint name starting with /"
         />
@@ -45,7 +45,7 @@ export default function Payload() {
           <label className="block font-medium mb-2">whatFor</label>
           <Input.TextArea
             rows={2}
-            defaultValue={information?.whatFor}
+            value={information?.whatFor}
             onChange={(e) => setInformation({ whatFor: e.target.value })}
             disabled={status === 'read_only'}
             placeholder='Explain to caller, when and how to use this endpoint' />

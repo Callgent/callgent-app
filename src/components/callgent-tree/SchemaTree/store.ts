@@ -35,7 +35,7 @@ export const useSchemaTreeStore = create<any>()(
       setResponsesOptions: (schema: any) => {
         set({ responsesOptions: flattenSchemaToMentions(schema) });
       },
-      clear: () => {
+      clearSchema: () => {
         set({ ...initData });
       },
     }),

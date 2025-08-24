@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Input, Button, Tabs, Modal } from 'antd'
 import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
@@ -12,7 +12,7 @@ export default function EndpointPage() {
   // AI generation states
   const [aiInputVisible, setAiInputVisible] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
-  const { parameters, requestBody, responses, clearSchemaTreeStore } = useSchemaTreeStore()
+  const { parameters, requestBody, responses, clearSchema } = useSchemaTreeStore()
 
   // Reset all states or 弹出确认框
   const handleCancel = () => {
@@ -36,7 +36,7 @@ export default function EndpointPage() {
   // 彻底关闭并重置
   const close = () => {
     clear()
-    clearSchemaTreeStore()
+    clearSchema()
     closeModal()
     setActiveKey('1')
   }
@@ -55,7 +55,11 @@ export default function EndpointPage() {
       handleConfirm(node)
     }, 50)
   }
-
+  useEffect(() => {
+    return () => {
+      close()
+    }
+  }, [])
   // useBeforeunload(() => {
   //   return shouldPreventNavigation({ confirm: false }) ? 'back' : false;
   // });
