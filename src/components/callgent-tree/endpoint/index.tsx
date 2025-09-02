@@ -4,7 +4,6 @@ import { useEndpointStore } from '@/models/endpoint'
 import useTreeActionStore, { useTreeActions } from '@/models/callgentTreeStore'
 import Payload from './payload'
 import Mapping from './mapping'
-import { useSchemaTreeStore } from '../SchemaTree/store'
 export default function EndpointPage() {
   const { status, formData, activeKey, handleConfirm, clear, setFormData, setActiveKey } = useEndpointStore()
   const { currentNode } = useTreeActionStore()
@@ -12,7 +11,6 @@ export default function EndpointPage() {
   // AI generation states
   const [aiInputVisible, setAiInputVisible] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
-  const { parameters, requestBody, responses, clearSchema } = useSchemaTreeStore()
 
   // Reset all states or 弹出确认框
   const handleCancel = () => {
@@ -36,7 +34,6 @@ export default function EndpointPage() {
   // 彻底关闭并重置
   const close = () => {
     clear()
-    clearSchema()
     closeModal()
     setActiveKey('1')
   }
@@ -46,10 +43,10 @@ export default function EndpointPage() {
     if (node?.type === 'CLIENT') {
       setFormData({
         ...formData,
-        metaExe: { ...formData?.metaExe, parameters, requestBody, responses },
+        metaExe: { ...formData?.metaExe },
       })
     } else {
-      setFormData({ ...formData, parameters, requestBody, responses })
+      setFormData({ ...formData })
     }
     setTimeout(() => {
       handleConfirm(node)

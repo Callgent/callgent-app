@@ -550,9 +550,9 @@ export function extractAllDefaults(params: any[]): Record<string, { default: str
   function traverse(items: any[]) {
     items.forEach(item => {
       // 如果当前项有id和default，添加到结果中
-      if (item.id && item.default !== undefined) {
+      if (item.id && (item.default !== undefined || item?.schema?.default !== undefined)) {
         result[item.id] = {
-          default: item.default
+          default: item.default || item?.schema?.default
         };
       }
       // 如果有子项，递归处理

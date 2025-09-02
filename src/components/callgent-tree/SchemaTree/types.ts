@@ -19,6 +19,7 @@ export interface SchemaEditorProps extends CommonProps {
   schema: TreeNodeData[];
   submitSchema: (data: TreeNodeData[]) => void;
   setFormData: any;
+  apiId: string | null;
 }
 
 export interface SchemaModalProps extends CommonProps {

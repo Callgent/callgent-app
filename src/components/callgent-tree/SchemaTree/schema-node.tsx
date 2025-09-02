@@ -16,7 +16,6 @@ import {
   RightOutlined,
 } from '@ant-design/icons'
 import { generateId, treeToSchema, typeOptions } from './utils'
-import { useSchemaTreeStore } from './store'
 import { useEndpointStore } from '@/models/endpoint'
 
 interface TreeNodeProps {
@@ -49,7 +48,7 @@ function TreeNodeInner({
   setFormData
 }: TreeNodeProps) {
   const indent = depth * 16
-  const { paramsOptions, responsesOptions } = useSchemaTreeStore()
+  const { paramsOptions, responsesOptions } = useEndpointStore()
   const [typePopoverOpen, setTypePopoverOpen] = useState(false)
 
   // 名称编辑完成处理
@@ -153,7 +152,7 @@ function TreeNodeInner({
   ])
 
   const { schemaData } = useEndpointStore()
-  const { setParamsOptions, setResponsesOptions } = useSchemaTreeStore()
+  const { setParamsOptions, setResponsesOptions } = useEndpointStore()
   useEffect(() => {
     const { parameters = [], requestBody = [], responses2 = [] } = schemaData;
     setParamsOptions(treeToSchema([...parameters, ...requestBody]) || {})

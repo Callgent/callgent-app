@@ -63,6 +63,8 @@ export interface EndpointState {
   editType: string
   information: any
   activeKey: string
+  paramsOptions: any[]
+  responsesOptions: any[]
   setActiveKey: (key: any) => void
   setInformation: (information: any) => void
   toggletheEP: (id: string) => Promise<any>
@@ -74,6 +76,8 @@ export interface EndpointState {
   setFormData: (data: Record<string, any>) => void
   setSchemaData: (data: Record<string, any>) => void
   setIsEndpointOpen: (open: boolean) => void
+  setParamsOptions: (data: any) => void
+  setResponsesOptions: (data: any) => void
   selectApi: (id: string, entry: string[], apiMap: any) => Promise<void>
   clear: () => void
 }

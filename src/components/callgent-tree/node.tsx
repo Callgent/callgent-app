@@ -11,7 +11,6 @@ import { createSearchParams, shouldPreventNavigation } from '@/utils';
 import { useEndpointStore } from '@/models/endpoint';
 import { useRouter, useSearchParams } from '@/router/hooks';
 import { unsavedGuard } from '@/router/utils';
-import { useSchemaTreeStore } from './SchemaTree/store';
 
 interface TreeNodeProps {
   nodes: CallgentInfoType[];
@@ -26,7 +25,6 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
   if (nodes.length === 0) { return null }
   const { openModal, setCallgentTree, setCurrentNode } = useTreeActions();
   const { clear, setActiveKey } = useEndpointStore()
-  const { clearSchema } = useSchemaTreeStore()
   const { closeModal } = useTreeActions()
   const { push } = useRouter()
   const node = nodes[0]
@@ -89,7 +87,6 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
         push(`/callgent/tree?callgentId=${callgentId}`)
         setCurrentNode(node);
         clear()
-        clearSchema()
         closeModal()
         setActiveKey('1')
       // push(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)

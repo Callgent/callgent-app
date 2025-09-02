@@ -20,7 +20,6 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
 
     // 初始化 & 同步 tree、store
     // 使用 ref 存储当前的 children，确保折叠状态计算的准确性
-    const currentChildrenRef = useRef<TreeNodeData[]>([])
     useEffect(() => {
         let children: TreeNodeData[] = schema || []
         if (mode !== 2 && schemaType === "responses") {
@@ -37,9 +36,6 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
                 },
             ];
         }
-
-        // 更新 ref
-        currentChildrenRef.current = children
 
         // 先更新 tree
         setTree((t) => ({ ...t, children }))
@@ -66,13 +62,8 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
     // 回调：新增子节点
     const addChild = useCallback(
         (parentId: string) => {
-            setTree((t) => {
-                const addSchema = addSchemaChild(t, parentId)
-                submitSchema(addSchema)
-                return addSchema
-            })
-        },
-        [mode]
+            setTree((t) => addSchemaChild(t, parentId))
+        }, [mode]
     )
 
     // 回调：更新节点
@@ -155,11 +146,10 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
                             deleteNode={deleteNode_}
                             setFormData={setFormData}
                         />
-                        {n.children &&
-                            !collapsedIds.has(n.id) &&
-                            ['object', 'array'].includes(n.type) && (
-                                <SchemaTree nodes={n.children} depth={depth + 1} />
-                            )}
+                        {
+                            n.children && !collapsedIds.has(n.id) && ['object', 'array'].includes(n.type) &&
+                            (<SchemaTree nodes={n.children} depth={depth + 1} />)
+                        }
                     </React.Fragment>
                 ));
             }),
@@ -205,5 +195,5 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
 }
 
 export default React.memo(JSONSchemaEditor, (prev, next) => {
-    return (prev.schema === next.schema)
+    return (prev.apiId === next.apiId)
 })

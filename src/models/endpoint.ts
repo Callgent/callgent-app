@@ -1,6 +1,6 @@
 import { EndpointState } from '#/store'
 import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
-import { jsonSchemaToTreeNode, extractFirst2xxJsonSchema, generateId, treeToSchema, extractAllDefaults, mergeSchemaWithFormData, transformArrayItems } from '@/components/callgent-tree/SchemaTree/utils';
+import { jsonSchemaToTreeNode, extractFirst2xxJsonSchema, generateId, treeToSchema, extractAllDefaults, mergeSchemaWithFormData, transformArrayItems, flattenSchemaToMentions } from '@/components/callgent-tree/SchemaTree/utils';
 import { unsavedGuard } from '@/router/utils';
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { message } from 'antd';
@@ -20,7 +20,9 @@ const initData = {
   editIndex: -1,
   editType: '',
   information: {},
-  activeKey: "1"
+  activeKey: "1",
+  paramsOptions: [],
+  responsesOptions: [],
 }
 
 export const useEndpointStore = create<EndpointState>()(
@@ -178,6 +180,13 @@ export const useEndpointStore = create<EndpointState>()(
             responses
           }
         })
+      },
+      // 表达式提示
+      setParamsOptions: (schema: any) => {
+        set({ paramsOptions: flattenSchemaToMentions(schema) });
+      },
+      setResponsesOptions: (schema: any) => {
+        set({ responsesOptions: flattenSchemaToMentions(schema) });
       },
       setInformation: (information: any) => {
         unsavedGuard.setUnsavedChanges(true);
