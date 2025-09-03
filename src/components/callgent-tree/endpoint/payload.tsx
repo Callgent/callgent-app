@@ -14,6 +14,7 @@ export default function Payload() {
     setInformation,
     schemaData,
     editId,
+    apiMapId,
     setSchemaData
   } = useEndpointStore()
 
@@ -63,7 +64,7 @@ export default function Payload() {
             schema={schemaData?.parameters}
             submitSchema={(data: any) => submitSchema(data, 'parameters')}
             setFormData={null}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
         </div>
       </div>
@@ -78,7 +79,7 @@ export default function Payload() {
             schema={schemaData?.requestBody}
             submitSchema={(data: any) => submitSchema(data, 'requestBody')}
             setFormData={null}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
         </div>
       </div>
@@ -93,7 +94,7 @@ export default function Payload() {
             schema={schemaData?.responses}
             submitSchema={(data: any) => submitSchema(data, 'responses')}
             setFormData={null}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
         </div>
       </div>

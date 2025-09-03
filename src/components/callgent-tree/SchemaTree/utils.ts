@@ -227,7 +227,6 @@ export function jsonSchemaToTreeNode(
   }
   if (schema.type === "array" && items) {
     node.children = [];
-
     if (Array.isArray(items)) {
       // items 是数组，说明是元组（tuple）类型，每个 item 可能结构不同
       items.forEach((item, index) => {
@@ -303,8 +302,10 @@ export function jsonSchemaToTreeNode(
 }
 
 // tree转schema
-// tree转schema
-export function treeNodeToJsonSchema(node: any): any {
+export function treeNodeToJsonSchema(
+  node: any,
+  schemaType: string = "schema"
+): any {
   if (node?.length < 1) return { type: "object", properties: {} };
 
   const {
@@ -325,7 +326,8 @@ export function treeNodeToJsonSchema(node: any): any {
   const effectiveType = nodeType || schema?.type;
 
   // 获取 default，优先使用节点的 default，如果没有则从 schema 中获取
-  const effectiveDefault = nodeDefault !== undefined ? nodeDefault : schema?.default;
+  const effectiveDefault =
+    nodeDefault !== undefined ? nodeDefault : schema?.default;
 
   // 格式化 default 值
   function formatDefault(def: any) {
@@ -343,7 +345,7 @@ export function treeNodeToJsonSchema(node: any): any {
     s.properties = {};
     const reqs: string[] = [];
     children?.forEach((c: any) => {
-      s.properties[c.name] = treeNodeToJsonSchema(c);
+      s.properties[c.name] = treeNodeToJsonSchema(c, schemaType);
       if (c.required) reqs.push(c.name);
     });
     if (reqs.length) s.required = reqs;
@@ -355,27 +357,52 @@ export function treeNodeToJsonSchema(node: any): any {
 
   // 2. array 类型
   if (effectiveType === "array") {
-    // 数组本身有 default
-    if (effectiveDefault !== undefined) {
-      s.default = Array.isArray(effectiveDefault)
-        ? effectiveDefault.map(formatDefault)
-        : formatDefault(effectiveDefault);
-    }
-
-    // 直接将所有 children 作为 items 数组项
-    if (Array.isArray(children) && children.length > 0) {
-      // 转换所有 children 为 items 数组
-      const itemsArray: any[] = [];
-      children.forEach((child: any) => {
-        const itemSchema = treeNodeToJsonSchema(child);
-        itemsArray.push(itemSchema);
-      });
-      s.items = itemsArray; // 保持数组格式，包含所有项
+    // apimap_items
+    if (schemaType === "apiMap") {
+      if (effectiveDefault !== undefined) {
+        s.default = Array.isArray(effectiveDefault)
+          ? effectiveDefault.map(formatDefault)
+          : formatDefault(effectiveDefault);
+      }
+      if (Array.isArray(children) && children.length > 0) {
+        // 转换所有 children 为 items 数组
+        const itemsArray: any[] = [];
+        children.forEach((child: any) => {
+          const itemSchema = treeNodeToJsonSchema(child, schemaType);
+          itemsArray.push(itemSchema);
+        });
+        s.items = itemsArray; // 保持数组格式，包含所有项
+      } else {
+        // 默认情况：从 schema.items 获取或使用默认值
+        s.items = schema?.items || { type: "string" };
+      }
+      return s;
     } else {
-      // 默认情况：从 schema.items 获取或使用默认值
-      s.items = schema?.items || { type: "string" };
+      // items 处理
+      if (Array.isArray(children) && children.length > 0) {
+        s.items = treeNodeToJsonSchema(children[0]);
+      } else {
+        s.items = schema?.items || { type: "string" };
+      }
+
+      // 默认值处理（必须在 items 处理完后）
+      if (effectiveDefault !== undefined) {
+        if (Array.isArray(effectiveDefault)) {
+          if (s.items && !s.items.oneOf) {
+            // 有明确单一子 schema -> 格式化数组元素
+            s.default = effectiveDefault.map((d) => formatDefault(d));
+          } else {
+            // oneOf 或 schema 不明确 -> 原样保留
+            s.default = effectiveDefault;
+          }
+        } else {
+          // 单个值强制放到数组里
+          s.default = [formatDefault(effectiveDefault)];
+        }
+      }
+
+      return s;
     }
-    return s;
   }
 
   // 3. 基本类型（string、number、boolean 等）
@@ -385,14 +412,14 @@ export function treeNodeToJsonSchema(node: any): any {
 
   // 复制 schema 中的其他属性（除了 type 和 default）
   if (schema) {
-    Object.keys(schema).forEach(key => {
-      if (key !== 'type' && key !== 'default') {
+    Object.keys(schema).forEach((key) => {
+      if (key !== "type" && key !== "default") {
         s[key] = schema[key];
       }
     });
   }
   if (!s?.default || s?.default === "") {
-    delete s?.default
+    delete s?.default;
   }
   return s;
 }
@@ -459,6 +486,7 @@ export const updateNode = (tree: any, id: string, partial: any) => {
       if (!isTypeChangeToArray && partial?.type !== undefined) {
         updated.children = [];
       }
+
       // 如果 name 被更新，也需要更新 id
       if (partial?.name !== undefined && parentId) {
         updated.id = `${parentId}_${partial.name}`;
@@ -591,7 +619,7 @@ export const mergeSchemaWithFormData = (schemaData: any, formData: any) => {
       delete currentTree.default
     }
     // 保存结果
-    results[key] = { ...treeNodeToJsonSchema(currentTree) };
+    results[key] = { ...treeNodeToJsonSchema(currentTree, 'apiMap') };
   });
   return results;
 };

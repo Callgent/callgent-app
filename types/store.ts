@@ -51,6 +51,7 @@ export interface ModalNode {
 
 export interface EndpointState {
   status: 'define' | 'implement' | 'read_only' | 'edit' | null
+  apiMapId: string | null
   editId: string | null
   parameters: any[]
   responses: any[]

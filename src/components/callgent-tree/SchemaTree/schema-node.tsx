@@ -15,7 +15,7 @@ import {
   DownOutlined,
   RightOutlined,
 } from '@ant-design/icons'
-import { generateId, treeToSchema, typeOptions } from './utils'
+import { treeToSchema, typeOptions } from './utils'
 import { useEndpointStore } from '@/models/endpoint'
 
 interface TreeNodeProps {
@@ -91,14 +91,14 @@ function TreeNodeInner({
       }
       if (t === 'object') payload.children = []
       if (t === 'array')
-        payload.item = {
-          id: generateId(),
+        payload.children = [{
+          id: `${node.id}_item_1`,
           name: 'item',
-          editingName: true,
+          editingName: false,
           type: 'string',
           required: false,
           in: 'query',
-        }
+        }]
       updateNode(node.id, payload)
       setTypePopoverOpen(false)
     },
@@ -215,6 +215,7 @@ function TreeNodeInner({
           )}
         </div>
         <div className="flex items-center space-x-2">
+          {JSON.stringify(node.items)}
           {((mode === 2 && ['object'].includes(node.type)) || (mode === 3 && ['array'].includes(node.type)) || ((mode === 2 && node.children?.length === 0))) && (
             <Button
               size="small"

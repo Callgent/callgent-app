@@ -10,6 +10,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 const initData = {
   status: null,
   editId: null,
+  apiMapId: null,
   parameters: [],
   responses: [],
   formData: {},
@@ -165,6 +166,7 @@ export const useEndpointStore = create<EndpointState>()(
           responses = jsonSchemaToTreeNode(data?.responses).children || []
         }
         set({
+          apiMapId: data.id,
           formData: {
             ...formData,
             defaultValue,

@@ -3,7 +3,7 @@ import SchemaEditor from '../SchemaTree/schema-editor'
 import { useEndpointStore } from '@/models/endpoint'
 
 export default function ApiMap() {
-  const { editId, formData, setFormData, schemaData, setSchemaData, responsesOptions } = useEndpointStore()
+  const { editId, apiMapId, formData, setFormData, schemaData, setSchemaData, responsesOptions } = useEndpointStore()
   // 更新
   const submitSchema = (data: any, form: string) => {
     setSchemaData((prevSchemaData: any) => ({
@@ -32,7 +32,7 @@ export default function ApiMap() {
             schema={schemaData?.parameters}
             submitSchema={(data: any) => submitSchema(data, 'parameters')}
             setFormData={(data: any) => updateFormValue(data, 'parameters')}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
           <SchemaEditor
             mode={1}
@@ -40,7 +40,7 @@ export default function ApiMap() {
             schema={schemaData?.requestBody}
             submitSchema={(data: any) => submitSchema(data, 'requestBody')}
             setFormData={(data: any) => updateFormValue(data, 'requestBody')}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
         </div>
         <div className="font-medium bg-gray-50  px-4 py-2">
@@ -53,7 +53,7 @@ export default function ApiMap() {
             schema={schemaData?.parameters2}
             submitSchema={(data: any) => submitSchema(data, 'parameters2')}
             setFormData={(data: any) => updateFormValue(data, 'parameters2')}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
           <SchemaEditor
             mode={3}
@@ -61,7 +61,7 @@ export default function ApiMap() {
             schema={schemaData?.requestBody2}
             submitSchema={(data: any) => submitSchema(data, 'requestBody2')}
             setFormData={(data: any) => updateFormValue(data, 'requestBody2')}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function ApiMap() {
             schema={schemaData?.responses2}
             submitSchema={(data: any) => submitSchema(data, 'responses2')}
             setFormData={(data: any) => updateFormValue(data, 'responses2')}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
         </div>
         <div className="font-medium bg-gray-50 px-4 py-2 bg-dark-green">
@@ -106,7 +106,7 @@ export default function ApiMap() {
             schema={schemaData?.responses}
             submitSchema={(data: any) => submitSchema(data, 'responses')}
             setFormData={(data: any) => updateFormValue(data, 'responses')}
-            apiId={editId}
+            apiId={`${editId}_${apiMapId}`}
           />
         </div>
       </div>

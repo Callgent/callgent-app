@@ -62,7 +62,13 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
     // 回调：新增子节点
     const addChild = useCallback(
         (parentId: string) => {
-            setTree((t) => addSchemaChild(t, parentId))
+            setTree((t) => {
+                const updated = addSchemaChild(t, parentId)
+                if (mode === 3) { submitSchema(updated) }
+                addSchemaChild(t, parentId)
+                return updated;
+            }
+            )
         }, [mode]
     )
 
