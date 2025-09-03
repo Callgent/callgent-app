@@ -58,6 +58,7 @@ export const useEndpointStore = create<EndpointState>()(
             endpoint: {
               method: data?.method || 'POST'
             },
+            statusCode: Object.keys(data?.metaExe?.apiMap?.responses || '')[0] || ''
           },
           activeKey: "1"
         })
@@ -120,11 +121,10 @@ export const useEndpointStore = create<EndpointState>()(
             }
           },
           responses: {
-            statusCode: metaExe?.statusCode || '',
-            "200": {
+            [information?.statusCode || '']: {
               content: {
                 "application/json": {
-                  schema: apiMapData?.responses || {}
+                  schema: { ...apiMapData?.responses || {}, default: formData?.defaultValue?.response }
                 }
               }
             }
@@ -153,7 +153,7 @@ export const useEndpointStore = create<EndpointState>()(
         if (apiMap) {
           const parameters2_default = extractAllDefaults(apiMap?.params?.parameters.map((item: any) => ({ ...item, id: item?._id })) || [])
           const requestBody2_default = extractAllDefaults(jsonSchemaToTreeNode(apiMap?.params?.requestBody?.content["application/json"]?.schema)?.children || [])
-          const responsesDefault = extractFirst2xxJsonSchema(apiMap?.responses)
+          const responsesDefault = extractFirst2xxJsonSchema(apiMap?.responses, apiMap)
           const responses_default = extractAllDefaults(jsonSchemaToTreeNode(responsesDefault)?.children || [])
           const data = mergeSchemaWithFormData({ parameters2, requestBody2, responses }, {
             parameters2: parameters2_default,

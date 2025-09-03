@@ -17,11 +17,15 @@ export function generateId() {
 }
 
 // 查找2XX的响应
-export function extractFirst2xxJsonSchema(openapiResponses: any): any | null {
+export function extractFirst2xxJsonSchema(openapiResponses: any, apiMap: any = null): any | null {
   try {
-    const statusCodes = Object.keys(openapiResponses).filter((code) =>
-      /^2\d\d$/.test(code)
-    );
+
+    let statusCodes = Object.keys(openapiResponses).filter((code) => {
+      return /^2\d\d$/.test(code)
+    });
+    if (apiMap?.responses) {
+      statusCodes = [Object.keys(apiMap.responses)[0]];
+    }
     for (const status of statusCodes) {
       const response = openapiResponses[status];
       const content = response?.content;
@@ -244,10 +248,8 @@ export function jsonSchemaToTreeNode(
     } else {
       // items 是对象，说明是统一类型数组
       let item = items;
-
       if (item?.default && Array.isArray(item.default)) {
         const defaults = item.default;
-
         if (item.type === "object") {
           for (let i = 0; i < defaults.length; i++) {
             const defaultEntry = defaults[i];

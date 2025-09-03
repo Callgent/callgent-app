@@ -1,14 +1,15 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import TreeNode from './schema-node'
 import SchemaDetailModal from './schema-modal'
 import { addSchemaChild, deleteNode, findNodeWithParent, getNestedNodeIds, updateNode } from './utils'
-import { Button, Form } from 'antd'
+import { Button, Form, Mentions } from 'antd'
 import type { SchemaEditorProps, TreeNodeData } from './types'
 import { useEndpointStore } from '@/models/endpoint'
+import { DownOutlined, RightOutlined } from '@ant-design/icons'
 
 function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData }: SchemaEditorProps) {
     const [tree, setTree] = useState<TreeNodeData>({ id: 'root', name: '', type: 'object', required: false, in: 'query', children: [], })
-    const { formData } = useEndpointStore()
+    const { formData, paramsOptions, responsesOptions } = useEndpointStore()
     // 折叠状态
     const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set())
 
@@ -22,25 +23,8 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
     // 使用 ref 存储当前的 children，确保折叠状态计算的准确性
     useEffect(() => {
         let children: TreeNodeData[] = schema || []
-        if (mode !== 2 && schemaType === "responses") {
-            const { defaultValue } = formData;
-            children = [
-                {
-                    id: 'root_response',
-                    name: 'response',
-                    type: 'object',
-                    required: false,
-                    in: 'body',
-                    default: mode === 1 ? defaultValue?.response2 : defaultValue?.response,
-                    children: children,
-                },
-            ];
-        }
-
-        // 先更新 tree
         setTree((t) => ({ ...t, children }))
-
-        // 然后基于新的 children 更新折叠状态（只在首次初始化时）
+        // 基于新的 children 更新折叠状态（只在首次初始化时）
         setCollapsedIds(prevCollapsed => {
             if (prevCollapsed.size === 0) {
                 // 首次初始化时折叠所有 object/array 节点
@@ -174,7 +158,30 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
     return (
         <div className="px-2 w-full">
             <div className="overflow-auto bg-white rounded mb-2 w-full">
-                <Form>{tree.children && <SchemaTree nodes={tree.children} />}</Form>
+                <Form>
+                    {(mode !== 2 && schemaType === "responses") ? (
+                        <details className="group" >
+                            <summary className="cursor-pointer select-none text-sm font-medium pt-1" style={{ listStyle: 'none', WebkitAppearance: 'none', }}>
+                                <span className="mr-1 w-full">
+                                    <span className="hidden group-open:inline"><DownOutlined /></span>
+                                    <span className="inline group-open:hidden"><RightOutlined /></span>
+                                    Response
+                                </span>
+                                <Form.Item name={['response', 'default']} initialValue={mode === 1 ? formData?.defaultValue?.response2 : formData?.defaultValue?.response}>
+                                    <Mentions
+                                        prefix="{{"
+                                        placeholder="Type {{ to mention…"
+                                        onBlur={(e) => setFormData({ ...formData, defaultValue: { ...formData.defaultValue, response: (e.target as HTMLTextAreaElement).value } })}
+                                        options={schemaType !== "responses" ? paramsOptions : responsesOptions}
+                                        rows={3}
+                                    />
+                                </Form.Item>
+                            </summary>
+                            {tree.children && <SchemaTree nodes={tree.children} />}
+                        </details>
+                    ) : (<>{tree.children && <SchemaTree nodes={tree.children} />}</>)}
+
+                </Form>
             </div>
 
             {mode === 2 && (

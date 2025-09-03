@@ -3,7 +3,7 @@ import SchemaEditor from '../SchemaTree/schema-editor'
 import { useEndpointStore } from '@/models/endpoint'
 
 export default function ApiMap() {
-  const { editId, apiMapId, formData, setFormData, schemaData, setSchemaData, responsesOptions } = useEndpointStore()
+  const { editId, apiMapId, information, setFormData, schemaData, setSchemaData, responsesOptions, setInformation } = useEndpointStore()
   // 更新
   const submitSchema = (data: any, form: string) => {
     setSchemaData((prevSchemaData: any) => ({
@@ -92,8 +92,8 @@ export default function ApiMap() {
                 <Mentions
                   prefix="{{"
                   placeholder="Type {{ to mention…"
-                  defaultValue={formData?.metaExe?.code}
-                  onChange={(value) => { setFormData({ ...formData, metaExe: { ...formData?.metaExe, statusCode: value } }) }}
+                  defaultValue={information?.statusCode}
+                  onChange={(value) => { setInformation({ statusCode: value }) }}
                   options={responsesOptions}
                   rows={2}
                 />
