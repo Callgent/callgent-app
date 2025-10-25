@@ -575,25 +575,82 @@ export function findNodeWithParent(tree: TreeNodeData, targetId: string) {
   return dfs(tree);
 }
 
-export function extractAllDefaults(params: any[]): Record<string, { default: string }> {
+export function extractAllDefaults(params: any[], tree: any) {
   const result: Record<string, { default: string }> = {};
+  const maxIds: Record<string, number> = {};
+
   function traverse(items: any[]) {
     items.forEach(item => {
-      // 如果当前项有id和default，添加到结果中
-      if (item.id && (item.default !== undefined || item?.schema?.default !== undefined)) {
-        result[item.id] = {
-          default: item.default || item?.schema?.default
-        };
+      if (item.id) {
+        const match = item.id.match(/^(.+)_item_(\d+)(?:_|$)/);
+
+        if (match) {
+          const part1 = match[1];
+          const part2 = Number(match[2]);
+          if (!maxIds[part1] || part2 > maxIds[part1]) {
+            maxIds[part1] = part2;
+          }
+        }
+
+        if (item.default !== undefined || item?.schema?.default !== undefined) {
+          result[item.id] = {
+            default: item.default || item?.schema?.default
+          };
+        }
       }
-      // 如果有子项，递归处理
+
       if (item.children && Array.isArray(item.children)) {
         traverse(item.children);
       }
     });
   }
+
   traverse(params);
-  return result;
+
+  // 根据 maxIds 扩展 tree
+  function expandChildren(tree: any, maxIds: Record<string, number>) {
+    function cloneWithNewId(item: any, newIndex: number, baseKey: string) {
+      const newItem = { ...item };
+      if (item.id) {
+        newItem.id = item.id.replace(
+          new RegExp(`^${baseKey}_item_\\d+`),
+          `${baseKey}_item_${newIndex}`
+        );
+      }
+
+      if (item.children && Array.isArray(item.children)) {
+        newItem.children = item.children.map((child: any) =>
+          cloneWithNewId(child, newIndex, baseKey)
+        );
+      }
+      return newItem;
+    }
+
+    Object.keys(maxIds).forEach(key => {
+      const max = maxIds[key];
+      const node = tree.find((t: any) => t.id === key);
+      if (!node || !node.children || node.children.length === 0) return;
+
+      const template = node.children[0];
+      const newChildren = [];
+
+      for (let i = 2; i <= max; i++) {
+        newChildren.push(cloneWithNewId(template, i, key));
+      }
+
+      node.children = [template, ...newChildren];
+    });
+
+    return tree;
+  }
+
+  const expandedTree = expandChildren(tree, maxIds);
+
+  return { result, tree: expandedTree };
 }
+
+
+
 
 // 合并所有schemaData&&formData
 export const mergeSchemaWithFormData = (schemaData: any, formData: any) => {

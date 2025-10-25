@@ -151,14 +151,14 @@ export const useEndpointStore = create<EndpointState>()(
         let responses = schemaData?.responses
         let defaultValue = { response: '', response2: '' }
         if (apiMap) {
-          const parameters2_default = extractAllDefaults(apiMap?.params?.parameters.map((item: any) => ({ ...item, id: item?._id })) || [])
-          const requestBody2_default = extractAllDefaults(jsonSchemaToTreeNode(apiMap?.params?.requestBody?.content["application/json"]?.schema)?.children || [])
+          const parameters2_default = extractAllDefaults(apiMap?.params?.parameters.map((item: any) => ({ ...item, id: item?._id })) || [], parameters2)
+          const requestBody2_default = extractAllDefaults(jsonSchemaToTreeNode(apiMap?.params?.requestBody?.content["application/json"]?.schema)?.children || [], requestBody2)
           const responsesDefault = extractFirst2xxJsonSchema(apiMap?.responses, apiMap)
-          const responses_default = extractAllDefaults(jsonSchemaToTreeNode(responsesDefault)?.children || [])
-          const data = mergeSchemaWithFormData({ parameters2, requestBody2, responses }, {
-            parameters2: parameters2_default,
-            requestBody2: requestBody2_default,
-            responses: { ...responses_default, root_response: responsesDefault?.default },
+          const responses_default = extractAllDefaults(jsonSchemaToTreeNode(responsesDefault)?.children || [], responses)
+          const data = mergeSchemaWithFormData({ parameters2: parameters2_default.tree, requestBody2: requestBody2_default.tree, responses: responses_default.tree }, {
+            parameters2: parameters2_default.result,
+            requestBody2: requestBody2_default.result,
+            responses: { ...responses_default.result, root_response: responsesDefault?.default },
           })
           defaultValue.response = responsesDefault?.default || ""
           parameters2 = jsonSchemaToTreeNode(data?.parameters2).children || []
