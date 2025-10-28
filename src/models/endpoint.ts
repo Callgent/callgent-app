@@ -136,7 +136,9 @@ export const useEndpointStore = create<EndpointState>()(
             message.success('success')
           })
         } else {
-          await postEndpointsApi(request)
+          const queryParams = new URLSearchParams(location.search);
+          const entryId = queryParams.get("entryId");
+          await postEndpointsApi({ ...request, entryId })
         }
         unsavedGuard.setUnsavedChanges(false);
       },

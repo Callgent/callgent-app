@@ -15,6 +15,7 @@ import {
   EditOutlined,
   DownOutlined,
   RightOutlined,
+  ArrowsAltOutlined,
 } from '@ant-design/icons'
 import { treeToSchema, typeOptions } from './utils'
 import { useEndpointStore } from '@/models/endpoint'
@@ -170,23 +171,25 @@ function TreeNodeInner({
       style={{ marginLeft: indent }}
     >
       <div className="flex justify-between items-center">
-        <div className="flex items-center">
-          {/* 折叠/展开 图标 */}
-          {['object', 'array'].includes(node.type) ? (
-            collapsed ? (
-              <RightOutlined onClick={onToggle} />
+        <div>
+          <div className="flex items-center">
+            {/* 折叠/展开 图标 */}
+            {['object', 'array'].includes(node.type) ? (
+              collapsed ? (
+                <RightOutlined onClick={onToggle} />
+              ) : (
+                <DownOutlined onClick={onToggle} />
+              )
             ) : (
-              <DownOutlined onClick={onToggle} />
-            )
-          ) : (
-            <span className="inline-block w-4" />
-          )}
-          {/* 名称 */}
-          <div>{NameField}</div>
+              <span className="inline-block w-4" />
+            )}
+            {/* 名称 */}
+            <div>{NameField}</div>
+          </div>
         </div>
-        <div className='pr-4 max-w-xs flex-1 flex justify-start'>
+        <div className='flex-1 min-w-0'>
           {mode === 2 && (
-            <div className="flex w-full">
+            <div className="">
               {node.editingDescription ? (
                 <Input
                   size="small"
@@ -252,75 +255,77 @@ function TreeNodeInner({
             </div>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          {JSON.stringify(node.items)}
-          {((mode === 2 && ['object'].includes(node.type)) || (mode === 3 && ['array'].includes(node.type)) || ((mode === 2 && node.children?.length === 0))) && (
-            <Button
-              size="small"
-              type="text"
-              icon={<PlusOutlined className="p-1 border rounded" />}
-              onClick={onAddChild}
-            />
-          )}
-
-          {(mode === 2 || (['array'].includes(node?.parentType))) && (
-            <Popconfirm
-              title="确认删除这个节点？"
-              onConfirm={onDelete}
-              okText="确认"
-              cancelText="取消"
-            >
+        <div>
+          <div className="flex items-center space-x-2">
+            {JSON.stringify(node.items)}
+            {((mode === 2 && ['object'].includes(node.type)) || (mode === 3 && ['array'].includes(node.type)) || ((mode === 2 && node.children?.length === 0))) && (
               <Button
                 size="small"
                 type="text"
-                disabled={parentType === 'array'}
-                icon={
-                  <DeleteOutlined className="text-red-500 p-1 border rounded" />
-                }
+                icon={<PlusOutlined className="p-1 border rounded" />}
+                onClick={onAddChild}
               />
-            </Popconfirm>
-          )}
-          <div></div>
-          {/* 类型切换 */}
-          {mode === 2 ? (
-            <Popover
-              open={typePopoverOpen}
-              onOpenChange={setTypePopoverOpen}
-              content={typeOptions.map((t) => (
-                <div
-                  key={t}
-                  className="cursor-pointer p-1 hover:bg-gray-100 rounded"
-                  onClick={() => onTypeSelect(t)}
-                >
-                  {t}
-                </div>
-              ))}
-              trigger="click"
-            >
-              <Tag className="cursor-pointer mr-2 w-14 text-center">
-                {node.type}
-              </Tag>
-            </Popover>
-          ) : (
-            <Tag className="mr-2 w-14 text-center">{node.type}</Tag>
-          )}
-          {/* 详情编辑 */}
-          {mode === 2 && parentType !== 'array' && (
-            <Button
-              size="small"
-              type="text"
-              icon={<EditOutlined className="p-1 border rounded" />}
-              onClick={onOpenDetail}
-            />
-          )}
-          {mode === 3 && parentType !== 'array' && (
-            <Button
-              size="small"
-              type="text"
-              icon={<EditOutlined className="p-1 border rounded" />}
-              onClick={showModal}
-            />
-          )}
+            )}
+
+            {(mode === 2 || (['array'].includes(node?.parentType))) && (
+              <Popconfirm
+                title="确认删除这个节点？"
+                onConfirm={onDelete}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button
+                  size="small"
+                  type="text"
+                  disabled={parentType === 'array'}
+                  icon={
+                    <DeleteOutlined className="text-red-500 p-1 border rounded" />
+                  }
+                />
+              </Popconfirm>
+            )}
+            <div></div>
+            {/* 类型切换 */}
+            {mode === 2 ? (
+              <Popover
+                open={typePopoverOpen}
+                onOpenChange={setTypePopoverOpen}
+                content={typeOptions.map((t) => (
+                  <div
+                    key={t}
+                    className="cursor-pointer p-1 hover:bg-gray-100 rounded"
+                    onClick={() => onTypeSelect(t)}
+                  >
+                    {t}
+                  </div>
+                ))}
+                trigger="click"
+              >
+                <Tag className="cursor-pointer mr-2 w-14 text-center">
+                  {node.type}
+                </Tag>
+              </Popover>
+            ) : (
+              <Tag className="mr-2 w-14 text-center">{node.type}</Tag>
+            )}
+            {/* 详情编辑 */}
+            {mode === 2 && parentType !== 'array' && (
+              <Button
+                size="small"
+                type="text"
+                icon={<EditOutlined className="p-1 border rounded" />}
+                onClick={onOpenDetail}
+              />
+            )}
+            {mode === 3 && parentType !== 'array' && (
+              <Button
+                size="small"
+                type="text"
+                icon={<ArrowsAltOutlined className="p-1 border rounded" />}
+                onClick={showModal}
+              />
+            )}
+          </div>
         </div>
       </div>
       {/* mode=3 时显示默认值 Mentions */}

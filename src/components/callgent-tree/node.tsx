@@ -89,7 +89,7 @@ const TreeNode = ({ nodes, level = 1, expandedNodes, onToggle, callgentId, class
         clear()
         closeModal()
         setActiveKey('1')
-      // push(`/callgentapi?callgentId=${callgentId}&entryId=${node?.id}`)
+        push(`/callgent/tree?callgentId=${callgentId}&entryId=${node?.id}`)
     }
     useTreeActionStore.setState({ action: actionType });
   }
