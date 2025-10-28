@@ -7,6 +7,7 @@ import {
   Popconfirm,
   Mentions,
   Form,
+  Modal,
 } from 'antd'
 import {
   PlusOutlined,
@@ -159,6 +160,10 @@ function TreeNodeInner({
     setResponsesOptions(treeToSchema([...parameters, ...requestBody, ...responses2]) || {})
   }, [schemaData])
 
+  const [open, setOpen] = useState(false);
+  const showModal = () => setOpen(true);
+  const handleCancel = () => setOpen(false);
+
   return (
     <div
       className="group pl-2 mt-1 p-1 border border-gray-300 rounded select-none"
@@ -179,9 +184,9 @@ function TreeNodeInner({
           {/* 名称 */}
           <div>{NameField}</div>
         </div>
-        <div className='flex-1 pl-2 pr-4'>
+        <div className='pr-4 max-w-xs flex-1 flex justify-start'>
           {mode === 2 && (
-            <div className="mx-2 flex w-full">
+            <div className="flex w-full">
               {node.editingDescription ? (
                 <Input
                   size="small"
@@ -209,6 +214,39 @@ function TreeNodeInner({
                   title={node.description}
                 >
                   {node.description || '添加描述...'}
+                </div>
+              )}
+            </div>
+          )}
+          {mode === 3 && (
+            <div className="flex w-full">
+              {node.editingDefault ? (
+                <Input
+                  size="small"
+                  autoFocus
+                  defaultValue={node.default}
+                  placeholder={node.description}
+                  className="border-0 border-b border-gray-300 focus:border-blue-500 focus:shadow-none rounded-none"
+                  onBlur={(e) => {
+                    updateNode(node.id, {
+                      default: (e.target as HTMLInputElement).value,
+                      editingDefault: false,
+                    })
+                  }}
+                  onPressEnter={(e) => {
+                    updateNode(node.id, {
+                      default: (e.target as HTMLInputElement).value,
+                      editingDefault: false,
+                    })
+                  }}
+                />
+              ) : (
+                <div
+                  className="text-gray-600 cursor-pointer border-b border-dashed border-transparent hover:border-gray-400 truncate w-full"
+                  onClick={() => updateNode(node.id, { editingDefault: true })}
+                  title={node.default}
+                >
+                  {node.default || '设置默认值...'}
                 </div>
               )}
             </div>
@@ -275,22 +313,40 @@ function TreeNodeInner({
               onClick={onOpenDetail}
             />
           )}
+          {mode === 3 && parentType !== 'array' && (
+            <Button
+              size="small"
+              type="text"
+              icon={<EditOutlined className="p-1 border rounded" />}
+              onClick={showModal}
+            />
+          )}
         </div>
       </div>
       {/* mode=3 时显示默认值 Mentions */}
-      {mode === 3 && (
+      <Modal
+        title="提示"
+        open={open}
+        onCancel={handleCancel}
+        centered
+        footer={null}
+        width={800}
+      >
         <div style={{ marginLeft: indent }} className="mt-1">
           <Form.Item name={[node.id, node.name]} initialValue={node?.default}>
             <Mentions
               prefix="{{"
               placeholder="Type {{ to mention…"
-              onBlur={(e) => setFormData({ id: node.id, name: 'default', value: (e.target as HTMLTextAreaElement).value })}
+              onBlur={(e) => {
+                setFormData({ id: node.id, name: 'default', value: (e.target as HTMLTextAreaElement).value });
+                updateNode(node.id, { default: (e.target as HTMLTextAreaElement).value })
+              }}
               options={schemaType !== "responses" ? paramsOptions : responsesOptions}
-              rows={3}
+              rows={15}
             />
           </Form.Item>
         </div>
-      )}
+      </Modal>
     </div>
   )
 }

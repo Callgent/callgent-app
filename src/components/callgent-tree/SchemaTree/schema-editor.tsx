@@ -157,7 +157,7 @@ function JSONSchemaEditor({ schema, mode, schemaType, submitSchema, setFormData 
 
     return (
         <div className="px-2 w-full">
-            <div className="overflow-auto bg-white rounded mb-2 w-full">
+            <div className="overflow bg-white rounded mb-2 w-full">
                 <Form>
                     {(mode !== 2 && schemaType === "responses") ? (
                         <details className="group" >
