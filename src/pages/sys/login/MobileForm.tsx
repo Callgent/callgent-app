@@ -9,7 +9,7 @@ const { Countdown } = Statistic;
 
 function MobileForm() {
 	const { t } = useTranslation();
-	const onFinish = (values: any) => {
+	const onFinish = () => {
 
 	};
 

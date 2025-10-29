@@ -86,15 +86,12 @@ export default function CalendarEventForm({
 					.validateFields()
 					.then((values) => {
 						form.resetFields();
-
 						const { id } = initValues;
 						const event = { ...values, id };
 						if (type === "add") onCreate(event);
 						if (type === "edit") onEdit(event);
 						onCancel();
 					})
-					.catch((info) => {
-					});
 			}}
 		>
 			<Form form={form} size="small" labelCol={{ span: 4 }} wrapperCol={{ span: 18 }} initialValues={initValues}>

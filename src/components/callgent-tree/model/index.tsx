@@ -21,7 +21,7 @@ export const TreeActionModal = () => {
       open={isModalOpen}
       onCancel={closeModal}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
     >
       <ActionForm />
     </Modal>

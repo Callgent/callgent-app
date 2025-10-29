@@ -7,9 +7,9 @@ import { useDeleteCallgent } from '@/models/callgentStore';
 import { delCallgentApi, deleteEntry } from '@/api/services/callgentService';
 import { deleteNode } from '@/utils/callgent-tree';
 import NodeComponent from './node-component';
-import { createSearchParams, shouldPreventNavigation } from '@/utils';
+import { createSearchParams } from '@/utils';
 import { useEndpointStore } from '@/models/endpoint';
-import { useRouter, useSearchParams } from '@/router/hooks';
+import { useRouter } from '@/router/hooks';
 import { unsavedGuard } from '@/router/utils';
 
 interface TreeNodeProps {

@@ -68,7 +68,7 @@ export const replaceDynamicParams = (menuKey: string, params: Params<string>) =>
 			const paramKey = paramName.slice(1);
 			if (!params[paramKey]) continue;
 
-			replacedPathName = replacedPathName.replace(paramName, params[paramKey]);
+			replacedPathName = replacedPathName.replace(paramName, params[paramKey] ?? '');
 		}
 	}
 

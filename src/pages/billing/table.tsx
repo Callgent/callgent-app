@@ -53,7 +53,7 @@ const BillingTable: React.FC = () => {
     const fetchTransactions = async () => {
       setLoading(true);
       try {
-        const res = await transactions();
+        await transactions();
       } catch (err) {
         console.error('Failed to load transactions:', err);
       } finally {

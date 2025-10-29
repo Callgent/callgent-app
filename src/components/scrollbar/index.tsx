@@ -31,7 +31,7 @@ export default Scrollbar;
 const ScrollbarRoot = styled(SimpleBar).withConfig({
 	shouldForwardProp: (prop: string) => !["fillContainer"].includes(prop),
 	displayName: "ScrollbarRoot",
-})<Pick<ScrollbarProps, "fillContainer">>`
+}) <Pick<ScrollbarProps, "fillContainer">>`
   min-width: 0;
   min-height: 0;
   max-height: 100%;

@@ -83,7 +83,7 @@ export default function AccountDropdown() {
 	];
 
 	return (
-		<Dropdown menu={{ items }} trigger={["click"]} dropdownRender={dropdownRender}>
+		<Dropdown menu={{ items }} trigger={["click"]} popupRender={dropdownRender}>
 			<IconButton className="h-10 w-10 transform-none px-0 hover:scale-105">
 				<img className="h-8 w-8 rounded-full" src={avatar} alt="" />
 			</IconButton>

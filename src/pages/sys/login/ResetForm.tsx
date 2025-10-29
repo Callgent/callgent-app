@@ -8,6 +8,7 @@ import { LoginStateEnum, useLoginStateContext } from "./providers/LoginStateProv
 
 function ResetForm() {
 	const onFinish = (values: any) => {
+		console.log("Received values of form: ", values);
 	};
 
 	const { t } = useTranslation();
