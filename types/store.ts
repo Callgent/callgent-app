@@ -54,7 +54,11 @@ export interface EndpointState {
   apiMapId: string | null
   editId: string | null
   parameters: any[]
+  requestBody: any[]
   responses: any[]
+  parameters2: any[]
+  requestBody2: any[]
+  responses2: any[]
   formData: Record<string, any>
   schemaData: Record<string, any>
   isParameterOpen: boolean
@@ -73,7 +77,11 @@ export interface EndpointState {
   setStatus: (status: 'define' | 'implement' | 'edit' | null) => void
   setEditId: (name: string | null) => void
   setParameters: (params: any[]) => void
+  setRequestBody: (data: any) => void
   setResponses: (resps: any[]) => void
+  setParameters2: (params: any[]) => void
+  setRequestBody2: (data: any) => void
+  setResponses2: (resps: any[]) => void
   setFormData: (data: Record<string, any>) => void
   setSchemaData: (data: Record<string, any>) => void
   setIsEndpointOpen: (open: boolean) => void

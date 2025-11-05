@@ -1,74 +1,83 @@
-import { useEffect, useState } from 'react'
-import { TreeSelect, Spin, message } from 'antd'
-import { getCallgentApiList } from '@/api/services/callgentService'
-import { useLocation } from 'react-router'
-import { useEndpointStore } from '@/models/endpoint'
+import { useEffect, useState } from "react";
+import { TreeSelect, Spin, message } from "antd";
+import { getCallgentApiList } from "@/api/services/callgentService";
+import { useLocation } from "react-router";
+import { useEndpointStore } from "@/models/endpoint";
 
 import {
   convertEndpointsToTreeNodes,
   convertSentriesToTreeNodes,
-  updateTreeNode
-} from '@/utils/callgent-tree'
-import ApiMap from './api-map'
+  updateTreeNode,
+} from "@/utils/callgent-tree";
+import ApiMap from "./api-map";
 
 export default function EndpointSelectApi() {
-  const location = useLocation()
-  const query = new URLSearchParams(location.search)
-  const callgentId = query.get('callgentId') || ''
-  const { setFormData, formData, selectApi } = useEndpointStore()
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const callgentId = query.get("callgentId") || "";
+  const { setFormData, formData, selectApi } = useEndpointStore();
 
-  const [treeData, setTreeData] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
+  const [treeData, setTreeData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Initialize top-level nodes
   const init = async () => {
-    if (!callgentId) return
-    setLoading(true)
+    if (!callgentId) return;
+    setLoading(true);
     try {
-      const { data } = await getCallgentApiList(callgentId)
-      const endpoints = data.endpoints || []
-      const sentries = data.sentries || []
-      const endpointNodes = convertEndpointsToTreeNodes(endpoints)
-      const sentryNodes = convertSentriesToTreeNodes(sentries).map((item: any) => ({ ...item, selectable: false }))
-      setTreeData([...endpointNodes, ...sentryNodes])
+      const { data } = await getCallgentApiList(callgentId);
+      const endpoints = data.endpoints || [];
+      const sentries = data.sentries || [];
+      const endpointNodes = convertEndpointsToTreeNodes(endpoints);
+      const sentryNodes = convertSentriesToTreeNodes(sentries).map(
+        (item: any) => ({ ...item, selectable: false })
+      );
+      setTreeData([...endpointNodes, ...sentryNodes]);
     } catch (err) {
-      message.error('Failed to initialize')
+      message.error("Failed to initialize");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    init()
-  }, [callgentId])
+    init();
+  }, [callgentId]);
 
   // Load sentry children on expand
   const onLoadData = async (treeNode: any) => {
-    if (treeNode.children?.length > 0) return
-    const callgentId = treeNode.callgentIds?.[0]
-    if (!callgentId) return
+    if (treeNode.children?.length > 0) return;
+    const callgentId = treeNode.callgentIds?.[0];
+    if (!callgentId) return;
     try {
-      const { data } = await getCallgentApiList(`${callgentId}^${treeNode.host}`)
-      const endpoints = data.endpoints || []
-      const sentries = data.sentries || []
-      const endpointNodes = convertEndpointsToTreeNodes(endpoints)
-      const sentryNodes = convertSentriesToTreeNodes(sentries).map((item: any) => ({ ...item, selectable: false }))
-      const newTreeData = updateTreeNode(treeData, treeNode.key, [...sentryNodes, ...endpointNodes])
-      setFormData({ ...formData, entry: data?.endpoints[0]?.entry })
-      setTreeData(newTreeData)
+      const { data } = await getCallgentApiList(
+        `${callgentId}^${treeNode.host}`
+      );
+      const endpoints = data.endpoints || [];
+      const sentries = data.sentries || [];
+      const endpointNodes = convertEndpointsToTreeNodes(endpoints);
+      const sentryNodes = convertSentriesToTreeNodes(sentries).map(
+        (item: any) => ({ ...item, selectable: false })
+      );
+      const newTreeData = updateTreeNode(treeData, treeNode.key, [
+        ...sentryNodes,
+        ...endpointNodes,
+      ]);
+      setFormData({ ...formData, entry: data?.endpoints[0]?.entry });
+      setTreeData(newTreeData);
     } catch (err) {
-      message.error('Failed to load child nodes')
+      message.error("Failed to load child nodes");
     }
-  }
+  };
 
   const handleApiSelect = async (value: string, node: any) => {
-    if (!node?.fullData) return
+    if (!node?.fullData) return;
     try {
-      await selectApi(value, node.fullData?.entry?.callgentIds, {})
+      await selectApi(value, node.fullData?.entry?.callgentIds, {});
     } catch (err) {
-      message.error('Failed to load API parameters')
+      message.error("Failed to load API parameters");
     }
-  }
+  };
   return (
     <div className="py-4">
       <Spin spinning={loading}>
@@ -86,5 +95,5 @@ export default function EndpointSelectApi() {
         <ApiMap />
       </Spin>
     </div>
-  )
+  );
 }

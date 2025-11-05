@@ -1,67 +1,62 @@
-import { Mentions } from 'antd'
-import SchemaEditor from '../SchemaTree/schema-editor'
-import { useEndpointStore } from '@/models/endpoint'
+import { Mentions } from "antd";
+import SchemaEditor from "../SchemaTree/schema-editor";
+import { useEndpointStore } from "@/models/endpoint";
+import EditableTree from "../schema/EditableTree";
+import { useState } from "react";
+import { DownOutlined, RightOutlined } from "@ant-design/icons";
 
 export default function ApiMap() {
-  const { editId, apiMapId, information, setFormData, schemaData, setSchemaData, responsesOptions, setInformation } = useEndpointStore()
-  // 更新
-  const submitSchema = (data: any, form: string) => {
-    setSchemaData((prevSchemaData: any) => ({
-      ...prevSchemaData,
-      [form]: data?.children || []
-    }))
-  }
-  // 更新默认值
-  const updateFormValue = (data: { id: string, name: string, value: any }, form: string) => {
-    const { id, name, value } = data;
-    setFormData((prevFormData: any) => ({
-      ...prevFormData,
-      [form]: { ...(prevFormData[form] || {}), [`${id}`]: { [name]: value } }
-    }));
-  }
+  const {
+    information,
+    parameters,
+    requestBody,
+    responses,
+    parameters2,
+    requestBody2,
+    responses2,
+    setInformation,
+    setResponses,
+    setParameters2,
+    setRequestBody2,
+  } = useEndpointStore();
+  const [isExpanded, setIsExpanded] = useState(false);
   return (
     <div className="space-y-4 mt-2 overflow-x-hidden border p-2 rounded">
       <div className="border border-gray-200 dark:border-gray-600 rounded">
         <div className="font-medium bg-gray-50  px-4 py-2">
           Payload comes from api1
         </div>
-        <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-          <SchemaEditor
+        <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600 p-1">
+          <EditableTree
             mode={1}
-            schemaType="parameters"
-            schema={schemaData?.parameters}
-            submitSchema={(data: any) => submitSchema(data, 'parameters')}
-            setFormData={(data: any) => updateFormValue(data, 'parameters')}
-            apiId={`${editId}_${apiMapId}`}
+            data={parameters}
+            treeType="parameters"
+            defaultExpandAll={false}
           />
-          <SchemaEditor
+          <EditableTree
             mode={1}
-            schemaType="requestBody"
-            schema={schemaData?.requestBody}
-            submitSchema={(data: any) => submitSchema(data, 'requestBody')}
-            setFormData={(data: any) => updateFormValue(data, 'requestBody')}
-            apiId={`${editId}_${apiMapId}`}
+            data={requestBody}
+            treeType="requestBody"
+            defaultExpandAll={false}
           />
         </div>
         <div className="font-medium bg-gray-50  px-4 py-2">
           Payload comes from api2
         </div>
-        <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-          <SchemaEditor
+        <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600 p-1">
+          <EditableTree
             mode={3}
-            schemaType="parameters"
-            schema={schemaData?.parameters2}
-            submitSchema={(data: any) => submitSchema(data, 'parameters2')}
-            setFormData={(data: any) => updateFormValue(data, 'parameters2')}
-            apiId={`${editId}_${apiMapId}`}
+            data={parameters2}
+            onChange={(data: any) => setParameters2(data)}
+            treeType="parameters"
+            defaultExpandAll={false}
           />
-          <SchemaEditor
+          <EditableTree
             mode={3}
-            schemaType="requestBody"
-            schema={schemaData?.requestBody2}
-            submitSchema={(data: any) => submitSchema(data, 'requestBody2')}
-            setFormData={(data: any) => updateFormValue(data, 'requestBody2')}
-            apiId={`${editId}_${apiMapId}`}
+            data={requestBody2}
+            onChange={(data: any) => setRequestBody2(data)}
+            treeType="requestBody"
+            defaultExpandAll={false}
           />
         </div>
       </div>
@@ -69,47 +64,66 @@ export default function ApiMap() {
         <div className="font-medium bg-gray-50 px-4 py-2 bg-dark-green">
           Responses comes from api2
         </div>
-        <div className="divide-y divide-gray-100">
-          <SchemaEditor
+        <div className="divide-y divide-gray-100 p-1">
+          <EditableTree
             mode={1}
-            schemaType="responses"
-            schema={schemaData?.responses2}
-            submitSchema={(data: any) => submitSchema(data, 'responses2')}
-            setFormData={(data: any) => updateFormValue(data, 'responses2')}
-            apiId={`${editId}_${apiMapId}`}
+            data={responses2}
+            treeType="responses"
+            defaultExpandAll={false}
           />
         </div>
         <div className="font-medium bg-gray-50 px-4 py-2 bg-dark-green">
           Responses comes from api1
         </div>
-        <div className="divide-y divide-gray-100">
-          <div>
-            <div className='border p-2 m-2'>
-              <div className="font-medium bg-gray-50  px-4 py-2">
-                statusCode
-              </div>
-              <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600">
-                <Mentions
-                  prefix="{{"
-                  placeholder="Type {{ to mention…"
-                  defaultValue={information?.statusCode}
-                  onChange={(value) => { setInformation({ statusCode: value }) }}
-                  options={responsesOptions}
-                  rows={2}
-                />
-              </div>
-            </div>
+        <div className="divide-y divide-gray-100 p-1">
+          <div className="flex flex-1 items-center space-x-2 justify-between cursor-pointer ">
+            <span className="pl-8">StatusCode</span>
+            <input
+              type="text"
+              value={information?.statusCode}
+              onChange={(e) => setInformation({ statusCode: e.target.value })}
+              className="border-b px-1 py-0.5 text-sm w-full focus:outline-none focus:ring-0 hover:bg-gray-100 hover:border-green-500 cursor-pointer  overflow-hidden whitespace-nowrap text-ellipsis focus:border-green-500"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
-          <SchemaEditor
-            mode={3}
-            schemaType="responses"
-            schema={schemaData?.responses}
-            submitSchema={(data: any) => submitSchema(data, 'responses')}
-            setFormData={(data: any) => updateFormValue(data, 'responses')}
-            apiId={`${editId}_${apiMapId}`}
-          />
+          <div
+            className="flex flex-1 items-center space-x-2 justify-between cursor-pointer "
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <button
+              type="button"
+              className="ml-2 text-gray-500 hover:text-gray-700 text-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
+            >
+              {isExpanded ? <DownOutlined /> : <RightOutlined />}
+            </button>
+            <span>Responses</span>
+            <input
+              type="text"
+              value={information?.responses_default}
+              onChange={(e) =>
+                setInformation({ responses_default: e.target.value })
+              }
+              className="border-b px-1 py-0.5 text-sm w-full focus:outline-none focus:ring-0 hover:bg-gray-100 hover:border-green-500 cursor-pointer  overflow-hidden whitespace-nowrap text-ellipsis focus:border-green-500"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          {isExpanded && (
+            <div className="p-3 border-t">
+              <EditableTree
+                mode={3}
+                data={responses}
+                onChange={(data: any) => setResponses(data)}
+                treeType="responses"
+                defaultExpandAll={false}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }
