@@ -60,7 +60,6 @@ export interface EndpointState {
   requestBody2: any[]
   responses2: any[]
   formData: Record<string, any>
-  schemaData: Record<string, any>
   isParameterOpen: boolean
   isResponseOpen: boolean
   isEndpointOpen: boolean
@@ -83,7 +82,6 @@ export interface EndpointState {
   setRequestBody2: (data: any) => void
   setResponses2: (resps: any[]) => void
   setFormData: (data: Record<string, any>) => void
-  setSchemaData: (data: Record<string, any>) => void
   setIsEndpointOpen: (open: boolean) => void
   setParamsOptions: (data: any) => void
   setResponsesOptions: (data: any) => void

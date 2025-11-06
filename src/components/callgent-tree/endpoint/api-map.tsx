@@ -1,5 +1,3 @@
-import { Mentions } from "antd";
-import SchemaEditor from "../SchemaTree/schema-editor";
 import { useEndpointStore } from "@/models/endpoint";
 import EditableTree from "../schema/EditableTree";
 import { useState } from "react";

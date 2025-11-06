@@ -1,7 +1,7 @@
 import { EndpointState } from '#/store'
 import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
 import { convertOpenApiToTree, convertTreeToOpenApi, mergeParametersWithDefaults, mergeSchemasWithDefaults } from '@/components/callgent-tree/schema/utils';
-import { jsonSchemaToTreeNode, extractFirst2xxJsonSchema, generateId, treeToSchema, extractAllDefaults, mergeSchemaWithFormData, transformArrayItems, flattenSchemaToMentions } from '@/components/callgent-tree/SchemaTree/utils';
+import { extractFirst2xxJsonSchema, flattenSchemaToMentions } from '@/components/callgent-tree/schema/utils';
 import { unsavedGuard } from '@/router/utils';
 import { convertToOpenAPI, restoreDataFromOpenApi } from '@/utils/callgent-tree';
 import { message } from 'antd';
@@ -19,7 +19,6 @@ const initData = {
   requestBody2: [],
   responses2: [],
   formData: {},
-  schemaData: {},
   isParameterOpen: false,
   isResponseOpen: false,
   isEndpointOpen: false,
@@ -48,11 +47,6 @@ export const useEndpointStore = create<EndpointState>()(
           parameters,
           requestBody,
           responses,
-          schemaData: {
-            parameters,
-            requestBody,
-            responses
-          },
           formData: {
             ...get().formData,
             metaExe: data?.metaExe
@@ -80,7 +74,7 @@ export const useEndpointStore = create<EndpointState>()(
 
       // 提交ep
       handleConfirm: async (currentNode) => {
-        const { formData, information, editId, schemaData, parameters, requestBody, responses, parameters2, requestBody2 } = get();
+        const { formData, information, editId, parameters, requestBody, responses, parameters2, requestBody2 } = get();
         const data = convertToOpenAPI({
           path: information?.endpointName,
           operationId: information?.endpointName,
@@ -100,18 +94,6 @@ export const useEndpointStore = create<EndpointState>()(
           responses: convertTreeToOpenApi(responses, 'responses'),
         })
         const metaExe = formData?.metaExe;
-        let apiMapData = mergeSchemaWithFormData(
-          {
-            parameters2: schemaData?.parameters2,
-            requestBody2: schemaData?.requestBody2,
-            responses: schemaData?.responses
-          },
-          {
-            parameters2: formData?.parameters2,
-            requestBody2: formData?.requestBody2,
-            responses: formData?.responses,
-          }
-        )
         const apiMap = (currentNode?.type === 'CLIENT' && metaExe?.apiMap?.epId) ? {
           epId: metaExe?.apiMap?.epId,
           epName: metaExe?.apiMap?.epName,
@@ -130,7 +112,7 @@ export const useEndpointStore = create<EndpointState>()(
             [information?.statusCode || '']: {
               content: {
                 "application/json": {
-                  schema: { ...apiMapData?.responses || {}, default: information?.responses_default }
+                  schema: { ...convertTreeToOpenApi(responses, 'responses') || {}, default: information?.responses_default }
                 }
               }
             }
@@ -155,16 +137,17 @@ export const useEndpointStore = create<EndpointState>()(
         const { data } = await getEndpointApi(id);
         let parameters2 = data?.params?.parameters
         let requestBody2 = data?.params?.requestBody?.content["application/json"]?.schema
-        let responses2 = convertOpenApiToTree(extractFirst2xxJsonSchema(data?.responses), 'responses')
-        let defaultValue = { response: '', response2: '' }
+        let responses2 = extractFirst2xxJsonSchema(data?.responses)
         if (apiMap) {
-          const parameters2_default = apiMap?.params?.parameters
-          const requestBody2_default = apiMap?.params?.requestBody?.content["application/json"]?.schema
-          const responses_default = apiMap?.responses[information?.statusCode]?.content["application/json"]?.schema
+          const parameters2_default = apiMap?.params?.parameters || []
+          const requestBody2_default = apiMap?.params?.requestBody?.content?.["application/json"]?.schema || {}
+          const responses_default = apiMap?.responses?.[information?.statusCode]?.content?.["application/json"]?.schema || {}
           parameters2 = convertOpenApiToTree(mergeParametersWithDefaults(parameters2, parameters2_default), 'parameters')
           requestBody2 = convertOpenApiToTree(mergeSchemasWithDefaults(requestBody2, requestBody2_default), 'requestBody')
-          responses2 = convertOpenApiToTree(mergeSchemasWithDefaults(responses, responses_default), 'responses')
+          responses2 = convertOpenApiToTree(mergeSchemasWithDefaults(convertTreeToOpenApi(responses, 'responses'), responses_default), 'responses')
           setInformation({ responses_default: responses_default?.default })
+        } else {
+          responses2 = convertOpenApiToTree(extractFirst2xxJsonSchema(data?.responses), 'responses')
         }
         set({
           apiMapId: data.id,
@@ -173,7 +156,6 @@ export const useEndpointStore = create<EndpointState>()(
           responses2,
           formData: {
             ...formData,
-            defaultValue,
             metaExe: {
               apiMap: { epId: data.id, epName: data.name, entry }
             }
@@ -202,14 +184,6 @@ export const useEndpointStore = create<EndpointState>()(
       setParameters2: (params) => set({ parameters2: params }),
       setRequestBody2: (params) => set({ requestBody2: params }),
       setResponses2: (resps) => set({ responses2: resps }),
-      setSchemaData: (schemaData: any) => {
-        set((state: any) => ({
-          schemaData:
-            typeof schemaData === "function"
-              ? schemaData(state.schemaData)
-              : { ...state.schemaData, ...schemaData },
-        }));
-      },
       setFormData: (formData: any) => {
         set((state: any) => ({
           formData:

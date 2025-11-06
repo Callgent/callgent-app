@@ -1,19 +1,14 @@
-import { useEffect, useState } from "react";
-import { Input, Button, Tabs, Modal } from "antd";
-import { useEndpointStore } from "@/models/endpoint";
 import useTreeActionStore, { useTreeActions } from "@/models/callgentTreeStore";
+import { useEndpointStore } from "@/models/endpoint";
+import { Button, Tabs, Modal } from "antd";
+import { useEffect } from "react";
 import Payload from "./payload";
 import Mapping from "./mapping";
+
 export default function EndpointPage() {
-  const {
-    status,
-    formData,
-    activeKey,
-    handleConfirm,
-    clear,
-    setFormData,
-    setActiveKey,
-  } = useEndpointStore();
+  const { status, formData, activeKey } = useEndpointStore();
+  const { handleConfirm, clear, setFormData, setActiveKey } =
+    useEndpointStore();
   const { currentNode } = useTreeActionStore();
   const { closeModal } = useTreeActions();
 
@@ -62,9 +57,6 @@ export default function EndpointPage() {
       close();
     };
   }, []);
-  // useBeforeunload(() => {
-  //   return shouldPreventNavigation({ confirm: false }) ? 'back' : false;
-  // });
 
   return (
     <div className="w-full mr-4">

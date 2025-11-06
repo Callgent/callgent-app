@@ -9,18 +9,18 @@ import { ThemeProvider } from "./theme/theme-provider";
 import Toast from "./components/layouts/toast";
 
 function App() {
-	return (
-		<ThemeProvider adapters={[AntdAdapter]}>
-			<MotionLazy>
-				<Helmet>
-					<title>Callgent</title>
-					<link rel="icon" href={Logo} />
-				</Helmet>
-				<Toast />
-				<Router />
-			</MotionLazy>
-		</ThemeProvider>
-	);
+  return (
+    <ThemeProvider adapters={[AntdAdapter]}>
+      <MotionLazy>
+        <Helmet>
+          <title>Callgent</title>
+          <link rel="icon" href={Logo} />
+        </Helmet>
+        <Toast />
+        <Router />
+      </MotionLazy>
+    </ThemeProvider>
+  );
 }
 
 export default App;

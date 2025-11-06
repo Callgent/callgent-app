@@ -10,6 +10,19 @@ export const typeOptions = [
   "array",
 ];
 
+// Request methods
+export const requestMethods = [
+  { value: "GET", description: "Retrieve data" },
+  { value: "POST", description: "Create new data" },
+  { value: "PUT", description: "Update/replace data" },
+  { value: "PATCH", description: "Partially update data" },
+  { value: "DELETE", description: "Remove data" },
+  { value: "HEAD", description: "Get metadata (no body)" },
+  { value: "OPTIONS", description: "List allowed methods" },
+  { value: "CONNECT", description: "Establish tunnel connection" },
+  { value: "TRACE", description: "Echoes request (debugging)" },
+];
+
 /**
  * 根据ID查找树节点
  * @param nodes 树节点数组
@@ -401,3 +414,54 @@ export const mergeParametersWithDefaults = (
   });
   return targetParameters;
 };
+
+// 查找2XX的响应
+export function extractFirst2xxJsonSchema(openapiResponses: any, apiMap: any = null): any | null {
+  try {
+
+    let statusCodes = Object.keys(openapiResponses).filter((code) => {
+      return /^2\d\d$/.test(code)
+    });
+    if (apiMap?.responses) {
+      statusCodes = [Object.keys(apiMap.responses)[0]];
+    }
+    for (const status of statusCodes) {
+      const response = openapiResponses[status];
+      const content = response?.content;
+      const json = content?.["application/json"];
+      if (json?.schema?.properties) {
+        return json.schema;
+      }
+    }
+    // message.error("Unsupported response type")
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+
+// schema转options
+export function flattenSchemaToMentions(schema: any, parentPath = ""): any[] {
+  const result: any[] = [];
+  if (schema.type === "object" && schema.properties) {
+    for (const key in schema.properties) {
+      const prop = schema.properties[key];
+      const currentPath = parentPath ? `${parentPath}.${key}` : key;
+      result.push(...flattenSchemaToMentions(prop, currentPath));
+    }
+  } else if (schema.type === "array" && schema.items) {
+    // 用 [] 表示数组字段
+    const currentPath = parentPath + "[]";
+    result.push(...flattenSchemaToMentions(schema.items, currentPath));
+  } else {
+    // 基础类型字段
+    const field = parentPath;
+    result.push({
+      value: `${field}}}`,
+      label: field,
+    });
+  }
+
+  return result;
+}

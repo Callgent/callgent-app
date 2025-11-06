@@ -1,9 +1,9 @@
 import { Icon } from "@iconify/react";
 import { Button, Form, Input, Modal, Select } from "antd";
 import { useEndpointStore } from "@/models/endpoint";
-import useTreeActionStore from "@/models/callgentTreeStore";
-import { requestMethods } from "../SchemaTree/utils";
 import EditableTree from "../schema/EditableTree";
+import { convertOpenApiToTree, requestMethods } from "../schema/utils";
+import AIGenerated from "../schema/ai-generated";
 
 export default function Payload() {
   const {
@@ -21,7 +21,12 @@ export default function Payload() {
   } = useEndpointStore();
 
   const [formEndpoint] = Form.useForm();
-  const { currentNode } = useTreeActionStore();
+  const handleChildData = (data: any) => {
+    const { Parameters = [], RequestBody = {}, Responses = {} } = data;
+    setParameters(convertOpenApiToTree(Parameters, "parameters"));
+    setRequestBody(convertOpenApiToTree(RequestBody, "requestBody"));
+    setResponses(convertOpenApiToTree(Responses, "responses"));
+  };
   return (
     <>
       <div className="flex items-center space-x-2">
@@ -37,20 +42,23 @@ export default function Payload() {
           <Icon icon="solar:settings-bold" className="w-5 h-5 " />
         </button>
       </div>
-
-      {/* Description */}
-      {currentNode?.type === "CLIENT" && (
-        <div className="my-2">
-          <label className="block font-medium mb-2">whatFor</label>
+      <div className="my-2">
+        <label className="block font-medium mb-2">whatFor</label>
+        <div className="border rounded">
           <Input.TextArea
-            rows={2}
             value={information?.whatFor}
             onChange={(e) => setInformation({ whatFor: e.target.value })}
             disabled={status === "read_only"}
             placeholder="Explain to caller, when and how to use this endpoint"
+            style={{ resize: "none" }}
+            className="border-none focus:ring-0 w-full p-2"
+            autoSize={{ minRows: 2, maxRows: 5 }}
           />
+          <div className="flex justify-end p-2">
+            <AIGenerated onDataReceived={handleChildData} />
+          </div>
         </div>
-      )}
+      </div>
       <div className="border border-gray-200 dark:border-gray-600 rounded">
         <div className="font-medium bg-gray-50  px-4 py-2">Parameters</div>
         <div className="divide-y divide-gray-100 border-t dark:border-t-gray-600 p-1">
