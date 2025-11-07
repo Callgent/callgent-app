@@ -22,10 +22,10 @@ export default function Payload() {
 
   const [formEndpoint] = Form.useForm();
   const handleChildData = (data: any) => {
-    const { Parameters = [], RequestBody = {}, Responses = {} } = data;
-    setParameters(convertOpenApiToTree(Parameters, "parameters"));
-    setRequestBody(convertOpenApiToTree(RequestBody, "requestBody"));
-    setResponses(convertOpenApiToTree(Responses, "responses"));
+    const { parameters = [], requestBody = {}, responses = {} } = data;
+    setParameters(convertOpenApiToTree(parameters, "parameters"));
+    setRequestBody(convertOpenApiToTree(requestBody, "requestBody"));
+    setResponses(convertOpenApiToTree(responses, "responses"));
   };
   return (
     <>

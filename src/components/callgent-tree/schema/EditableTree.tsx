@@ -472,7 +472,7 @@ const EditableTree: React.FC<EditableTreeProps> = ({
             )}
             {mode === 3 ? (
               <Form.Item name="defaultValue" label="Default Value">
-                <Input.TextArea />
+                <Input.TextArea rows={10} />
               </Form.Item>
             ) : (
               <Form.Item name="defaultValue" label="Default Value">

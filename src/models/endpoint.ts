@@ -157,7 +157,7 @@ export const useEndpointStore = create<EndpointState>()(
           formData: {
             ...formData,
             metaExe: {
-              apiMap: { epId: data.id, epName: data.name, entry }
+              apiMap: { epId: data.id, epName: data.name, entry: { callgentIds: (entry as any)?.callgentIds || entry } }
             }
           },
         })

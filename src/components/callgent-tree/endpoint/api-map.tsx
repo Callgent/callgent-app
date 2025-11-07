@@ -1,7 +1,12 @@
 import { useEndpointStore } from "@/models/endpoint";
 import EditableTree from "../schema/EditableTree";
 import { useState } from "react";
-import { DownOutlined, RightOutlined } from "@ant-design/icons";
+import {
+  ArrowsAltOutlined,
+  DownOutlined,
+  RightOutlined,
+} from "@ant-design/icons";
+import { Button, Mentions, Modal } from "antd";
 
 export default function ApiMap() {
   const {
@@ -18,6 +23,8 @@ export default function ApiMap() {
     setRequestBody2,
   } = useEndpointStore();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [mention, setMention] = useState("");
   return (
     <div className="space-y-4 mt-2 overflow-x-hidden border p-2 rounded">
       <div className="border border-gray-200 dark:border-gray-600 rounded">
@@ -75,19 +82,34 @@ export default function ApiMap() {
         </div>
         <div className="divide-y divide-gray-100 p-1">
           <div className="flex flex-1 items-center space-x-2 justify-between cursor-pointer ">
-            <span className="pl-8">StatusCode</span>
-            <input
-              type="text"
-              value={information?.statusCode}
-              onChange={(e) => setInformation({ statusCode: e.target.value })}
-              className="border-b px-1 py-0.5 text-sm w-full focus:outline-none focus:ring-0 hover:bg-gray-100 hover:border-green-500 cursor-pointer  overflow-hidden whitespace-nowrap text-ellipsis focus:border-green-500"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div className="w-28 flex items-center ml-8 ">
+              <div className="border-b px-1 py-0.5 text-sm w-full focus:outline-none focus:ring-0 hover:bg-gray-100 hover:border-green-500 cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis focus:border-green-500">
+                StatusCode
+              </div>
+            </div>
+            <div className="flex-1">
+              <input
+                type="text"
+                value={information?.statusCode}
+                onChange={(e) => setInformation({ statusCode: e.target.value })}
+                className="border-b px-1 py-0.5 text-sm w-full focus:outline-none focus:ring-0 hover:bg-gray-100 hover:border-green-500 cursor-pointer  overflow-hidden whitespace-nowrap text-ellipsis focus:border-green-500"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                size="small"
+                type="text"
+                icon={<ArrowsAltOutlined className="p-1 border rounded" />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMention("StatusCode");
+                  setIsModalVisible(true);
+                }}
+              />
+            </div>
           </div>
-          <div
-            className="flex flex-1 items-center space-x-2 justify-between cursor-pointer "
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
+          <div className="flex flex-1 items-center space-x-2 justify-between cursor-pointer ">
             <button
               type="button"
               className="ml-2 text-gray-500 hover:text-gray-700 text-sm"
@@ -98,19 +120,37 @@ export default function ApiMap() {
             >
               {isExpanded ? <DownOutlined /> : <RightOutlined />}
             </button>
-            <span>Responses</span>
-            <input
-              type="text"
-              value={information?.responses_default}
-              onChange={(e) =>
-                setInformation({ responses_default: e.target.value })
-              }
-              className="border-b px-1 py-0.5 text-sm w-full focus:outline-none focus:ring-0 hover:bg-gray-100 hover:border-green-500 cursor-pointer  overflow-hidden whitespace-nowrap text-ellipsis focus:border-green-500"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div className="w-28 flex items-center">
+              <div className="border-b px-1 py-0.5 text-sm w-full focus:outline-none focus:ring-0 hover:bg-gray-100 hover:border-green-500 cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis focus:border-green-500">
+                Responses
+              </div>
+            </div>
+            <div className="flex-1">
+              <input
+                type="text"
+                value={information?.responses_default}
+                onChange={(e) =>
+                  setInformation({ responses_default: e.target.value })
+                }
+                className="border-b px-1 py-0.5 text-sm w-full focus:outline-none focus:ring-0 hover:bg-gray-100 hover:border-green-500 cursor-pointer  overflow-hidden whitespace-nowrap text-ellipsis focus:border-green-500"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                size="small"
+                type="text"
+                icon={<ArrowsAltOutlined className="p-1 border rounded" />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMention("Responses");
+                  setIsModalVisible(true);
+                }}
+              />
+            </div>
           </div>
           {isExpanded && (
-            <div className="p-3 border-t">
+            <div className="ml-5 border-t">
               <EditableTree
                 mode={3}
                 data={responses}
@@ -119,6 +159,38 @@ export default function ApiMap() {
                 defaultExpandAll={false}
               />
             </div>
+          )}
+          {isModalVisible && (
+            <Modal
+              title="Edit Node Detail"
+              open={isModalVisible}
+              onOk={() => setIsModalVisible(false)}
+              onCancel={() => setIsModalVisible(false)}
+              forceRender
+            >
+              <Mentions
+                prefix="{{"
+                placeholder="Type {{ to mention…"
+                defaultValue={
+                  mention === "Responses"
+                    ? information?.responses_default
+                    : information?.statusCode
+                }
+                onBlur={(e) => {
+                  console.log(e.target.value);
+                  if (mention === "Responses") {
+                    setInformation({ responses_default: e.target.value });
+                  } else {
+                    setInformation({ statusCode: e.target.value });
+                  }
+                }}
+                options={responses.map((i) => ({
+                  value: i?.name,
+                  label: i?.name,
+                }))}
+                rows={3}
+              />
+            </Modal>
           )}
         </div>
       </div>

@@ -105,39 +105,28 @@ export const convertTreeToOpenApi = (
   }
 
   if (["requestBody", "responses"].includes(treeType)) {
-    if (tree.length === 1) {
-      const rootNode = tree[0];
-      return convertNodeToSchema(
-        {
-          ...rootNode,
-          children: tree.filter((child) => child.parentId === rootNode.id),
-        },
-        tree
-      );
-    } else {
-      const properties: any = {};
-      const requiredFields: string[] = [];
-      tree
-        .filter((node) => node.parentId === 0)
-        .forEach((node) => {
-          properties[node.name] = convertNodeToSchema(
-            {
-              ...node,
-              children: tree.filter((child) => child.parentId === node.id),
-            },
-            tree
-          );
-          if (node.required) {
-            requiredFields.push(node.name);
-          }
-        });
+    const properties: any = {};
+    const requiredFields: string[] = [];
+    tree
+      .filter((node) => node.parentId === 0)
+      .forEach((node) => {
+        properties[node.name] = convertNodeToSchema(
+          {
+            ...node,
+            children: tree.filter((child) => child.parentId === node.id),
+          },
+          tree
+        );
+        if (node.required) {
+          requiredFields.push(node.name);
+        }
+      });
 
-      return {
-        type: "object",
-        properties: properties,
-        ...(requiredFields.length > 0 && { required: requiredFields }),
-      };
-    }
+    return {
+      type: "object",
+      properties: properties,
+      ...(requiredFields.length > 0 && { required: requiredFields }),
+    };
   } else if (treeType === "parameters") {
     const parameters: any[] = [];
     tree.forEach((node) => {
