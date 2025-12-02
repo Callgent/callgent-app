@@ -7,7 +7,7 @@ import "ace-builds/src-noconflict/theme-github_dark";
 import { toast } from "sonner";
 import { Button } from "antd";
 import { restoreDataFromOpenApi } from "@/utils/callgent-tree";
-import { postEndpointsApi, putEndpointApi } from "@/api/services/callgentService";
+import { postEndpointsApi, putEndpointApi } from "@/api/callgentService";
 import { useRouter } from "@/router/hooks";
 
 export default function SwaggerEditor({ openApi }: { openApi: any }) {
@@ -16,7 +16,7 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
   const [error, setError] = useState(null);
   const [runLoading, setRunLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
-  const { push } = useRouter()
+  const { push } = useRouter();
   const handleEditorChange = (value: any) => {
     setSpec(value);
     setError(null);
@@ -32,7 +32,7 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
       setError(e.message);
       toast.error(e.message, {
         position: "top-center",
-        closeButton: true
+        closeButton: true,
       });
     } finally {
       setRunLoading(false);
@@ -55,11 +55,15 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
         await putEndpointApi(id!, restoreData);
       } else if (callgentId && entryId) {
         const restoreData = restoreDataFromOpenApi(dataToSave);
-        await postEndpointsApi({ ...restoreData, callgentId: callgentId, entryId: entryId });
+        await postEndpointsApi({
+          ...restoreData,
+          callgentId: callgentId,
+          entryId: entryId,
+        });
       } else {
         push("/callgent/callgents", { replace: false });
       }
-      setParsedSpec(dataToSave)
+      setParsedSpec(dataToSave);
       toast.success("OpenAPI spec saved successfully!");
     } finally {
       setSaveLoading(false);
@@ -67,7 +71,10 @@ export default function SwaggerEditor({ openApi }: { openApi: any }) {
   };
 
   return (
-    <div className="flex flex-col-reverse md:flex-row w-full" style={{ height: "calc(100vh - 6px)" }}>
+    <div
+      className="flex flex-col-reverse md:flex-row w-full"
+      style={{ height: "calc(100vh - 6px)" }}
+    >
       <div className="w-full md:w-1/2 flex flex-col min-h-0">
         <div className="flex-1 relative min-h-0">
           <AceEditor

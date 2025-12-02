@@ -1,8 +1,8 @@
 import { toast } from "sonner";
 import { create } from "zustand";
-import type { CallgentInfo, PageInfo } from "#/entity";
-import type { CallgentStore } from "#/store";
-import { getCallgents, getServer, getTasks, postCallgent, putCallgent, deleteCallgent } from "@/api/services/callgentService";
+import type { CallgentInfo, PageInfo } from "@/types/entity";
+import type { CallgentStore } from "@/types/store";
+import { getCallgents, getServer, getTasks, postCallgent, putCallgent, deleteCallgent } from "@/api/callgentService";
 
 const initState = {
   callgentInfo: {},

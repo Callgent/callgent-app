@@ -73,6 +73,7 @@
 		"styled-components": "^6.1.13",
 		"swagger-ui-react": "^5.20.0",
 		"tailwind-merge": "^2.5.4",
+		"vite-plugin-fake-server": "^2.2.2",
 		"zustand": "^4.4.3"
 	},
 	"devDependencies": {

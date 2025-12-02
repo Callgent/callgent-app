@@ -1,10 +1,10 @@
-import { useDeleteCallgent } from '@/models/callgentStore';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Avatar, Card, Popconfirm, Rate, Typography } from 'antd';
-import type React from 'react';
-import { useState } from 'react';
-import type { CallgentInfo } from '#/entity';
-import { useRouter } from '@/router/hooks';
+import { useDeleteCallgent } from "@/store/callgentStore";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Avatar, Card, Popconfirm, Rate, Typography } from "antd";
+import type React from "react";
+import { useState } from "react";
+import type { CallgentInfo } from "@/types/entity";
+import { useRouter } from "@/router/hooks";
 
 const { Paragraph } = Typography;
 
@@ -16,7 +16,7 @@ interface CallgentCardProps {
 const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const { push } = useRouter()
+  const { push } = useRouter();
   const showPopconfirm = () => {
     setOpenConfirm(true);
   };
@@ -26,7 +26,7 @@ const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
   };
 
   // del callgent
-  const delCallgent = useDeleteCallgent()
+  const delCallgent = useDeleteCallgent();
   const deleteCallgent = async () => {
     setConfirmLoading(true);
     try {
@@ -60,12 +60,22 @@ const CallgentCard: React.FC<CallgentCardProps> = ({ item, onEdit }) => {
       ]}
     >
       <Card.Meta
-        avatar={<Avatar onClick={handleCardClick} className='cursor-pointer' src={item.avatar || '/images/avatar.svg'} />}
-        title={<div onClick={handleCardClick} className='cursor-pointer'>{item.name}</div>}
+        avatar={
+          <Avatar
+            onClick={handleCardClick}
+            className="cursor-pointer"
+            src={item.avatar || "/images/avatar.svg"}
+          />
+        }
+        title={
+          <div onClick={handleCardClick} className="cursor-pointer">
+            {item.name}
+          </div>
+        }
         description={
-          <div onClick={handleCardClick} className='cursor-pointer'>
-            <Paragraph ellipsis>{item.whatFor || 'no description'}</Paragraph>
-            <span>{item.updatedAt?.split('T')[0]}</span>
+          <div onClick={handleCardClick} className="cursor-pointer">
+            <Paragraph ellipsis>{item.whatFor || "no description"}</Paragraph>
+            <span>{item.updatedAt?.split("T")[0]}</span>
           </div>
         }
       />

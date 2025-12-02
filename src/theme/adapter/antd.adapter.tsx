@@ -2,7 +2,7 @@ import useLocale from "@/locales/use-locale";
 import { StyleProvider } from "@ant-design/cssinjs";
 import type { ThemeConfig } from "antd";
 import { App, ConfigProvider, theme } from "antd";
-import { ThemeMode } from "#/enum";
+import { ThemeMode } from "@/types/enum";
 import { baseThemeTokens } from "../tokens/base";
 import {
   darkColorTokens,
@@ -11,7 +11,7 @@ import {
 } from "../tokens/color";
 import type { UILibraryAdapter } from "../type";
 
-import { useSettings } from "@/models/settingStore";
+import { useSettings } from "@/store/settingStore";
 import { removePx } from "@/utils/theme";
 import { lightShadowTokens } from "../tokens/shadow";
 import { darkShadowTokens } from "../tokens/shadow";

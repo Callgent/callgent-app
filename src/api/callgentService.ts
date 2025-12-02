@@ -1,6 +1,6 @@
 import type { Result } from "#/api";
-import type { CallgentInfo, Realm } from "#/entity";
-import apiClient from "../apiClient";
+import type { CallgentInfo, Realm } from "@/types/entity";
+import apiClient from "../utils/apiClient";
 
 export interface CallgentParams {
 	query?: string;
@@ -154,4 +154,16 @@ export const postRequestApi = async (callgentId: string, data: any, taskId: stri
 export const getCallgentApiList = async (id: string) =>
 	apiClient.get<any>({
 		url: `/api/endpoints/from/${id}`
+	});
+
+/** get /api/realm */
+export const getRealmApi = async () =>
+	apiClient.get<any>({
+		url: `/api/realm`
+	});
+
+/** get /api/realm */
+export const getRealmDetailApi = async () =>
+	apiClient.get<any>({
+		url: `/api/realm/a`
 	});

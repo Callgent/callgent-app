@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { Space } from "antd";
-import { getEndpointApi } from "@/api/services/callgentService";
+import { getEndpointApi } from "@/api/callgentService";
 import SwaggerApi from "@/components/callgent-tree/sep-api/callgent-api";
 import { callgentApi } from "@/utils/callgent-tree";
 import { CircleLoading } from "@/components/layouts/loading";
@@ -9,7 +9,7 @@ import { useRouter } from "@/router/hooks";
 
 export default function CallgentApi() {
   const location = useLocation();
-  const { push } = useRouter()
+  const { push } = useRouter();
   const [openApi, setOpenApi] = useState<any>({});
 
   const init = async () => {
@@ -19,8 +19,8 @@ export default function CallgentApi() {
       if (!endpointsId) {
         const data = {
           openapi: "3.0.0",
-          paths: {}
-        }
+          paths: {},
+        };
         setOpenApi(data);
       } else {
         const { data } = await getEndpointApi(endpointsId);

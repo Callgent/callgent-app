@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Input, InputRef, Tabs } from "antd";
-import { useEndpointStore } from "@/models/endpoint";
+import { useEndpointStore } from "@/store/endpoint";
 import EndpointSelectApi from "./select-api";
 
 export default function Mapping() {

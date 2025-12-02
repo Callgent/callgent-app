@@ -1,4 +1,4 @@
-import type { ThemeMode } from "#/enum";
+import type { ThemeMode } from "@/types/enum";
 
 export const themeTokens = {
 	colors: {
@@ -195,6 +195,6 @@ export type IsLeafObject<T> = T extends object ? (T[keyof T] extends null | stri
 // add channel
 export type AddChannelToLeaf<T> = T extends object
 	? IsLeafObject<T> extends true
-		? T & { [K in keyof T as `${string & K}Channel`]: string } // only add channel to leaf
-		: { [K in keyof T]: AddChannelToLeaf<T[K]> } // recursive other level
+	? T & { [K in keyof T as `${string & K}Channel`]: string } // only add channel to leaf
+	: { [K in keyof T]: AddChannelToLeaf<T[K]> } // recursive other level
 	: T;

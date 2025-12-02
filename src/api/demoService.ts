@@ -1,4 +1,4 @@
-import apiClient from "../apiClient";
+import apiClient from "../utils/apiClient";
 
 export enum DemoApi {
 	TOKEN_EXPIRED = "/user/tokenExpired",

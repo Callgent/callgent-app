@@ -1,5 +1,5 @@
-import { EndpointState } from '#/store'
-import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/services/callgentService';
+import { EndpointState } from '@/types/store'
+import { getEndpointApi, postEndpointsApi, putEndpointApi } from '@/api/callgentService';
 import { convertOpenApiToTree, convertTreeToOpenApi, mergeParametersWithDefaults, mergeSchemasWithDefaults } from '@/components/callgent-tree/schema/utils';
 import { extractFirst2xxJsonSchema, flattenSchemaToMentions } from '@/components/callgent-tree/schema/utils';
 import { unsavedGuard } from '@/router/utils';

@@ -1,7 +1,7 @@
 import { themeVars } from "@/theme/theme.css";
 import styled from "styled-components";
 
-import { ThemeMode } from "#/enum";
+import { ThemeMode } from "@/types/enum";
 
 export const StyledCalendar = styled.div<{ $themeMode: ThemeMode }>`
   width: 100%;

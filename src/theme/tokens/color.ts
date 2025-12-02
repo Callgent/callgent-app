@@ -1,5 +1,5 @@
 import { rgbAlpha } from "@/utils/theme";
-import { ThemeColorPresets } from "#/enum";
+import { ThemeColorPresets } from "@/types/enum";
 
 export const presetsColors = {
 	[ThemeColorPresets.Default]: {
@@ -134,8 +134,8 @@ export const darkColorTokens = {
 		disabled: "#637381",
 	},
 	background: {
-		default: "#212121",
-		paper: "#212121",
-		neutral: "#212121",
+		default: "#000000",
+		paper: "#000000",
+		neutral: "#000000",
 	},
 };

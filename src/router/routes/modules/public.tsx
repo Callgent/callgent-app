@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { SvgIcon } from "@/components/icon";
-import type { AppRouteObject } from "#/router";
+import type { AppRouteObject } from "@/types/router";
 import { CircleLoading } from "@/components/layouts/loading";
 import { Outlet } from "react-router";
 
@@ -19,12 +19,18 @@ const publicRouter: AppRouteObject = {
       element: <HomePage />,
       meta: {
         label: "sys.menu.billing.billing",
-        icon: <SvgIcon icon="ic-analysis" className="ant-menu-item-icon" size="24" />,
+        icon: (
+          <SvgIcon
+            icon="ic-analysis"
+            className="ant-menu-item-icon"
+            size="24"
+          />
+        ),
         key: "/workbench",
-        hideMenu: true
+        hideMenu: true,
       },
-    }
-  ]
+    },
+  ],
 };
 
 export default publicRouter;

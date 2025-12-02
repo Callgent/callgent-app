@@ -1,10 +1,13 @@
-import useCallgentStore, { useCallgentActions, useFetchCallgentTasks } from "@/models/callgentStore";
+import useCallgentStore, {
+  useCallgentActions,
+  useFetchCallgentTasks,
+} from "@/store/callgentStore";
 import { Col, Pagination, Row } from "antd";
 import { useEffect, useState } from "react";
 import CallgentCard from "./tasks-card";
 
 const TasksListComponent: React.FC = () => {
-  const { callgentList, pageInfo, searchInfo } = useCallgentStore()
+  const { callgentList, pageInfo, searchInfo } = useCallgentStore();
   const { perPage, page, total } = pageInfo;
   const fetchCallgentList = useFetchCallgentTasks();
   const { reset } = useCallgentActions();
@@ -16,8 +19,8 @@ const TasksListComponent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setCurrentPage(page)
-  }, [page])
+    setCurrentPage(page);
+  }, [page]);
 
   const init = () => {
     reset();
@@ -40,9 +43,7 @@ const TasksListComponent: React.FC = () => {
       <Row gutter={[24, 24]} justify="start">
         {callgentList.map((item) => (
           <Col key={item.id} xs={24} md={12} lg={12} xl={8} xxl={6}>
-            <CallgentCard
-              item={item}
-            />
+            <CallgentCard item={item} />
           </Col>
         ))}
       </Row>

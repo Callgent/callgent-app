@@ -1,4 +1,4 @@
-import type { CallgentInfo, PageInfo, Realm, TreeAction } from "#/entity";
+import type { CallgentInfo, PageInfo, Realm, TreeAction } from "@/types/entity";
 
 export interface CallgentStore {
   callgentList: CallgentInfo[];

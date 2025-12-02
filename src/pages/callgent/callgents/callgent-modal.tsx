@@ -1,9 +1,15 @@
 import { Form, Input, Modal } from "antd";
 import { useState, useEffect } from "react";
-import type { CallgentInfo } from "#/entity";
-import { useCreateCallgent, useUpdateCallgent } from "@/models/callgentStore";
+import type { CallgentInfo } from "@/types/entity";
+import { useCreateCallgent, useUpdateCallgent } from "@/store/callgentStore";
 
-export function CallgentModal({ title, show, formValue, onOk, onCancel }: CallgentModalProps) {
+export function CallgentModal({
+  title,
+  show,
+  formValue,
+  onOk,
+  onCancel,
+}: CallgentModalProps) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -11,14 +17,14 @@ export function CallgentModal({ title, show, formValue, onOk, onCancel }: Callge
     form.setFieldsValue(formValue);
   }, [formValue, form]);
 
-  const createCallgent = useCreateCallgent()
-  const updateCallgent = useUpdateCallgent()
+  const createCallgent = useCreateCallgent();
+  const updateCallgent = useUpdateCallgent();
   const submit = async () => {
     const values = form.getFieldsValue();
     setLoading(true);
     try {
       if (formValue.id) {
-        await updateCallgent(formValue.id, values)
+        await updateCallgent(formValue.id, values);
       } else {
         await createCallgent(values);
       }
@@ -46,10 +52,28 @@ export function CallgentModal({ title, show, formValue, onOk, onCancel }: Callge
         <Form.Item label="Name" name="name" required>
           <Input />
         </Form.Item>
-        <Form.Item label="whatFor" name="whatFor" rules={[{ required: false, message: 'Please describe the purpose of this Callgent' }]}>
+        <Form.Item
+          label="whatFor"
+          name="whatFor"
+          rules={[
+            {
+              required: false,
+              message: "Please describe the purpose of this Callgent",
+            },
+          ]}
+        >
           <Input.TextArea placeholder="Describe the purpose of this Callgent (e.g., its function or goal)" />
         </Form.Item>
-        <Form.Item label="how2Use" name="how2Ops" rules={[{ required: false, message: 'Please explain how to use this Callgent' }]}>
+        <Form.Item
+          label="how2Use"
+          name="how2Ops"
+          rules={[
+            {
+              required: false,
+              message: "Please explain how to use this Callgent",
+            },
+          ]}
+        >
           <Input.TextArea placeholder="Provide usage instructions for this Callgent (e.g., steps to operate it)" />
         </Form.Item>
       </Form>

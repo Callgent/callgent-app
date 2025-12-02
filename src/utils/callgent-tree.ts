@@ -1,4 +1,4 @@
-import { Adaptor, CallgentInfo } from '#/entity';
+import { Adaptor, CallgentInfo } from '@/types/entity';
 
 // 控制节点状态
 export const enhanceNode = (node: CallgentInfo, level: number, parentType: string | undefined): CallgentInfo => {

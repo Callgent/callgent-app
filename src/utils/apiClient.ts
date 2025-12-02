@@ -1,13 +1,13 @@
 import axios, { type AxiosRequestConfig, type AxiosError, type AxiosResponse } from "axios";
 
 import { t } from "@/locales/i18n";
-import userStore from "@/models/userStore";
+import userStore from "@/store/userStore";
 
 import { toast } from "sonner";
-import type { Result } from "#/api";
-
+import { Result } from "@/types/api";
+const isDev = import.meta.env.MODE === 'development';
 const axiosInstance = axios.create({
-	baseURL: import.meta.env.VITE_API_URL,
+	baseURL: isDev ? null : import.meta.env.VITE_API_URL,
 	headers: { "Content-Type": "application/json;charset=utf-8" },
 	withCredentials: true
 });

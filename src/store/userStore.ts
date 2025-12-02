@@ -3,9 +3,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import { deleteCookie } from "@/router/utils";
 import { toast } from "sonner";
-import type { UserInfo } from "#/entity";
-import { StorageEnum } from "#/enum";
-import { findUserInfo, signin, SignInReq } from "@/api/services/userService";
+import type { UserInfo } from "@/types/entity";
+import { StorageEnum } from "@/types/enum";
+import { findUserInfo, signin, SignInReq } from "@/api/userService";
 import { useRouter } from "@/router/hooks";
 
 const { VITE_APP_HOMEPAGE: HOMEPAGE, VITE_COOKIE_NAME } = import.meta.env;

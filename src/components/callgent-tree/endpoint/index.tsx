@@ -1,5 +1,5 @@
-import useTreeActionStore, { useTreeActions } from "@/models/callgentTreeStore";
-import { useEndpointStore } from "@/models/endpoint";
+import useTreeActionStore, { useTreeActions } from "@/store/callgentTreeStore";
+import { useEndpointStore } from "@/store/endpoint";
 import { Button, Tabs, Modal } from "antd";
 import { useEffect } from "react";
 import Payload from "./payload";

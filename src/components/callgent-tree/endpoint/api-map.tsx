@@ -1,4 +1,4 @@
-import { useEndpointStore } from "@/models/endpoint";
+import { useEndpointStore } from "@/store/endpoint";
 import EditableTree from "../schema/EditableTree";
 import { useState } from "react";
 import {

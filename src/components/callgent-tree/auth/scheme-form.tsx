@@ -1,6 +1,6 @@
-import React from 'react';
-import { Form, Input, Select, Switch } from 'antd';
-import { Realm } from '#/entity';
+import React from "react";
+import { Form, Input, Select, Switch } from "antd";
+import { Realm } from "@/types/entity";
 
 interface AuthSchemeFormProps {
   formValues: Realm;
@@ -18,8 +18,8 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
     <>
       <Form.Item
         label="Scheme In"
-        name={['scheme', 'in']}
-        rules={[{ required: true, message: 'Please select scheme in' }]}
+        name={["scheme", "in"]}
+        rules={[{ required: true, message: "Please select scheme in" }]}
       >
         <Select placeholder="Select scheme in">
           <Select.Option value="header">header</Select.Option>
@@ -31,26 +31,32 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
 
       <Form.Item
         label="Scheme Name"
-        name={['scheme', 'name']}
-        rules={[{ required: true, message: 'Please enter scheme name' }]}
+        name={["scheme", "name"]}
+        rules={[{ required: true, message: "Please enter scheme name" }]}
       >
         <Input
-          placeholder={formValues?.id && "Enter scheme realm, e.g. 'x-api-key'"} />
+          placeholder={formValues?.id && "Enter scheme realm, e.g. 'x-api-key'"}
+        />
       </Form.Item>
 
       <Form.Item
         label="Realm Name"
-        name='realm'
-        rules={[{ required: false, message: 'Please enter scheme name' }]}
+        name="realm"
+        rules={[{ required: false, message: "Please enter scheme name" }]}
       >
-        <Input className='bg-white' placeholder={formValues?.id ? "" : "Enter scheme realm, e.g. 'x-api-key'"} />
+        <Input
+          className="bg-white"
+          placeholder={
+            formValues?.id ? "" : "Enter scheme realm, e.g. 'x-api-key'"
+          }
+        />
       </Form.Item>
 
-      <Form.Item label="ValidationUrl" name={['scheme', 'validationUrl']}>
+      <Form.Item label="ValidationUrl" name={["scheme", "validationUrl"]}>
         <Input placeholder={formValues?.id ? "" : "Enter validationUr"} />
       </Form.Item>
 
-      <Form.Item label="secret" name='secret'>
+      <Form.Item label="secret" name="secret">
         <Input.Password placeholder={formValues?.id ? "" : "Enter secret"} />
       </Form.Item>
 
@@ -58,7 +64,11 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
         label="Enable Pricing"
         name="pricingEnabled"
         valuePropName="checked"
-        initialValue={(formValues?.pricing?.perRequest || formValues?.pricing?.perResponse) ? true : false}
+        initialValue={
+          formValues?.pricing?.perRequest || formValues?.pricing?.perResponse
+            ? true
+            : false
+        }
       >
         <Switch />
       </Form.Item>
@@ -67,13 +77,18 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
         <Form.Item
           noStyle
           shouldUpdate={(prevValues, currentValues) =>
-            prevValues?.pricing?.perRequest !== currentValues?.pricing?.perRequest ||
-            prevValues?.pricing?.perResponse !== currentValues?.pricing?.perResponse
+            prevValues?.pricing?.perRequest !==
+              currentValues?.pricing?.perRequest ||
+            prevValues?.pricing?.perResponse !==
+              currentValues?.pricing?.perResponse
           }
         >
           {({ getFieldValue }) => {
-            const priceValue = getFieldValue(['pricing', 'perRequest']);
-            const calcPriceFunctionValue = getFieldValue(['pricing', 'perResponse']);
+            const priceValue = getFieldValue(["pricing", "perRequest"]);
+            const calcPriceFunctionValue = getFieldValue([
+              "pricing",
+              "perResponse",
+            ]);
             const showPriceInput = !calcPriceFunctionValue;
             const showFunctionInput = !priceValue;
             return (
@@ -81,7 +96,7 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
                 {showPriceInput && (
                   <Form.Item
                     label="Fixed Price Per Request (in Cents)"
-                    name={['pricing', 'perRequest']}
+                    name={["pricing", "perRequest"]}
                   >
                     <Input
                       placeholder={formValues?.id ? "" : "Enter price in cents"}
@@ -96,10 +111,14 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
                 {showFunctionInput && (
                   <Form.Item
                     label="Calculate Price Per Request (in Cents)"
-                    name={['pricing', 'perResponse']}
+                    name={["pricing", "perResponse"]}
                   >
                     <Input.TextArea
-                      placeholder={formValues?.id ? "" : "Enter JS function calcPrice(req): [(resp) => int] / Per Response, 1billion=$0.01"}
+                      placeholder={
+                        formValues?.id
+                          ? ""
+                          : "Enter JS function calcPrice(req): [(resp) => int] / Per Response, 1billion=$0.01"
+                      }
                       rows={4}
                       className="w-[300px]"
                     />
@@ -116,12 +135,12 @@ const JwtForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
 
 const AuthSchemeForm: React.FC<AuthSchemeFormProps> = ({ formValues }) => {
   switch (formValues?.authType) {
-    case 'apiKey':
-    case 'jwt':
+    case "apiKey":
+    case "jwt":
       return <JwtForm formValues={formValues} />;
-    case 'http':
-    case 'oauth2':
-    case 'openIdConnect':
+    case "http":
+    case "oauth2":
+    case "openIdConnect":
       return <EmptyForm />;
     default:
       return null;

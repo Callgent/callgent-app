@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { TreeSelect, Spin, message } from "antd";
-import { getCallgentApiList } from "@/api/services/callgentService";
+import { getCallgentApiList } from "@/api/callgentService";
 import { useLocation } from "react-router";
-import { useEndpointStore } from "@/models/endpoint";
+import { useEndpointStore } from "@/store/endpoint";
 
 import {
   convertEndpointsToTreeNodes,

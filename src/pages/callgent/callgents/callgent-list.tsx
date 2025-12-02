@@ -1,16 +1,21 @@
-import useCallgentStore, { useCallgentActions, useFetchCallgentList } from "@/models/callgentStore";
+import useCallgentStore, {
+  useCallgentActions,
+  useFetchCallgentList,
+} from "@/store/callgentStore";
 import { Col, Pagination, Row } from "antd";
 import { useEffect, useState } from "react";
-import type { CallgentInfo } from "#/entity";
+import type { CallgentInfo } from "@/types/entity";
 import CallgentCard from "./callgent-card";
 
 interface CallgentListComponentProps {
   onEdit: (data: CallgentInfo) => void;
 }
 
-const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit }) => {
+const CallgentListComponent: React.FC<CallgentListComponentProps> = ({
+  onEdit,
+}) => {
   const fetchCallgentList = useFetchCallgentList();
-  const { callgentList, searchInfo, pageInfo } = useCallgentStore()
+  const { callgentList, searchInfo, pageInfo } = useCallgentStore();
   const { perPage, page, total } = pageInfo;
   const { reset } = useCallgentActions();
   const [currentPage, setCurrentPage] = useState(page);
@@ -21,8 +26,8 @@ const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit })
   }, []);
 
   useEffect(() => {
-    setCurrentPage(page)
-  }, [page])
+    setCurrentPage(page);
+  }, [page]);
 
   const init = () => {
     reset();
@@ -45,10 +50,7 @@ const CallgentListComponent: React.FC<CallgentListComponentProps> = ({ onEdit })
       <Row gutter={[24, 24]} justify="start">
         {callgentList.map((item) => (
           <Col key={item.id} xs={24} md={12} lg={12} xl={8} xxl={6}>
-            <CallgentCard
-              item={item}
-              onEdit={() => onEdit(item)}
-            />
+            <CallgentCard item={item} onEdit={() => onEdit(item)} />
           </Col>
         ))}
       </Row>

@@ -1,17 +1,16 @@
-import path from "node:path";
-
+import { vitePluginFakeServer } from "vite-plugin-fake-server";
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig, loadEnv } from "vite";
 import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
 import tsconfigPaths from "vite-tsconfig-paths";
-
-// ... existing imports ...
+import path from "node:path";
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), "");
 	const base = env.VITE_APP_BASE_PATH || "/";
+	const { VITE_API_URL } = env
 	const isProduction = mode === "production";
 
 	return {
@@ -23,6 +22,13 @@ export default defineConfig(({ mode }) => {
 						plugins: ["decorators-legacy", "classProperties"],
 					},
 				},
+			}),
+			// mock
+			vitePluginFakeServer({
+				include: "src/_mock",
+				logger: false,
+				infixName: false,
+				enableProd: true,
 			}),
 			vanillaExtractPlugin({
 				identifiers: ({ debugId }) => `${debugId}`,
@@ -42,9 +48,15 @@ export default defineConfig(({ mode }) => {
 		].filter(Boolean),
 
 		server: {
-			open: true,
 			host: true,
-			port: Number(env.VITE_PORT) || 5173
+			port: Number(env.VITE_PORT) || 5173,
+			proxy: {
+				"/api": {
+					target: VITE_API_URL,
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/api/, "/api"),
+				},
+			}
 		},
 
 		build: {

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { fetchAdaptors, getCallgentTree } from '@/api/services/callgentService';
-import { ModalNode, TreeActionState } from '#/store';
-import { CallgentInfo, Realm, TreeAction } from '#/entity';
+import { fetchAdaptors, getCallgentTree } from '@/api/callgentService';
+import { ModalNode, TreeActionState } from '@/types/store';
+import { CallgentInfo, Realm, TreeAction } from '@/types/entity';
 import { enhanceNode } from '@/utils/callgent-tree';
 
 const initState = {

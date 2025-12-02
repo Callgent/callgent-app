@@ -1,20 +1,29 @@
-import useTreeActionStore, { useFetchCallgentTree, useTreeActions } from '@/models/callgentTreeStore';
-import { deleteRealms, postRealms, putRealms } from '@/api/services/callgentService';
-import { AuthType, FormValues, NewAuthProps, Realm } from '#/entity';
-import { Form, Select, Button, Space, Popconfirm } from 'antd';
-import React, { useState, useEffect } from 'react';
-import AuthSchemeForm from './scheme-form';
+import useTreeActionStore, {
+  useFetchCallgentTree,
+  useTreeActions,
+} from "@/store/callgentTreeStore";
+import { deleteRealms, postRealms, putRealms } from "@/api/callgentService";
+import { AuthType, FormValues, NewAuthProps, Realm } from "@/types/entity";
+import { Form, Select, Button, Space, Popconfirm } from "antd";
+import React, { useState, useEffect } from "react";
+import AuthSchemeForm from "./scheme-form";
 
 const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
   const [form] = Form.useForm();
   const defaultValues: FormValues = {
-    callgentId: callgentId || '',
-    authType: 'apiKey',
-    scheme: { type: 'apiKey', in: 'header', name: '', provider: '', secret: '' }
+    callgentId: callgentId || "",
+    authType: "apiKey",
+    scheme: {
+      type: "apiKey",
+      in: "header",
+      name: "",
+      provider: "",
+      secret: "",
+    },
   };
   const { realms, realmKey } = useTreeActionStore();
   const { closeModal, setRealmKey } = useTreeActions();
-  const initialData = realms.find(item => realmKey === item.id);
+  const initialData = realms.find((item) => realmKey === item.id);
   const [isEditable, setIsEditable] = useState(initialData ? false : true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -27,7 +36,7 @@ const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
 
   const handleAuthTypeChange = (value: AuthType) => {
     form.setFieldsValue({
-      scheme: { type: value, in: 'header', name: '', provider: '', secret: '' }
+      scheme: { type: value, in: "header", name: "", provider: "", secret: "" },
     });
   };
 
@@ -41,15 +50,19 @@ const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
       if (isEditable && !initialData) {
         // add
         const { data } = await postRealms({ ...values, callgentId });
-        setRealmKey(data?.id || 'new');
+        setRealmKey(data?.id || "new");
       } else {
         // edit
-        await putRealms({ ...values, id: initialData && initialData.id || '', callgentId });
+        await putRealms({
+          ...values,
+          id: (initialData && initialData.id) || "",
+          callgentId,
+        });
       }
       await featchCallgentTree(callgentId!);
       setIsEditable(false);
     } catch (error) {
-      console.error('Submission failed:', error);
+      console.error("Submission failed:", error);
     } finally {
       closeModal();
       setIsSubmitting(false);
@@ -64,7 +77,7 @@ const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
       try {
         await deleteRealms({ callgentId, ...initialData });
         const data = await featchCallgentTree(callgentId!);
-        setRealmKey(data?.realms![0]?.id || 'new')
+        setRealmKey(data?.realms![0]?.id || "new");
       } finally {
         setIsDeleting(false);
       }
@@ -72,12 +85,12 @@ const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
   };
   const formValues = Form.useWatch([], form);
   useEffect(() => {
-    setIsEditable(false)
-    if (realmKey === 'new') {
+    setIsEditable(false);
+    if (realmKey === "new") {
       form.resetFields();
-      setIsEditable(true)
+      setIsEditable(true);
     }
-  }, [realmKey])
+  }, [realmKey]);
   return (
     <div className="h-full flex flex-col">
       <Form
@@ -91,7 +104,8 @@ const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
         <Form.Item
           label="Scheme Type"
           name="authType"
-          rules={[{ required: true, message: 'Please select scheme type' }]}>
+          rules={[{ required: true, message: "Please select scheme type" }]}
+        >
           <Select onChange={handleAuthTypeChange}>
             <Select.Option value="apiKey">apiKey</Select.Option>
             <Select.Option value="jwt">jwt</Select.Option>
@@ -103,10 +117,7 @@ const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
         <AuthSchemeForm formValues={{ ...initialData, ...formValues }} />
         <div className="flex justify-end items-center p-4 sm:col-span-2 lg:col-span-3">
           <Space>
-            <Button
-              onClick={handleEdit}
-              disabled={isEditable}
-            >
+            <Button onClick={handleEdit} disabled={isEditable}>
               Edit
             </Button>
             <Popconfirm
@@ -117,11 +128,7 @@ const NewAuth: React.FC<NewAuthProps> = ({ callgentId }) => {
               okButtonProps={{ disabled: false }}
               cancelButtonProps={{ disabled: false }}
             >
-              <Button
-                loading={isDeleting}
-                disabled={isEditable}
-                danger
-              >
+              <Button loading={isDeleting} disabled={isEditable} danger>
                 Delete
               </Button>
             </Popconfirm>

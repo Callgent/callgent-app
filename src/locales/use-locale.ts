@@ -3,7 +3,7 @@ import zh_CN from "antd/locale/zh_CN";
 import { useTranslation } from "react-i18next";
 
 import type { Locale as AntdLocal } from "antd/es/locale";
-import { LocalEnum } from "#/enum";
+import { LocalEnum } from "@/types/enum";
 
 type Locale = keyof typeof LocalEnum;
 type Language = {

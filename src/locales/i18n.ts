@@ -7,7 +7,7 @@ import { getStringItem } from "@/utils/storage";
 import en_US from "./lang/en_US";
 import zh_CN from "./lang/zh_CN";
 
-import { LocalEnum, StorageEnum } from "#/enum";
+import { LocalEnum, StorageEnum } from "@/types/enum";
 
 const defaultLng = getStringItem(StorageEnum.I18N) || (LocalEnum.en_US as string);
 i18n

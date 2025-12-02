@@ -1,6 +1,6 @@
-import { Avatar, Card, Rate, Tooltip, Typography } from 'antd';
-import type React from 'react';
-import type { CallgentInfo } from '#/entity';
+import { Avatar, Card, Rate, Tooltip, Typography } from "antd";
+import type React from "react";
+import type { CallgentInfo } from "@/types/entity";
 
 const { Paragraph } = Typography;
 
@@ -9,28 +9,25 @@ interface CallgentCardProps {
 }
 
 const ServicesCard: React.FC<CallgentCardProps> = ({ item }) => {
-
   return (
     <Card
       className="max-w[500] min-w-[300] w-full"
-      actions={[
-        <Rate key="viewed" count={1} defaultValue={item.viewed} />
-      ]}
+      actions={[<Rate key="viewed" count={1} defaultValue={item.viewed} />]}
     >
       <Card.Meta
-        avatar={<Avatar src={item.avatar || '/images/avatar.svg'} />}
+        avatar={<Avatar src={item.avatar || "/images/avatar.svg"} />}
         title={item.name}
         description={
           <>
-            <Tooltip title={item.whatFor || 'No description available'}>
+            <Tooltip title={item.whatFor || "No description available"}>
               <Paragraph
                 className="line-clamp-2"
                 ellipsis={{ rows: 2, expandable: false }}
               >
-                {item.whatFor || 'No description available'}
+                {item.whatFor || "No description available"}
               </Paragraph>
             </Tooltip>
-            <span>{item.updatedAt?.split('T')[0]}</span>
+            <span>{item.updatedAt?.split("T")[0]}</span>
           </>
         }
       />

@@ -1,8 +1,8 @@
-import useCallgentStore, { useCallgentActions } from "@/models/callgentStore";
-import { useFetchCallgentList } from "@/models/callgentStore";
+import useCallgentStore, { useCallgentActions } from "@/store/callgentStore";
+import { useFetchCallgentList } from "@/store/callgentStore";
 import { Button, Card, Col, Form, Input, Row, Select, Space } from "antd";
 import { useState } from "react";
-import type { CallgentInfo } from "#/entity";
+import type { CallgentInfo } from "@/types/entity";
 import CallgentList from "./callgent-list";
 import { CallgentModal, type CallgentModalProps } from "./callgent-modal";
 
@@ -11,23 +11,24 @@ export default function Callgents() {
   const fetchCallgentList = useFetchCallgentList();
   const [searchForm] = Form.useForm();
 
-  const [CallgentModalPros, setCallgentModalProps] = useState<CallgentModalProps>({
-    formValue: { name: "" },
-    title: "New",
-    show: false,
-    onOk: () => {
-      setCallgentModalProps((prev) => ({ ...prev, show: false }));
-    },
-    onCancel: () => {
-      setCallgentModalProps((prev) => ({ ...prev, show: false }));
-    },
-  });
+  const [CallgentModalPros, setCallgentModalProps] =
+    useState<CallgentModalProps>({
+      formValue: { name: "" },
+      title: "New",
+      show: false,
+      onOk: () => {
+        setCallgentModalProps((prev) => ({ ...prev, show: false }));
+      },
+      onCancel: () => {
+        setCallgentModalProps((prev) => ({ ...prev, show: false }));
+      },
+    });
 
   const onCreate = () => {
     setCallgentModalProps((prev) => ({
       ...prev,
       show: true,
-      title: "Create New Callgent"
+      title: "Create New Callgent",
     }));
   };
 
@@ -44,11 +45,11 @@ export default function Callgents() {
   const onSearchFormReset = async () => {
     reset();
     searchForm.resetFields();
-    await fetchCallgentList({})
+    await fetchCallgentList({});
   };
 
   // search
-  const { perPage } = useCallgentStore(state => state.pageInfo);
+  const { perPage } = useCallgentStore((state) => state.pageInfo);
   const onSearch = async () => {
     const values = searchForm.getFieldsValue();
     setSearchInfo(values);

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Table } from 'antd';
-import type { TableColumnsType } from 'antd';
-import { transactions } from '@/api/services/billing';
+import React, { useEffect, useState } from "react";
+import { Table } from "antd";
+import type { TableColumnsType } from "antd";
+import { transactions } from "@/api/billing";
 
 interface DetailItem {
   key: string;
@@ -21,27 +21,27 @@ interface CallItem extends ApiItem {
 
 const columns: TableColumnsType<CallItem | ApiItem | DetailItem> = [
   {
-    title: 'ID',
-    dataIndex: 'id',
-    key: 'id',
+    title: "ID",
+    dataIndex: "id",
+    key: "id",
   },
   {
-    title: 'Cost ($)',
-    dataIndex: 'cost',
-    key: 'cost',
+    title: "Cost ($)",
+    dataIndex: "cost",
+    key: "cost",
     render: (text) => Number(text)?.toFixed(2),
   },
   {
-    title: 'Callgent',
-    dataIndex: 'callgent',
-    key: 'callgent',
-    render: (text) => text || '-',
+    title: "Callgent",
+    dataIndex: "callgent",
+    key: "callgent",
+    render: (text) => text || "-",
   },
   {
-    title: 'Timestamp',
-    dataIndex: 'timestamp',
-    key: 'timestamp',
-    render: (text) => text || '-',
+    title: "Timestamp",
+    dataIndex: "timestamp",
+    key: "timestamp",
+    render: (text) => text || "-",
   },
 ];
 
@@ -55,7 +55,7 @@ const BillingTable: React.FC = () => {
       try {
         await transactions();
       } catch (err) {
-        console.error('Failed to load transactions:', err);
+        console.error("Failed to load transactions:", err);
       } finally {
         setLoading(false);
       }
@@ -65,40 +65,40 @@ const BillingTable: React.FC = () => {
 
     setData([
       {
-        key: 'call-001',
-        id: 'Call Record #001',
+        key: "call-001",
+        id: "Call Record #001",
         cost: 1.32,
-        callgent: '-',
-        timestamp: '2025-04-20 10:01',
+        callgent: "-",
+        timestamp: "2025-04-20 10:01",
         children: [
           {
-            key: 'api-002',
-            id: 'getTransactionList',
+            key: "api-002",
+            id: "getTransactionList",
             cost: 0.57,
-            callgent: 'transactionService.getList',
+            callgent: "transactionService.getList",
             children: [
               {
-                key: 'detail-003',
-                id: 'Params: userId=123&limit=10',
+                key: "detail-003",
+                id: "Params: userId=123&limit=10",
                 cost: 0.57,
-                callgent: '-',
+                callgent: "-",
               },
             ],
           },
         ],
       },
       {
-        key: 'call-002',
-        id: 'Call Record #002',
-        cost: 2.10,
-        callgent: '-',
-        timestamp: '2025-04-20 11:15',
+        key: "call-002",
+        id: "Call Record #002",
+        cost: 2.1,
+        callgent: "-",
+        timestamp: "2025-04-20 11:15",
         children: [
           {
-            key: 'api-003',
-            id: 'fetchOrders',
-            cost: 2.10,
-            callgent: 'orderService.fetchOrders',
+            key: "api-003",
+            id: "fetchOrders",
+            cost: 2.1,
+            callgent: "orderService.fetchOrders",
           },
         ],
       },

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { ChatBoxStore } from "#/store";
+import type { ChatBoxStore } from "@/types/store";
 
 const initState = {
   chatBox: [],

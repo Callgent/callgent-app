@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { FontFamilyPreset, typographyTokens } from "@/theme/tokens/typography";
-import { StorageEnum, ThemeColorPresets, ThemeLayout, ThemeMode } from "#/enum";
+import { StorageEnum, ThemeColorPresets, ThemeLayout, ThemeMode } from "@/types/enum";
 
 type SettingsType = {
 	themeColorPresets: ThemeColorPresets;

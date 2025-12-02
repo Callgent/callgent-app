@@ -20,5 +20,7 @@
   "sys.menu.callgent.callgent": "Callgent",
   "sys.menu.callgent.callgents": "Callgents",
   "sys.menu.callgent.histtasks": "HistTasks",
-  "sys.menu.callgent.services": "Services"
+  "sys.menu.callgent.services": "Services",
+  "sys.menu.callgent.realm": "Realm",
+  "sys.menu.callgent.provider": "Provider"
 }

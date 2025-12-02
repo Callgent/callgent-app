@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Button, Modal, Input } from "antd";
 import { Wand } from "lucide-react";
-import { useEndpointStore } from "@/models/endpoint";
-import apiClient from "@/api/apiClient";
+import { useEndpointStore } from "@/store/endpoint";
+import apiClient from "@/utils/apiClient";
 
 interface TreePageProps {
   onDataReceived: (data: any) => void;

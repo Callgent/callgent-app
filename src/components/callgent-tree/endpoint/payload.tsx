@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { Button, Form, Input, Modal, Select } from "antd";
-import { useEndpointStore } from "@/models/endpoint";
+import { useEndpointStore } from "@/store/endpoint";
 import EditableTree from "../schema/EditableTree";
 import { convertOpenApiToTree, requestMethods } from "../schema/utils";
 import AIGenerated from "../schema/ai-generated";
