@@ -81,33 +81,6 @@ export default defineFakeRoute([
       return { code: 404, message: 'Not found', data: null };
     },
   },
-
-  // 获取所有 providers
-  {
-    url: '/api/providers',
-    method: 'GET',
-    response: () => {
-      return {
-        code: 0,
-        message: 'OK',
-        data: providers,
-      };
-    },
-  },
-
-  // 创建 provider
-  {
-    url: '/api/providers',
-    method: 'POST',
-    response: ({ body }) => {
-      const newProvider = {
-        id: Date.now(),
-        ...body,
-      };
-      providers.push(newProvider);
-      return { code: 0, message: 'OK', data: newProvider };
-    },
-  },
   // 绑定realm
   {
     url: '/api/realms/bind',

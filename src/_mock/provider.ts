@@ -39,4 +39,18 @@ export default defineFakeRoute([
       return { code: 404, message: 'Not found', data: null };
     },
   },
+
+  // 创建 provider
+  {
+    url: '/api/providers',
+    method: 'POST',
+    response: ({ body }) => {
+      const newProvider = {
+        id: Date.now(),
+        ...body,
+      };
+      providers.push(newProvider);
+      return { code: 0, message: 'OK', data: newProvider };
+    },
+  },
 ]);
