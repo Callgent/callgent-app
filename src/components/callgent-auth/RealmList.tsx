@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { useAuthRealmStore } from "@/store/authRealmStore";
 import RealmCard from "./RealmCard";
-import { Search, Plus, Sun, Moon } from "lucide-react";
+import { Search } from "lucide-react";
 
-export default function RealmList({ isDark, setIsDark }) {
+export default function RealmList() {
   const { realms } = useAuthRealmStore();
   const [search, setSearch] = useState("");
 
@@ -13,9 +13,6 @@ export default function RealmList({ isDark, setIsDark }) {
       {/* Header */}
       <div className="flex justify-between mb-8">
         <h1 className="text-2xl font-bold dark:text-white">Realms</h1>
-        <button onClick={() => setIsDark(!isDark)} className="p-2">
-          {isDark ? <Sun /> : <Moon />}
-        </button>
       </div>
 
       {/* Search */}

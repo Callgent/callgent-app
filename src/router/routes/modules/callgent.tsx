@@ -8,8 +8,9 @@ import type { AppRouteObject } from "@/types/router";
 import CallgentInfo from "@/pages/callgent/callgent-tree";
 import CallgentAuth from "@/pages/callgent/callgent-auth";
 import CallgentRrealms from "@/pages/callgent/realm";
-import RealmEditPage from "@/pages/callgent/realm/edit";
-import RealmNewPage from "@/pages/callgent/realm/new";
+import RealmFormPage from "@/pages/callgent/realm/form";
+import ProviderPage from "@/pages/callgent/provider";
+import ProviderFormPage from "@/pages/callgent/provider/form";
 
 const Callgents = lazy(() => import("@/pages/callgent/callgents"));
 const Services = lazy(() => import("@/pages/callgent/services"));
@@ -57,28 +58,36 @@ const callgent: AppRouteObject = {
       },
     },
     {
-      path: "realms",
+      path: "realm",
       element: <CallgentRrealms />,
       meta: {
         label: "sys.menu.callgent.realm",
-        key: "/callgent/realms",
+        key: "/callgent/realm",
       },
     },
     {
-      path: "realms/:id/edit",
-      element: <RealmEditPage />,
+      path: "realm/form",
+      element: <RealmFormPage />,
       meta: {
         label: "sys.menu.callgent.realms",
-        key: "/callgent/realms/edit",
+        key: "/callgent/realms/form",
         hideMenu: true,
       },
     },
     {
-      path: "realms-new",
-      element: <RealmNewPage />,
+      path: "provider",
+      element: <ProviderPage />,
       meta: {
-        label: "sys.menu.callgent.realms-new",
-        key: "/callgent/realms-new",
+        label: "sys.menu.callgent.provider",
+        key: "/callgent/provider",
+      },
+    },
+    {
+      path: "provider/form",
+      element: <ProviderFormPage />,
+      meta: {
+        label: "sys.menu.callgent.provider",
+        key: "/callgent/provider/form",
         hideMenu: true,
       },
     },

@@ -6,59 +6,72 @@ export interface RealmQueryParams {
   enabled?: 'all' | 'enabled' | 'disabled';
 }
 
-/** GET /api/realms */
+// 获取安全域列表
 export const getRealmsApi = async (params?: RealmQueryParams) =>
   apiClient.get<any>({
     url: `/api/realms`,
     params
   });
 
-/** GET /api/realms/:id */
+// 获取单个安全域详情
 export const getRealmByIdApi = async (id: string) =>
   apiClient.get<any>({
     url: `/api/realms/${id}`
   });
 
-/** POST /api/realms */
+// 创建新安全域
 export const createRealmApi = async (data: RealmFormValues) =>
   apiClient.post<any>({
     url: `/api/realms`,
     data
   });
 
-/** PUT /api/realms/:id */
+// 更新安全域
 export const updateRealmApi = async (id: string, data: RealmFormValues) =>
   apiClient.put<any>({
     url: `/api/realms/${id}`,
     data
   });
 
-/** DELETE /api/realms/:id */
+// 删除安全域
 export const deleteRealmApi = async (id: string) =>
   apiClient.delete<any>({
     url: `/api/realms/${id}`
   });
 
-/** GET /api/providers */
+// 绑定安全域
+export const bindRealmApi = async (realmId: number) =>
+  apiClient.post<any>({
+    url: `/api/realms/bind`,
+    data: { realmId }
+  });
+
+// 解除绑定
+export const unbindRealmApi = async () =>
+  apiClient.delete<any>({
+    url: `/api/realms/bind`
+  });
+
+
+// 获取认证提供者列表
 export const getProvidersApi = async (search?: string) =>
   apiClient.get<any>({
     url: `/api/providers`,
     params: search ? { search } : undefined
   });
 
-/** POST /api/providers */
+// 创建新认证提供者
 export const createProviderApi = async (data: ProviderFormValues) =>
   apiClient.post<any>({
     url: `/api/providers`,
     data
   });
 
-
-/** POST /api/providers/test - 测试 Provider 配置 */
+// 测试认证提供者配置
 export const testProviderApi = async (data: {
   validUrl: string;
-  method: 'GET' | 'POST';
-  attachType: string;
+  method?: string;
+  strategy: string;
   token: string;
   config: {
     location?: string;

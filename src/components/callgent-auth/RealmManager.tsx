@@ -8,8 +8,6 @@ import RealmDetail from "./RealmDetail";
 
 export default function RealmManager() {
   const { fetchRealms, fetchProviders, selectedRealm } = useAuthRealmStore();
-
-  const [isDark, setIsDark] = useState(true);
   const [view, setView] = useState<"list" | "detail">("list");
 
   /** init load */
@@ -24,18 +22,12 @@ export default function RealmManager() {
   }, [selectedRealm]);
 
   return (
-    <div className={isDark ? "dark" : ""}>
-      <div className="min-h-screen dark:bg-black bg-gray-50 transition-all">
-        {view === "list" ? (
-          <RealmList isDark={isDark} setIsDark={setIsDark} />
-        ) : (
-          <RealmDetail
-            isDark={isDark}
-            setIsDark={setIsDark}
-            goBack={() => setView("list")}
-          />
-        )}
-      </div>
+    <div className="dark:bg-black bg-gray-50 transition-all">
+      {view === "list" ? (
+        <RealmList />
+      ) : (
+        <RealmDetail goBack={() => setView("list")} />
+      )}
     </div>
   );
 }

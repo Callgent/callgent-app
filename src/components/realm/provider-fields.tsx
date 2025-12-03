@@ -49,15 +49,18 @@ export default function ProviderFields() {
 
       <div className="grid grid-cols-2 gap-4">
         <Form.Item
-          label="附加类型"
-          name={["provider", "attachType"]}
-          initialValue="BEARER"
+          label="策略"
+          name={["provider", "strategy"]}
+          initialValue="STATIC"
           rules={[{ required: true }]}
         >
           <Select>
-            <Select.Option value="BEARER">Bearer Token</Select.Option>
-            <Select.Option value="BASIC">Basic Auth</Select.Option>
-            <Select.Option value="CUSTOM">Custom</Select.Option>
+            <Select.Option value="STATIC">STATIC</Select.Option>
+            <Select.Option value="DYNAMIC">DYNAMIC</Select.Option>
+            <Select.Option value="REFRESHABLE">REFRESHABLE</Select.Option>
+            <Select.Option value="ROTATING">ROTATING</Select.Option>
+            <Select.Option value="CUSTOM">CUSTOM</Select.Option>
+            <Select.Option value="NONE">NONE</Select.Option>
           </Select>
         </Form.Item>
 
@@ -170,12 +173,12 @@ export default function ProviderFields() {
         <Form.Item
           label="共享范围"
           name={["provider", "shared"]}
-          initialValue="private"
+          initialValue={false}
         >
           <Select style={{ width: 120 }}>
-            <Select.Option value="private">私有</Select.Option>
-            <Select.Option value="tenant">租户内</Select.Option>
-            <Select.Option value="global">全局</Select.Option>
+            <Select.Option value={false}>私有</Select.Option>
+            <Select.Option value={null}>租户内</Select.Option>
+            <Select.Option value={true}>全局</Select.Option>
           </Select>
         </Form.Item>
       </div>

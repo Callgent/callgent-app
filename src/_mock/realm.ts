@@ -7,10 +7,14 @@ export default defineFakeRoute([
     url: '/api/realms',
     method: 'GET',
     response: () => {
+      const data = realms.map(realm => ({
+        ...realm,
+        provider: providers.find(p => p.id === realm.providerId) || null,
+      }));
       return {
         code: 0,
         message: 'OK',
-        data: realms,  // 无额外 provider 组合逻辑
+        data,
       };
     },
   },
@@ -21,10 +25,16 @@ export default defineFakeRoute([
     method: 'GET',
     response: ({ params }) => {
       const realm = realms.find(r => r.id === params.id);
+      if (!realm) {
+        return { code: 404, message: 'Not found', data: null };
+      }
       return {
-        code: realm ? 0 : 404,
-        message: realm ? 'OK' : 'Not found',
-        data: realm || null,
+        code: 0,
+        message: 'OK',
+        data: {
+          ...realm,
+          provider: providers.find(p => p.id === realm.providerId) || null,
+        },
       };
     },
   },
@@ -96,6 +106,35 @@ export default defineFakeRoute([
       };
       providers.push(newProvider);
       return { code: 0, message: 'OK', data: newProvider };
+    },
+  },
+  // 绑定realm
+  {
+    url: '/api/realms/bind',
+    method: 'POST',
+    response: ({ body }) => {
+      return {
+        code: 0,
+        message: 'OK',
+        data: {
+          realmId: body.realmId,
+          status: 'bound',
+        },
+      };
+    },
+  },
+  // 解除绑定
+  {
+    url: '/api/realms/bind',
+    method: 'DELETE',
+    response: () => {
+      return {
+        code: 0,
+        message: 'OK',
+        data: {
+          status: 'unbound',
+        },
+      };
     },
   },
 ]);

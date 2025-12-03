@@ -1,13 +1,18 @@
-import { Globe, Users, Calendar, Trash2 } from "lucide-react";
-import type { RealmItem } from "@/types/realm";
+import { Key, Link, Calendar, Trash2, Shield } from "lucide-react";
+import type { ProviderItem } from "@/types/provider";
 
-interface RealmCardProps {
-  item: RealmItem;
+interface ProviderCardProps {
+  item: ProviderItem;
   onClick: () => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
 }
 
-export default function RealmCard({ item, onClick, onDelete }: RealmCardProps) {
+// Provider 卡片组件
+export default function ProviderCard({
+  item,
+  onClick,
+  onDelete,
+}: ProviderCardProps) {
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
@@ -19,12 +24,19 @@ export default function RealmCard({ item, onClick, onDelete }: RealmCardProps) {
     onDelete(item.id);
   };
 
+  // 共享范围标签
+  const getShareLabel = () => {
+    if (item.shared === true) return "全局";
+    if (item.shared === null) return "租户";
+    return "私有";
+  };
+
   return (
     <div
       onClick={onClick}
       className="group relative bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-800 rounded-xl p-6 cursor-pointer transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-md"
     >
-      {/* Delete Button - 右下角，hover 显示 */}
+      {/* Delete Button */}
       <button
         onClick={handleDelete}
         className="absolute bottom-4 right-4 p-2 rounded-lg opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 transition-all duration-200"
@@ -35,13 +47,13 @@ export default function RealmCard({ item, onClick, onDelete }: RealmCardProps) {
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-            <Globe className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <Key className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </div>
           <div>
             <h3 className="font-medium text-gray-900 dark:text-white">
               {item.name}
             </h3>
-            <p className="text-sm font-mono text-gray-500">{item.id}</p>
+            <p className="text-sm font-mono text-gray-500">{item.strategy}</p>
           </div>
         </div>
         <span
@@ -66,22 +78,20 @@ export default function RealmCard({ item, onClick, onDelete }: RealmCardProps) {
 
       <div className="flex items-center gap-6 text-sm">
         <div className="flex items-center gap-2">
-          <Globe className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-500">Provider</span>
+          <Link className="w-4 h-4 text-gray-400" />
+          <span className="text-gray-500">URL</span>
         </div>
-        <span className="text-gray-900 dark:text-white truncate max-w-[160px]">
-          {item.provider?.name || "-"}
+        <span className="text-gray-900 dark:text-white truncate max-w-[200px] font-mono text-xs">
+          {item.validUrl || "-"}
         </span>
       </div>
 
       <div className="flex items-center gap-6 text-sm mt-2">
         <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-500">Shared</span>
+          <Shield className="w-4 h-4 text-gray-400" />
+          <span className="text-gray-500">Scope</span>
         </div>
-        <span className="text-gray-900 dark:text-white">
-          {item.shared ? "租户内" : "私有"}
-        </span>
+        <span className="text-gray-900 dark:text-white">{getShareLabel()}</span>
       </div>
 
       <div className="flex items-center gap-2 mt-4 pt-4 border-t border-dashed border-gray-200 dark:border-gray-800 text-xs text-gray-500">

@@ -16,7 +16,7 @@ import { testProviderApi } from "@/api/realm";
 import type {
   RealmItem,
   ProviderFormValues,
-  ShareType,
+  RealmShareType,
   ProviderItem,
 } from "@/types/realm";
 import { useNavigate } from "react-router";
@@ -28,7 +28,7 @@ interface FormValues {
   name: string;
   desc?: string;
   enabled: boolean;
-  shared: ShareType;
+  shared: RealmShareType;
   providerId?: number;
   provider?: ProviderFormValues;
 }
@@ -36,10 +36,16 @@ interface FormValues {
 interface RealmFormProps {
   realm?: RealmItem | null;
   isEdit?: boolean;
+  onClose?: () => void;
 }
 
-export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
+export default function RealmForm({
+  realm,
+  isEdit = false,
+  onClose,
+}: RealmFormProps) {
   const navigate = useNavigate();
+  const router = useRouter();
   const [form] = Form.useForm<FormValues>();
   const {
     providers,
@@ -61,13 +67,9 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
     uid?: string;
     error?: string;
   } | null>(null);
-  const router = useRouter();
   const searchRef = useRef<ReturnType<typeof setTimeout>>();
 
-  useEffect(() => {
-    fetchProviders();
-  }, [fetchProviders]);
-
+  // 编辑模式下，填充表单数据
   useEffect(() => {
     if (realm) {
       form.setFieldsValue({
@@ -75,16 +77,15 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
         desc: realm.desc,
         providerId: realm.providerId,
         enabled: realm.enabled,
-        shared: realm.shared ?? "private",
+        shared: realm.shared ?? false,
       });
-      // 设置选中的 provider
       if (realm.provider) {
         setSelectedProvider(realm.provider);
       }
     }
   }, [realm, form]);
 
-  // 当 providers 加载完成后，如果有 providerId，设置选中的 provider
+  // 提供者列表加载后，设置选中的提供者
   useEffect(() => {
     const providerId = form.getFieldValue("providerId");
     if (providerId && providers.length > 0) {
@@ -95,6 +96,7 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
     }
   }, [providers, form]);
 
+  // 处理提供者选择变化
   const handleProviderChange = (value: number | string) => {
     if (value === CREATE_NEW_PROVIDER) {
       setShowProviderForm(true);
@@ -107,6 +109,7 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
     }
   };
 
+  // 搜索提供者（防抖）
   const handleProviderSearch = (value: string) => {
     if (searchRef.current) {
       clearTimeout(searchRef.current);
@@ -116,6 +119,7 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
     }, 300);
   };
 
+  // 测试提供者配置
   const handleTestProvider = async () => {
     if (!testToken.trim()) {
       message.warning("请输入测试 Token");
@@ -135,7 +139,7 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
       const res = await testProviderApi({
         validUrl: providerValues.validUrl,
         method: providerValues.method || "GET",
-        attachType: providerValues.attachType || "BEARER",
+        strategy: providerValues.strategy || "bearer-token",
         token: testToken,
         config: {
           location: providerValues.config?.location || "headers",
@@ -236,7 +240,7 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
         });
         message.success("创建成功");
       }
-      navigate("/realm");
+      onClose ? onClose() : router.push("/callnegt/realm");
     } catch {
       message.error(isEdit ? "更新失败" : "创建失败");
     }
@@ -244,12 +248,12 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
 
   return (
     <main className="w-full bg-white dark:bg-black px-4 sm:px-6 lg:px-8 py-10 transition-colors duration-200">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.back()}
+              onClick={() => (onClose ? onClose() : router.back())}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-gray-500" />
@@ -337,12 +341,12 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
             layout="vertical"
             initialValues={{
               enabled: true,
-              shared: "private",
+              shared: false,
               provider: {
                 method: "GET",
-                attachType: "BEARER",
+                strategy: "bearer-token",
                 enabled: true,
-                shared: "private",
+                shared: false,
                 config: {
                   location: "headers",
                   key: "Authorization",
@@ -356,66 +360,131 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
             {/* Step 1 */}
             {currentStep === 0 && (
               <div className="space-y-6">
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    为安全域设置名称和访问权限
+                {/* 提示信息 */}
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                      <Key className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                        配置安全域基本信息
+                      </p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                        安全域用于管理认证策略，设置名称和访问权限后可在下一步配置认证提供者
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 名称输入 */}
+                <div className="space-y-2">
+                  <Form.Item
+                    name="name"
+                    label={
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        安全域名称
+                      </span>
+                    }
+                    rules={[{ required: true, message: "请输入名称" }]}
+                    className="mb-0"
+                  >
+                    <Input
+                      placeholder="例如：OpenAI Authentication"
+                      size="large"
+                      className="!rounded-lg"
+                    />
+                  </Form.Item>
+                  <p className="text-xs text-gray-400 pl-1">
+                    建议使用有意义的名称，便于后续管理和识别
                   </p>
                 </div>
 
-                <Form.Item
-                  name="name"
-                  label={
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      名称
-                    </span>
-                  }
-                  rules={[{ required: true, message: "请输入名称" }]}
-                >
-                  <Input placeholder="OpenAI Authentication" size="large" />
-                </Form.Item>
-
-                <Form.Item
-                  name="desc"
-                  label={
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      描述 <span className="text-gray-400">(可选)</span>
-                    </span>
-                  }
-                >
-                  <Input.TextArea
-                    rows={3}
-                    placeholder="用于验证 OpenAI API Key"
-                  />
-                </Form.Item>
-
-                <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-3">
-                      <Form.Item
-                        name="enabled"
-                        valuePropName="checked"
-                        className="mb-0"
-                      >
-                        <Switch />
-                      </Form.Item>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        启用
+                {/* 描述输入 */}
+                <div className="space-y-2">
+                  <Form.Item
+                    name="desc"
+                    label={
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        描述{" "}
+                        <span className="text-gray-400 font-normal">
+                          (可选)
+                        </span>
                       </span>
+                    }
+                    className="mb-0"
+                  >
+                    <Input.TextArea
+                      rows={3}
+                      placeholder="描述此安全域的用途，例如：用于验证 OpenAI API Key 的有效性"
+                      className="!rounded-lg"
+                    />
+                  </Form.Item>
+                </div>
+
+                {/* 状态和共享设置 */}
+                <div className="p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-800">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                    访问控制
+                  </h4>
+                  <div className="grid grid-cols-2 gap-6">
+                    {/* 启用状态 */}
+                    <div className="p-4 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              启用状态
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              开启后立即生效
+                            </p>
+                          </div>
+                        </div>
+                        <Form.Item
+                          name="enabled"
+                          valuePropName="checked"
+                          className="mb-0"
+                        >
+                          <Switch />
+                        </Form.Item>
+                      </div>
                     </div>
-                    <div className="h-4 w-px bg-gray-200 dark:bg-gray-800" />
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        共享范围
-                      </span>
-                      <Form.Item name="shared" className="mb-0">
-                        <Select style={{ width: 100 }}>
-                          <Select.Option value="private">私有</Select.Option>
-                          <Select.Option value="tenant">租户内</Select.Option>
-                          <Select.Option value="global">全局</Select.Option>
-                        </Select>
-                      </Form.Item>
+
+                    {/* 共享范围 */}
+                    <div className="p-4 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                            <Globe className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              共享范围
+                            </p>
+                            <p className="text-xs text-gray-500">设置可见性</p>
+                          </div>
+                        </div>
+                        <Form.Item name="shared" className="mb-0">
+                          <Select style={{ width: 100 }}>
+                            <Select.Option value={false}>私有</Select.Option>
+                            <Select.Option value={true}>租户内</Select.Option>
+                          </Select>
+                        </Form.Item>
+                      </div>
                     </div>
                   </div>
+                </div>
+
+                {/* 快速提示 */}
+                <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-100 dark:border-amber-900/30">
+                  <span className="text-amber-500">💡</span>
+                  <p className="text-xs text-amber-700 dark:text-amber-300">
+                    完成基本信息后，点击"下一步"配置认证提供者
+                  </p>
                 </div>
               </div>
             )}
@@ -455,7 +524,7 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
                         <div className="flex items-center justify-between">
                           <span>{p.name}</span>
                           <span className="text-xs text-gray-400 font-mono">
-                            {p.config?.tokenFormat || "apiKey"}
+                            {p.strategy || "bearer-token"}
                           </span>
                         </div>
                       </Select.Option>
@@ -493,13 +562,13 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
                       <div>
                         <p className="text-xs text-gray-500 mb-1">验证方法</p>
                         <p className="text-gray-900 dark:text-white font-mono">
-                          {selectedProvider.method}
+                          {selectedProvider.method || "GET"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">附加类型</p>
+                        <p className="text-xs text-gray-500 mb-1">策略</p>
                         <p className="text-gray-900 dark:text-white">
-                          {selectedProvider.attachType}
+                          {selectedProvider.strategy}
                         </p>
                       </div>
                       <div className="col-span-2">
@@ -552,9 +621,9 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
                       </span>
                       <span className="text-xs text-gray-500">
                         共享：
-                        {selectedProvider.shared === "global"
+                        {selectedProvider.shared === true
                           ? "全局"
-                          : selectedProvider.shared === "tenant"
+                          : selectedProvider.shared === null
                           ? "租户内"
                           : "私有"}
                       </span>
@@ -615,21 +684,25 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
                       <div className="grid grid-cols-2 gap-4">
                         <Form.Item
                           label={
-                            <span className="text-xs text-gray-500">
-                              附加类型
-                            </span>
+                            <span className="text-xs text-gray-500">策略</span>
                           }
-                          name={["provider", "attachType"]}
+                          name={["provider", "strategy"]}
+                          rules={[{ required: true, message: "必填" }]}
                           className="mb-0"
                         >
                           <Select>
-                            <Select.Option value="BEARER">
-                              Bearer Token
+                            <Select.Option value="STATIC">STATIC</Select.Option>
+                            <Select.Option value="DYNAMIC">
+                              DYNAMIC
                             </Select.Option>
-                            <Select.Option value="BASIC">
-                              Basic Auth
+                            <Select.Option value="REFRESHABLE">
+                              REFRESHABLE
                             </Select.Option>
-                            <Select.Option value="CUSTOM">Custom</Select.Option>
+                            <Select.Option value="ROTATING">
+                              ROTATING
+                            </Select.Option>
+                            <Select.Option value="CUSTOM">CUSTOM</Select.Option>
+                            <Select.Option value="NONE">NONE</Select.Option>
                           </Select>
                         </Form.Item>
                         <Form.Item
@@ -801,13 +874,13 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
                                             size="small"
                                             style={{ width: 90 }}
                                           >
-                                            <Select.Option value="private">
+                                            <Select.Option value={false}>
                                               私有
                                             </Select.Option>
-                                            <Select.Option value="tenant">
+                                            <Select.Option value={null}>
                                               租户内
                                             </Select.Option>
-                                            <Select.Option value="global">
+                                            <Select.Option value={true}>
                                               全局
                                             </Select.Option>
                                           </Select>
@@ -892,7 +965,10 @@ export default function RealmForm({ realm, isEdit = false }: RealmFormProps) {
 
           {/* Actions */}
           <div className="flex justify-between items-center px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-            <Button type="text" onClick={() => navigate("/realm")}>
+            <Button
+              type="text"
+              onClick={() => (onClose ? onClose() : router.back())}
+            >
               取消
             </Button>
             <div className="flex gap-3">

@@ -2,18 +2,35 @@ import type { RealmQueryParams } from '@/api/realm'
 
 export type PrincipalStatus = 'ACTIVE' | 'EXPIRED' | 'REVOKED' | 'REFRESHING'
 
-export type ShareType = 'private' | 'tenant' | 'global'
+/** Provider shared: false=self, null=tenant, true=global */
+export type ProviderShareType = boolean | null
+
+/** Realm shared: false=self, true=tenant */
+export type RealmShareType = boolean
 
 export type TokenFormat = 'jwt' | 'apiKey' | 'basic' | 'oauth2'
 
+export type TokenLocation = 'headers' | 'query' | 'body' | 'cookie' | 'cert'
+
+/** Provider strategy for token processing */
+export type ProviderStrategy = 'STATIC' | 'DYNAMIC' | 'REFRESHABLE' | 'ROTATING' | 'CUSTOM' | 'NONE'
+
 export interface ProviderConfig {
-  location?: 'headers' | 'query' | 'body' | 'cookie' | 'cert'
+  /** token location in request */
+  location: TokenLocation
+  /** token key */
   key?: string
+  /** value prefix */
   prefix?: string
+  /** value postfix */
   postfix?: string
-  tokenFormat?: TokenFormat
+  /** token format, e.g. 'jwt', etc */
+  tokenFormat?: string
+  /** token algorithm name */
   algorithm?: string
+  /** algorithm params e.g. region, hashAlgorithm */
   algorithmParams?: Record<string, any>
+  /** expression to extract uid from validation response */
   uidExpl?: string
 }
 
@@ -21,17 +38,22 @@ export interface ProviderItem {
   id: number
   name: string
   desc?: string
-  method: 'GET' | 'POST'
+  /** validation http method, default GET */
+  method?: string
+  /** token validation url */
   validUrl: string
-  attachType: 'BEARER' | 'BASIC' | 'CUSTOM'
+  /** provider configs except credentials/secrets */
   config: ProviderConfig
-  shared: ShareType
+  /** strategy name about how token is processed */
+  strategy: ProviderStrategy
+  /** false: self; null: tenant; true: global */
+  shared?: ProviderShareType
   enabled: boolean
-  tenantPk_: number
-  createdBy: string
-  createdAt: string
-  updatedAt: string
-  deletedAt: number
+  tenantPk_?: number
+  createdBy?: string
+  createdAt?: string
+  updatedAt?: string
+  deletedAt?: number
 }
 
 export interface PrincipalItem {
@@ -52,12 +74,13 @@ export interface PrincipalItem {
 }
 
 export interface RealmItem {
-  pk: number
+  pk?: number
   id: string
   name: string
   desc?: string
   enabled: boolean
-  shared: ShareType
+  /** false: self; true: tenant */
+  shared: RealmShareType
   providerId: number
   provider?: ProviderItem
   principalPk?: number
@@ -65,9 +88,9 @@ export interface RealmItem {
   pricing?: any
   tenantPk_?: number
   createdBy?: string
-  createdAt: string
-  updatedAt: string
-  deletedAt: number | bigint
+  createdAt?: string
+  updatedAt?: string
+  deletedAt?: number | bigint
 }
 
 export interface RealmFormValues {
@@ -75,18 +98,20 @@ export interface RealmFormValues {
   name: string
   desc?: string
   enabled?: boolean
-  shared?: ShareType
+  /** false: self; true: tenant */
+  shared?: RealmShareType
   providerId: number
 }
 
 export interface ProviderFormValues {
   name: string
   desc?: string
-  method: 'GET' | 'POST'
+  method?: string
   validUrl: string
-  attachType: 'BEARER' | 'BASIC' | 'CUSTOM'
   config: ProviderConfig
-  shared?: ShareType
+  strategy: ProviderStrategy
+  /** false: self; null: tenant; true: global */
+  shared?: ProviderShareType
   enabled?: boolean
 }
 

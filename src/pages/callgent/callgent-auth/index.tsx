@@ -1,57 +1,26 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { Button, Spin, Empty, Input, Segmented, Modal, message } from "antd";
-import { Plus, Moon, Sun, Search } from "lucide-react";
+import { useEffect } from "react";
+import { Button, Spin, Empty, Modal, message } from "antd";
+import { Plus } from "lucide-react";
 import { useRealmStore } from "@/store/realm";
 import RealmCard from "@/components/realm/realm-card";
 import { useNavigate } from "react-router";
 import { useRouter } from "@/router/hooks";
 
-type FilterType = "all" | "enabled" | "disabled";
-
 export default function RealmPage() {
   const navigate = useNavigate();
   const { realms, loading, fetchRealms, deleteRealm } = useRealmStore();
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<FilterType>("all");
-  const [isDark, setIsDark] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const router = useRouter();
 
-  const loadRealms = useCallback(
-    (searchValue: string, filterValue: FilterType) => {
-      fetchRealms({
-        search: searchValue || undefined,
-        enabled: filterValue,
-      });
-    },
-    [fetchRealms]
-  );
-
-  useEffect(() => {
-    loadRealms("", "all");
-  }, [loadRealms]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
-
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-    debounceRef.current = setTimeout(() => {
-      loadRealms(value, filter);
-    }, 300);
+  const loadRealms = async () => {
+    await fetchRealms();
   };
 
-  const handleFilterChange = (value: FilterType) => {
-    setFilter(value);
-    loadRealms(search, value);
-  };
+  useEffect(() => {
+    loadRealms();
+  }, []);
 
   const handleCardClick = (realmId: string) => {
-    router.push(`/callgent/realms/${realmId}/edit`);
+    router.push(`/callgent/realm/form?id=${realmId}`);
   };
 
   const handleDelete = (id: string) => {
@@ -65,7 +34,7 @@ export default function RealmPage() {
         try {
           await deleteRealm(id);
           message.success("删除成功");
-          loadRealms(search, filter);
+          loadRealms();
         } catch {
           message.error("删除失败");
         }

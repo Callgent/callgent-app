@@ -11,6 +11,7 @@ import { createSearchParams } from "@/utils";
 import { useEndpointStore } from "@/store/endpoint";
 import { useRouter } from "@/router/hooks";
 import { unsavedGuard } from "@/router/utils";
+import SelectRealmPage from "../callgent-auth/select";
 
 interface TreeNodeProps {
   nodes: CallgentInfoType[];
@@ -206,7 +207,7 @@ const TreeNode = ({
               </div>
             </Tooltip>
             <div className="node-right flex gap-2 items-center mr-2">
-              {node.lock && (
+              {node.lock && level === 1 && (
                 <div
                   onClick={() => handleAction(level === 1 ? "lock" : "select")}
                 >
@@ -219,6 +220,7 @@ const TreeNode = ({
                   />
                 </div>
               )}
+              {node.lock && level !== 1 && <SelectRealmPage />}
               {node.add && (
                 <div
                   onClick={() => handleAction("add")}
