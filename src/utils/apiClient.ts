@@ -24,13 +24,10 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
 	(res: Result) => {
 		if (!res.data) throw new Error(t("sys.api.apiRequestFailed"));
-		const { message, data } = res.data;
-		if (data) {
-			return res.data;
-		}
-		// error
+		const { message } = res.data;
 		const errorMessage = Array.isArray(message) ? message[0] : message;
-		throw new Error(errorMessage || t("sys.api.apiRequestFailed"));
+		toast.success(errorMessage, { position: "top-center" })
+		return res.data;
 	},
 	(error: AxiosError<Result>) => {
 		const { response, message } = error || {};
