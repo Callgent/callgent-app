@@ -45,7 +45,6 @@ export default defineFakeRoute([
     method: 'POST',
     response: ({ body }) => {
       const newRealm = {
-        pk: Date.now(),
         id: `realm-${Date.now()}`,
         ...body,
       };

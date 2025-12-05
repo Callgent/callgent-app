@@ -70,7 +70,6 @@ export const providers = [
 
 export const realms = [
   {
-    pk: 2001,
     id: 'openai-auth',
     name: 'OpenAI Authentication Realm',
     desc: 'Realm for OpenAI API key verification only',
@@ -86,7 +85,6 @@ export const realms = [
     deletedAt: 0,
   },
   {
-    pk: 2002,
     id: 'internal-admin-sso',
     name: 'Internal Admin SSO',
     desc: 'Single Sign-On for internal dashboard access',

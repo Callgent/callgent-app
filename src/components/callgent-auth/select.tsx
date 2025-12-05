@@ -22,8 +22,8 @@ export default function SelectRealmPage() {
     }
   }, [modalOpen]);
 
-  const handleRealmChange = (pk: number) => {
-    const realm = realms.find((r) => r.pk === pk);
+  const handleRealmChange = (id: string) => {
+    const realm = realms.find((r) => r.id === id);
     if (realm) setTempSelected(realm);
   };
 
@@ -121,13 +121,13 @@ export default function SelectRealmPage() {
 
           <Select
             placeholder="搜索或选择 Realm..."
-            value={tempSelected?.pk}
+            value={tempSelected?.id}
             onChange={handleRealmChange}
             loading={loading}
             showSearch
             filterOption={false}
             onSearch={handleSearch}
-            options={realms.map((r) => ({ value: r.pk, label: r.name }))}
+            options={realms.map((r) => ({ value: r.id, label: r.name }))}
             className="w-full"
             size="large"
             notFoundContent={loading ? <Spin size="small" /> : "暂无可用 Realm"}
