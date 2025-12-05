@@ -6,10 +6,12 @@ import type { RealmItem } from "@/types/realm";
 import { LockIcon, UnlockIcon } from "../icon/icon-tree";
 import { useRouter } from "@/router/hooks";
 import { bindRealmApi, unbindRealmApi } from "@/api/realm";
+import useTreeActionStore from "@/store/callgentTreeStore";
 
 export default function SelectRealmPage() {
   const router = useRouter();
   const { realms, loading, fetchRealms } = useRealmStore();
+  const { currentNode } = useTreeActionStore();
   const [boundRealm, setBoundRealm] = useState<RealmItem | null>(null);
   const [tempSelected, setTempSelected] = useState<RealmItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -34,12 +36,11 @@ export default function SelectRealmPage() {
     }, 300);
   };
 
-  // ⭐ 修改：绑定时调用 API
+  // 修改：绑定时调用 API
   const handleConfirm = async () => {
     if (!tempSelected) return;
-
     try {
-      await bindRealmApi(tempSelected.id);
+      await bindRealmApi(tempSelected.id, currentNode?.id);
       setBoundRealm(tempSelected);
       setModalOpen(false);
     } catch (err) {
@@ -54,7 +55,7 @@ export default function SelectRealmPage() {
     }
   };
 
-  // ⭐ 修改：解除绑定时调用 API
+  // 修改：解除绑定时调用 API
   const handleUnbind = async () => {
     if (!boundRealm) return;
 
@@ -70,15 +71,12 @@ export default function SelectRealmPage() {
 
   return (
     <div>
-      {/* 锁图标 */}
       <button
         onClick={() => setModalOpen(true)}
         title={boundRealm ? `已绑定: ${boundRealm.name}` : "点击绑定安全域"}
       >
         {boundRealm ? LockIcon : UnlockIcon}
       </button>
-
-      {/* 弹出层 */}
       <Modal
         title={
           <div className="flex items-center gap-2">
@@ -133,11 +131,9 @@ export default function SelectRealmPage() {
             notFoundContent={loading ? <Spin size="small" /> : "暂无可用 Realm"}
           />
 
-          {/* 详情区域 */}
           <div className="mt-4 min-h-[140px] p-4 rounded-xl bg-gray-50 dark:bg-[#111] border border-gray-100 dark:border-gray-800">
             {tempSelected ? (
               <div className="space-y-3">
-                {/* 头部 */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-blue-500" />
@@ -154,12 +150,10 @@ export default function SelectRealmPage() {
                   </button>
                 </div>
 
-                {/* 描述 */}
                 <p className="text-sm text-gray-500 leading-relaxed">
                   {tempSelected.desc || "暂无描述"}
                 </p>
 
-                {/* Provider 信息 */}
                 {tempSelected.provider && (
                   <div className="pt-3 border-t border-dashed border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between">

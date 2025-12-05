@@ -25,8 +25,10 @@ axiosInstance.interceptors.response.use(
 	(res: Result) => {
 		if (!res.data) throw new Error(t("sys.api.apiRequestFailed"));
 		const { message } = res.data;
-		const messages = Array.isArray(message) ? message[0] : message;
-		toast.success(messages, { position: "top-center" })
+		if (message) {
+			const messages = Array.isArray(message) ? message[0] : message;
+			toast.success(messages, { position: "top-center" })
+		}
 		return res.data;
 	},
 	(error: AxiosError<Result>) => {

@@ -40,10 +40,10 @@ export const deleteRealmApi = async (id: string) =>
   });
 
 // 绑定安全域
-export const bindRealmApi = async (realmId: number) =>
+export const bindRealmApi = async (realmId: string, entryId: string) =>
   apiClient.post<any>({
     url: `/api/realms/bind`,
-    data: { realmId }
+    data: { realmId, entryId }
   });
 
 // 解除绑定

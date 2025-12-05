@@ -55,7 +55,11 @@ const TreeNode = ({
   }, []);
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id!);
-  const handleAction = (actionType: TreeAction) => {
+  const handleAction = (actionType?: TreeAction) => {
+    if (!actionType) {
+      setCurrentNode(node);
+      return;
+    }
     if (unsavedGuard.hasUnsavedChanges()) {
       const shouldProceed =
         window.confirm("确定要离开吗？未保存的更改将会丢失");
@@ -220,7 +224,15 @@ const TreeNode = ({
                   />
                 </div>
               )}
-              {node.lock && level !== 1 && <SelectRealmPage />}
+              {node.lock && level !== 1 && (
+                <div
+                  onClick={() => {
+                    handleAction();
+                  }}
+                >
+                  <SelectRealmPage />
+                </div>
+              )}
               {node.add && (
                 <div
                   onClick={() => handleAction("add")}
