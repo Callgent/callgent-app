@@ -89,7 +89,7 @@ export default function ProviderCard({
       <div className="flex items-center gap-6 text-sm mt-2">
         <div className="flex items-center gap-2">
           <Shield className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-500">Scope</span>
+          <span className="text-gray-500">Shared</span>
         </div>
         <span className="text-gray-900 dark:text-white">{getShareLabel()}</span>
       </div>

@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Modal, Select, Spin, Button } from "antd";
-import { Shield, Pencil, Key } from "lucide-react";
+import { Key, Plus } from "lucide-react";
 import { useRealmStore } from "@/store/realm";
-import type { RealmItem } from "@/types/realm";
 import { LockIcon, UnlockIcon } from "../icon/icon-tree";
 import { useRouter } from "@/router/hooks";
 import { bindRealmApi, unbindRealmApi } from "@/api/realm";
@@ -11,23 +10,22 @@ import { CallgentInfo } from "@/types/entity";
 export default function SelectRealmPage({ node }: { node: CallgentInfo }) {
   const router = useRouter();
   const { realms, loading, fetchRealms } = useRealmStore();
-  const [boundRealm, setBoundRealm] = useState<RealmItem | null>(null);
-  const [tempSelected, setTempSelected] = useState<RealmItem | null>(null);
+
+  const [selectedRealms, setSelectedRealms] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
+  /** 打开 Modal 时加载 realm 列表并回显 node 的已有绑定 */
   useEffect(() => {
     if (modalOpen) {
       fetchRealms({ enabled: "enabled" });
-      setTempSelected(boundRealm);
+      const ids =
+        node?.securities?.map((s: { realmId: string }) => s.realmId) ?? [];
+      setSelectedRealms(ids);
     }
   }, [modalOpen]);
 
-  const handleRealmChange = (id: string) => {
-    const realm = realms.find((r) => r.id === id);
-    if (realm) setTempSelected(realm);
-  };
-
+  /** 搜索 */
   const handleSearch = (value: string) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -35,33 +33,25 @@ export default function SelectRealmPage({ node }: { node: CallgentInfo }) {
     }, 300);
   };
 
-  // 修改：绑定时调用 API
+  /** 提交绑定（注意：你需要改造 bindRealmApi 支持多选数组） */
   const handleConfirm = async () => {
-    if (!tempSelected) return;
     try {
-      await bindRealmApi(tempSelected.id, node?.id!, node?.level!);
-      setBoundRealm(tempSelected);
+      await bindRealmApi(
+        selectedRealms.map((i) => ({ realmId: i })),
+        node.id!,
+        node.level!
+      ); // <-- 发送数组
       setModalOpen(false);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (tempSelected) {
-      router.push(`/callgent/realm/form?id=${tempSelected.id}`);
-    }
-  };
-
-  // 修改：解除绑定时调用 API
+  /** 清空绑定 */
   const handleUnbind = async () => {
-    if (!boundRealm) return;
-
     try {
-      await unbindRealmApi(node?.id!, node?.level!);
-      setBoundRealm(null);
-      setTempSelected(null);
+      await unbindRealmApi(node.id!, node.level!);
+      setSelectedRealms([]);
       setModalOpen(false);
     } catch (err) {
       console.error(err);
@@ -73,119 +63,92 @@ export default function SelectRealmPage({ node }: { node: CallgentInfo }) {
       <button
         onClick={() => setModalOpen(true)}
         title={
-          node?.securities
+          node?.securities?.length
             ? `已绑定: ${node?.securities.length}`
             : "点击绑定安全域"
         }
       >
         {node?.securities?.length ? LockIcon : UnlockIcon}
       </button>
+
       <Modal
         title={
           <div className="flex items-center gap-2">
             <Key className="w-5 h-5 text-gray-400" />
-            <span>绑定安全域</span>
+            <span className="font-semibold text-base">绑定安全域</span>
           </div>
         }
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
+        width={480}
         footer={
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pt-2">
             <Button
               type="text"
               danger
               onClick={handleUnbind}
-              disabled={!boundRealm}
+              disabled={!selectedRealms.length}
             >
-              解除绑定
+              解除全部绑定
             </Button>
+
             <div className="flex gap-2">
               <Button onClick={() => setModalOpen(false)}>取消</Button>
               <Button
                 type="primary"
+                disabled={!selectedRealms.length}
                 onClick={handleConfirm}
-                disabled={!tempSelected}
-                className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100"
+                className="bg-black dark:bg-white text-white dark:text-black"
               >
                 确认绑定
               </Button>
             </div>
           </div>
         }
-        width={480}
-        destroyOnHidden
       >
-        <div className="py-2">
-          <div className="text-sm text-gray-500 mb-3">
-            选择一个安全域来保护此 Callgent 的访问权限
+        {/** 上半部分：选择区 + 新增按钮 */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <label className="block text-sm text-gray-600 mb-1">
+              选择安全域
+            </label>
+
+            <Select
+              mode="multiple"
+              placeholder="搜索或选择 Realm..."
+              value={selectedRealms}
+              onChange={setSelectedRealms}
+              loading={loading}
+              showSearch
+              filterOption={false}
+              onSearch={handleSearch}
+              options={realms.map((r) => ({ value: r.id, label: r.name }))}
+              className="w-full"
+              size="large"
+              notFoundContent={
+                loading ? <Spin size="small" /> : "暂无可用 Realm"
+              }
+            />
           </div>
 
-          <Select
-            placeholder="搜索或选择 Realm..."
-            value={tempSelected?.id}
-            onChange={handleRealmChange}
-            loading={loading}
-            showSearch
-            filterOption={false}
-            onSearch={handleSearch}
-            options={realms.map((r) => ({ value: r.id, label: r.name }))}
-            className="w-full"
-            size="large"
-            notFoundContent={loading ? <Spin size="small" /> : "暂无可用 Realm"}
-          />
+          <Button
+            type="default"
+            icon={<Plus size={16} />}
+            onClick={() => router.push("/callgent/realm/form")}
+            className="ml-3 mt-7"
+          >
+            新增
+          </Button>
+        </div>
 
-          <div className="mt-4 min-h-[140px] p-4 rounded-xl bg-gray-50 dark:bg-[#111] border border-gray-100 dark:border-gray-800">
-            {tempSelected ? (
-              <div className="space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-blue-500" />
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {tempSelected.name}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleEdit}
-                    className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                    title="编辑此 Realm"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  {tempSelected.desc || "暂无描述"}
-                </p>
-
-                {tempSelected.provider && (
-                  <div className="pt-3 border-t border-dashed border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-xs text-gray-400 mb-1">
-                          认证提供商
-                        </div>
-                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          {tempSelected.provider.name}
-                        </div>
-                      </div>
-                      <span className="text-xs font-mono px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800">
-                        {tempSelected.provider.strategy}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center py-4">
-                <Shield className="w-10 h-10 text-gray-200 dark:text-gray-700 mb-2" />
-                <div className="text-sm text-gray-400">
-                  从上方选择一个 Realm
-                </div>
-                <div className="text-xs text-gray-300 dark:text-gray-600 mt-1">
-                  绑定后将使用该安全域进行访问控制
-                </div>
-              </div>
-            )}
+        {/** 中部：状态显示 */}
+        <div className="py-3 px-3 rounded-md bg-gray-50 dark:bg-[#111] border border-gray-100 dark:border-gray-700">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            已绑定：
+            <span className="font-semibold text-gray-800 dark:text-gray-200 ml-1">
+              {selectedRealms.length}
+            </span>
+            个 Realm
           </div>
         </div>
       </Modal>
