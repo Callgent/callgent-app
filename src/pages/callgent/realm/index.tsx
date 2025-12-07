@@ -115,7 +115,7 @@ export default function RealmPage() {
             <Button
               type="primary"
               icon={<Plus className="w-4 h-4" />}
-              onClick={() => navigate("/realm/form")}
+              onClick={() => navigate("/callgent/realm/form")}
               className="flex items-center gap-1 bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100"
             >
               新建 Realm
@@ -155,7 +155,7 @@ export default function RealmPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {realms.map((item) => (
               <RealmCard
-                key={item.pk}
+                key={item.id}
                 item={item}
                 onClick={() => handleCardClick(item.id)}
                 onDelete={handleDelete}

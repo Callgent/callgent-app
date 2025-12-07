@@ -57,7 +57,7 @@ const TreeNode = ({
   const isExpanded = expandedNodes.has(node.id!);
   const handleAction = (actionType?: TreeAction) => {
     if (!actionType) {
-      setCurrentNode(node);
+      setCurrentNode({ ...node, level });
       return;
     }
     if (unsavedGuard.hasUnsavedChanges()) {
@@ -230,7 +230,7 @@ const TreeNode = ({
                     handleAction();
                   }}
                 >
-                  <SelectRealmPage />
+                  <SelectRealmPage node={node} />
                 </div>
               )}
               {node.add && (

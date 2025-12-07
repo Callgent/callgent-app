@@ -6,12 +6,11 @@ import type { RealmItem } from "@/types/realm";
 import { LockIcon, UnlockIcon } from "../icon/icon-tree";
 import { useRouter } from "@/router/hooks";
 import { bindRealmApi, unbindRealmApi } from "@/api/realm";
-import useTreeActionStore from "@/store/callgentTreeStore";
+import { CallgentInfo } from "@/types/entity";
 
-export default function SelectRealmPage() {
+export default function SelectRealmPage({ node }: { node: CallgentInfo }) {
   const router = useRouter();
   const { realms, loading, fetchRealms } = useRealmStore();
-  const { currentNode } = useTreeActionStore();
   const [boundRealm, setBoundRealm] = useState<RealmItem | null>(null);
   const [tempSelected, setTempSelected] = useState<RealmItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -40,7 +39,7 @@ export default function SelectRealmPage() {
   const handleConfirm = async () => {
     if (!tempSelected) return;
     try {
-      await bindRealmApi(tempSelected.id, currentNode?.id);
+      await bindRealmApi(tempSelected.id, node?.id!, node?.level!);
       setBoundRealm(tempSelected);
       setModalOpen(false);
     } catch (err) {
@@ -60,7 +59,7 @@ export default function SelectRealmPage() {
     if (!boundRealm) return;
 
     try {
-      await unbindRealmApi();
+      await unbindRealmApi(node?.id!, node?.level!);
       setBoundRealm(null);
       setTempSelected(null);
       setModalOpen(false);
@@ -73,9 +72,13 @@ export default function SelectRealmPage() {
     <div>
       <button
         onClick={() => setModalOpen(true)}
-        title={boundRealm ? `已绑定: ${boundRealm.name}` : "点击绑定安全域"}
+        title={
+          node?.securities
+            ? `已绑定: ${node?.securities.length}`
+            : "点击绑定安全域"
+        }
       >
-        {boundRealm ? LockIcon : UnlockIcon}
+        {node?.securities?.length ? LockIcon : UnlockIcon}
       </button>
       <Modal
         title={
