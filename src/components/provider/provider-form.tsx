@@ -281,7 +281,7 @@ export default function ProviderForm({
                           </Form.Item>
 
                           <Form.Item
-                            label="Header Key"
+                            label="Token Key Name"
                             name={["config", "key"]}
                           >
                             <Input

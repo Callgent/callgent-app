@@ -579,7 +579,7 @@ export default function RealmForm({
                     </div>
                     {selectedProvider.config?.key && (
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Header Key</p>
+                        <p className="text-xs text-gray-500 mb-1">Token Key Name</p>
                         <p className="text-gray-900 dark:text-white font-mono">
                           {selectedProvider.config.key}
                         </p>
@@ -750,7 +750,7 @@ export default function RealmForm({
                                 <Form.Item
                                   label={
                                     <span className="text-xs text-gray-500">
-                                      Header Key
+                                      Token Key Name
                                     </span>
                                   }
                                   name={["provider", "config", "key"]}
