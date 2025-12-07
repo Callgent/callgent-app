@@ -19,7 +19,6 @@ import type {
   RealmShareType,
   ProviderItem,
 } from "@/types/realm";
-import { useNavigate } from "react-router";
 import { useRouter } from "@/router/hooks";
 
 const CREATE_NEW_PROVIDER = "__CREATE_NEW__";
@@ -44,7 +43,6 @@ export default function RealmForm({
   isEdit = false,
   onClose,
 }: RealmFormProps) {
-  const navigate = useNavigate();
   const router = useRouter();
   const [form] = Form.useForm<FormValues>();
   const {
@@ -205,8 +203,6 @@ export default function RealmForm({
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      console.log(values);
-
       let providerId = values.providerId;
       if (showProviderForm && values.provider) {
         await createProvider(values.provider);
