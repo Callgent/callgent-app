@@ -55,7 +55,7 @@ export const providers = [
         region: 'us-east-1',
         service: 'sts',
       },
-      uidExpl: '$.GetCallerIdentityResponse.GetCallerIdentityResult.Arn',
+      uidJsonPath: '$.GetCallerIdentityResponse.GetCallerIdentityResult.Arn',
     },
     strategy: 'REFRESHABLE',
     shared: false, // self

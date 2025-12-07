@@ -70,7 +70,7 @@ export default function ProviderForm({
           key: values.config?.key || "Authorization",
           prefix: values.config?.prefix || "Bearer ",
           postfix: values.config?.postfix,
-          uidExpl: values.config?.uidExpl,
+          uidJsonPath: values.config?.uidJsonPath,
         },
       });
 
@@ -377,7 +377,7 @@ export default function ProviderForm({
                                 UID 表达式
                               </span>
                             }
-                            name={["config", "uidExpl"]}
+                            name={["config", "uidJsonPath"]}
                             className="mb-0"
                           >
                             <Input

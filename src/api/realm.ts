@@ -78,7 +78,7 @@ export const testProviderApi = async (data: {
     key?: string;
     prefix?: string;
     postfix?: string;
-    uidExpl?: string;
+    uidJsonPath?: string;
   };
 }) =>
   apiClient.post<any>({

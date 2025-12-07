@@ -146,7 +146,7 @@ export default function RealmForm({
           key: providerValues.config?.key || "Authorization",
           prefix: providerValues.config?.prefix || "Bearer ",
           postfix: providerValues.config?.postfix,
-          uidExpl: providerValues.config?.uidExpl,
+          uidJsonPath: providerValues.config?.uidJsonPath,
         },
       });
 
@@ -833,7 +833,7 @@ export default function RealmForm({
                                         UID 表达式
                                       </span>
                                     }
-                                    name={["provider", "config", "uidExpl"]}
+                                    name={["provider", "config", "uidJsonPath"]}
                                     className="mb-0"
                                   >
                                     <Input
