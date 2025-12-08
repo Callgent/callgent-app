@@ -205,6 +205,7 @@ export default function ProviderForm({
                     高级配置
                   </span>
                 ),
+                forceRender: true,
                 children: (
                   <div className="space-y-4 pt-2">
                     <div className="grid grid-cols-2 gap-4">
