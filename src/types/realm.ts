@@ -29,7 +29,7 @@ export interface ProviderConfig {
   /** token algorithm name */
   algorithm?: string
   /** algorithm params e.g. region, hashAlgorithm */
-  algorithmParams?: Record<string, any>
+  algorithmParams?: Record<string, any> | string
   /** expression to extract uid from validation response */
   uidJsonPath?: string
 }

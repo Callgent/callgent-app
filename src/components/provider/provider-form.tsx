@@ -17,13 +17,26 @@ export default function ProviderForm({
   isEdit = false,
   handleSubmit,
 }: ProviderFormProps) {
-  console.log(provider);
-
   const router = useRouter();
   const [form] = Form.useForm<ProviderFormValues>();
   const { loading } = useProviderStore();
   const [testToken, setTestToken] = useState("");
   const [testing, setTesting] = useState(false);
+  const [initProvider, setProvider] = useState({
+    shared: false,
+    enabled: true,
+    method: "GET",
+    strategy: "STATIC",
+    config: {
+      location: "headers",
+      key: "Authorization",
+      prefix: "",
+      postfix: "",
+      algorithm: "",
+      algorithmParams: "{}",
+      uidJsonPath: "",
+    },
+  });
   const [testResult, setTestResult] = useState<{
     success: boolean;
     uid?: string;
@@ -41,7 +54,10 @@ export default function ProviderForm({
         method: provider.method ?? "GET",
         validUrl: provider.validUrl,
         strategy: provider.strategy,
-        config: provider.config,
+        config: {
+          ...provider.config,
+          algorithmParams: JSON.stringify(provider?.config?.algorithmParams),
+        },
       });
     }
   }, [provider, form]);
@@ -59,7 +75,15 @@ export default function ProviderForm({
     try {
       const res = await testProviderApi({
         token: testToken,
-        provider: values,
+        provider: {
+          ...values,
+          config: {
+            ...values?.config,
+            algorithmParams: JSON.parse(
+              (values?.config?.algorithmParams as string) ?? "{}"
+            ),
+          },
+        },
       });
 
       if (res.data?.success) {
@@ -89,21 +113,8 @@ export default function ProviderForm({
       <Form
         form={form}
         layout="vertical"
-        initialValues={{
-          shared: false,
-          enabled: true,
-          method: "GET",
-          strategy: "STATIC",
-          config: {
-            location: "headers",
-            key: "Authorization",
-            prefix: "",
-            postfix: "",
-            algorithm: "",
-            algorithmParams: {},
-            uidJsonPath: "",
-          },
-        }}
+        disabled={provider?.shared ? true : false}
+        initialValues={initProvider}
         className="p-6"
       >
         <div className="space-y-6">
@@ -183,17 +194,6 @@ export default function ProviderForm({
             </Form.Item>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* <Form.Item label="Token 格式" name={["config", "tokenFormat"]}>
-                  <Select >
-                    <Select.Option value="apiKey">API Key</Select.Option>
-                    <Select.Option value="jwt">JWT</Select.Option>
-                    <Select.Option value="basic">Basic</Select.Option>
-                    <Select.Option value="oauth2">OAuth2</Select.Option>
-                  </Select>
-                </Form.Item> */}
-          </div>
-
           <Collapse
             ghost
             className="!bg-gray-50 dark:!bg-gray-900 !rounded-lg !border !border-gray-200 dark:!border-gray-800"
@@ -256,6 +256,12 @@ export default function ProviderForm({
                         />
                       </Form.Item>
                     </div>
+                    <Form.Item
+                      label="algorithmParams"
+                      name={["config", "algorithmParams"]}
+                    >
+                      <Input.TextArea placeholder="描述此 Provider 的用途" />
+                    </Form.Item>
                   </div>
                 ),
               },
@@ -283,6 +289,9 @@ export default function ProviderForm({
                   <Select size="small" style={{ width: 110 }}>
                     <Select.Option value={false}>私有</Select.Option>
                     <Select.Option value={"null"}>租户内</Select.Option>
+                    <Select.Option value={true} disabled>
+                      全局
+                    </Select.Option>
                   </Select>
                 </Form.Item>
               </div>
@@ -298,8 +307,13 @@ export default function ProviderForm({
                 value={testToken}
                 onChange={(e) => setTestToken(e.target.value)}
                 className="font-mono"
+                disabled={false}
               />
-              <Button onClick={handleTestProvider} loading={testing}>
+              <Button
+                onClick={handleTestProvider}
+                loading={testing}
+                disabled={false}
+              >
                 {testing ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
