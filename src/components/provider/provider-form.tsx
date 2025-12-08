@@ -220,7 +220,10 @@ export default function ProviderForm({
                         </Select>
                       </Form.Item>
 
-                      <Form.Item label="Header Key" name={["config", "key"]}>
+                      <Form.Item
+                        label="Token Key Name"
+                        name={["config", "key"]}
+                      >
                         <Input
                           placeholder="Authorization"
                           className="font-mono"
