@@ -135,17 +135,8 @@ export default function RealmForm({
 
     try {
       const res = await testProviderApi({
-        validUrl: providerValues.validUrl,
-        method: providerValues.method || "GET",
-        strategy: providerValues.strategy || "bearer-token",
         token: testToken,
-        config: {
-          location: providerValues.config?.location || "headers",
-          key: providerValues.config?.key || "Authorization",
-          prefix: providerValues.config?.prefix || "Bearer ",
-          postfix: providerValues.config?.postfix,
-          uidJsonPath: providerValues.config?.uidJsonPath,
-        },
+        provider: providerValues,
       });
 
       if (res.data?.success) {
@@ -334,19 +325,18 @@ export default function RealmForm({
             form={form}
             layout="vertical"
             initialValues={{
-              enabled: true,
               shared: false,
-              provider: {
-                method: "GET",
-                strategy: "bearer-token",
-                enabled: true,
-                shared: false,
-                config: {
-                  location: "headers",
-                  key: "Authorization",
-                  prefix: "Bearer ",
-                  tokenFormat: "apiKey",
-                },
+              enabled: true,
+              method: "GET",
+              strategy: "STATIC",
+              config: {
+                location: "headers",
+                key: "Authorization",
+                prefix: "",
+                postfix: "",
+                algorithm: "",
+                algorithmParams: {},
+                uidJsonPath: "",
               },
             }}
             className="p-6"
@@ -512,7 +502,7 @@ export default function RealmForm({
                       <div className="flex items-center justify-between">
                         <span>{p.name}</span>
                         <span className="text-xs text-gray-400 font-mono">
-                          {p.strategy || "bearer-token"}
+                          {p.strategy || "STATIC"}
                         </span>
                       </div>
                     </Select.Option>
@@ -565,12 +555,12 @@ export default function RealmForm({
                         {selectedProvider.validUrl}
                       </p>
                     </div>
-                    <div>
+                    {/* <div>
                       <p className="text-xs text-gray-500 mb-1">Token 格式</p>
                       <p className="text-gray-900 dark:text-white">
                         {selectedProvider.config?.tokenFormat || "apiKey"}
                       </p>
-                    </div>
+                    </div> */}
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Token 位置</p>
                       <p className="text-gray-900 dark:text-white">
@@ -670,11 +660,10 @@ export default function RealmForm({
                         label={
                           <span className="text-xs text-gray-500">策略</span>
                         }
-                        name={["provider", "strategy"]}
-                        rules={[{ required: true, message: "必填" }]}
-                        className="mb-0"
+                        name="strategy"
+                        rules={[{ required: true, message: "请选择策略" }]}
                       >
-                        <Select>
+                        <Select size="large">
                           <Select.Option value="STATIC">STATIC</Select.Option>
                           <Select.Option value="DYNAMIC">DYNAMIC</Select.Option>
                           <Select.Option value="REFRESHABLE">
@@ -687,7 +676,7 @@ export default function RealmForm({
                           <Select.Option value="NONE">NONE</Select.Option>
                         </Select>
                       </Form.Item>
-                      <Form.Item
+                      {/* <Form.Item
                         label={
                           <span className="text-xs text-gray-500">
                             Token 格式
@@ -702,7 +691,7 @@ export default function RealmForm({
                           <Select.Option value="basic">Basic</Select.Option>
                           <Select.Option value="oauth2">OAuth2</Select.Option>
                         </Select>
-                      </Form.Item>
+                      </Form.Item> */}
                     </div>
 
                     {/* 高级配置 */}

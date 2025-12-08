@@ -69,17 +69,8 @@ export const createProviderApi = async (data: ProviderFormValues) =>
 
 // 测试认证提供者配置
 export const testProviderApi = async (data: {
-  validUrl: string;
-  method?: string;
-  strategy: string;
   token: string;
-  config: {
-    location?: string;
-    key?: string;
-    prefix?: string;
-    postfix?: string;
-    uidJsonPath?: string;
-  };
+  provider: ProviderFormValues
 }) =>
   apiClient.post<any>({
     url: `/api/providers/test`,
