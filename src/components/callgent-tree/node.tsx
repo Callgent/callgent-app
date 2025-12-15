@@ -230,7 +230,7 @@ const TreeNode = ({
                     handleAction();
                   }}
                 >
-                  <SelectRealmPage node={node} />
+                  <SelectRealmPage node={{ ...node, level }} />
                 </div>
               )}
               {node.add && (

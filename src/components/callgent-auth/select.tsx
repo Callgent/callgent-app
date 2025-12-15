@@ -50,7 +50,7 @@ export default function SelectRealmPage({ node }: { node: CallgentInfo }) {
   /** 清空绑定 */
   const handleUnbind = async () => {
     try {
-      await unbindRealmApi(node.id!, node.level!);
+      await bindRealmApi([], node.id!, node.level!);
       setSelectedRealms([]);
       setModalOpen(false);
     } catch (err) {
