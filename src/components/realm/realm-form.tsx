@@ -336,7 +336,7 @@ export default function RealmForm({
                 postfix: "",
                 algorithm: "",
                 algorithmParams: {},
-                uidJsonPath: "",
+                uidPel: "",
               },
             }}
             className="p-6"
@@ -802,7 +802,7 @@ export default function RealmForm({
                                       UID 表达式
                                     </span>
                                   }
-                                  name={["provider", "config", "uidJsonPath"]}
+                                  name={["provider", "config", "uidPel"]}
                                   className="mb-0"
                                 >
                                   <Input

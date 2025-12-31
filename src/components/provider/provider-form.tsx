@@ -34,7 +34,7 @@ export default function ProviderForm({
       postfix: "",
       algorithm: "",
       algorithmParams: "{}",
-      uidJsonPath: "",
+      uidPel: "",
     },
   });
   const [testResult, setTestResult] = useState<{
@@ -248,8 +248,8 @@ export default function ProviderForm({
                       </Form.Item>
 
                       <Form.Item
-                        label="UID JSONPath"
-                        name={["config", "uidJsonPath"]}
+                        label="UID 表达式"
+                        name={["config", "uidPel"]}
                       >
                         <Input
                           placeholder="$.data.user.id"

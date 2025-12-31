@@ -46,7 +46,7 @@ const InputField: React.FC = () => {
       return;
     }
     const formData = new FormData();
-    formData.append("requirement", input);
+    formData.append("message", input);
     files.forEach((file) => {
       formData.append("files", file);
     });

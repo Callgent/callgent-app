@@ -148,7 +148,7 @@ export default function ProviderFields() {
 
                 <Form.Item
                   label="UID 提取表达式"
-                  name={["provider", "config", "uidJsonPath"]}
+                  name={["provider", "config", "uidPel"]}
                 >
                   <Input
                     placeholder="例如: $.data.user.id"

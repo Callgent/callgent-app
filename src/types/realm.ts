@@ -30,8 +30,8 @@ export interface ProviderConfig {
   algorithm?: string
   /** algorithm params e.g. region, hashAlgorithm */
   algorithmParams?: Record<string, any> | string
-  /** expression to extract uid from validation response */
-  uidJsonPath?: string
+  /** liquid expression to extract uid */
+  uidPel?: string
 }
 
 export interface ProviderItem {

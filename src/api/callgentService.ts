@@ -144,7 +144,7 @@ export const postEndpointsApi = async (data: any) =>
 /** post /api/request */
 export const postRequestApi = async (callgentId: string, data: any, taskId: string) =>
 	apiClient.post({
-		url: `/api/rest/request/${callgentId}/`, data, headers: {
+		url: `/api/rest/chat/${callgentId}/`, data, headers: {
 			"Content-Type": "multipart/form-data",
 			"x-callgent-taskId": taskId
 		}
